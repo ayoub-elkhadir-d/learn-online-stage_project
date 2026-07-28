@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\VideoController;
 use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\LessonController;
 
@@ -32,6 +33,7 @@ Route::middleware('user.only')->group(function () {
 // Authenticated users only (not admins)
 Route::middleware(['auth', 'user.only'])->group(function () {
     Route::get('/courses/{slug}/learn', [CourseController::class, 'learn'])->name('courses.learn');
+    Route::get('/lessons/{lesson}/video', [VideoController::class, 'stream'])->name('lessons.video');
     Route::get('/courses/{slug}/checkout', [CourseController::class, 'checkout'])->name('courses.checkout');
     Route::post('/courses/{slug}/purchase', [PurchaseController::class, 'purchase'])->name('courses.purchase');
 

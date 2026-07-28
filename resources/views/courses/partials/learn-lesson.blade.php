@@ -4,7 +4,7 @@
         <div class="spinner-ring"></div>
     </div>
     <video controls autoplay controlsList="nodownload" oncontextmenu="return false;">
-        <source src="{{ Storage::disk('public')->url($currentLesson->video_path) }}" type="video/mp4">
+        <source src="{{ route('lessons.video', $currentLesson) }}" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 </div>
