@@ -222,15 +222,29 @@
                 activateSidebarItem(lessonId);
 
                 if (push) history.pushState({ lessonId }, '', url);
-                bindVideoEvents();
+                bindVideoEvents(true);
             })
             .catch(() => { window.location.href = url; })
             .finally(() => showLoading(false));
     }
 
-    function bindVideoEvents() {
+    function bindVideoEvents(isSwap) {
         const video = videoArea.querySelector('video');
         if (!video) return;
+
+        if (isSwap) {
+            // Video/source tags inserted via innerHTML don't reliably start
+            // loading on their own — force it, then attempt to play.
+            video.load();
+            const playPromise = video.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch(() => {
+                    // Autoplay was blocked (no user gesture in scope) — that's fine,
+                    // the visible controls let the learner press play manually.
+                });
+            }
+        }
+
         video.addEventListener('ended', function () {
             const nextBtn = videoArea.querySelector('[data-next-lesson]');
             if (nextBtn) loadLesson(nextBtn.href, nextBtn.dataset.lessonId, true);

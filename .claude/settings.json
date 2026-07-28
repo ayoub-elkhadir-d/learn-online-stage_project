@@ -6,7 +6,14 @@
       "Bash(php \"C:\\\\Users\\\\safiy\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--laragon-www-index-test\\\\2b956adc-584b-4a60-b896-b8235380b353\\\\scratchpad\\\\clean_db.php\")",
       "Bash(php -r ' *)",
       "Bash(DB_DATABASE=index_test_fresh_check php artisan migrate --force)",
-      "Bash(DB_DATABASE=index_test_fresh_check php artisan db:seed --force)"
+      "Bash(DB_DATABASE=index_test_fresh_check php artisan db:seed --force)",
+      "Bash(php \"C:\\\\Users\\\\safiy\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--laragon-www-index-test\\\\2b956adc-584b-4a60-b896-b8235380b353\\\\scratchpad\\\\db_check.php\")",
+      "Bash(php \"C:\\\\Users\\\\safiy\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--laragon-www-index-test\\\\2b956adc-584b-4a60-b896-b8235380b353\\\\scratchpad\\\\setup_verify.php\")",
+      "Bash(DB_HOST=127.0.0.1 DB_DATABASE=index_test DB_USERNAME=root DB_PASSWORD= APP_URL=http://127.0.0.1:8123 php artisan serve --port=8123)",
+      "Bash(curl -sf http://127.0.0.1:8123)",
+      "Bash(break)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:8123)",
+      "Bash(chromium-cli --help)"
     ]
   }
 }
