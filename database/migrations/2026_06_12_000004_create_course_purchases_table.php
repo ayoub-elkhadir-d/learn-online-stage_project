@@ -16,6 +16,9 @@ return new class extends Migration
 
             // bank transfer, etc.
             $table->string('payment_method')->nullable();
+            $table->string('full_name')->nullable();
+            $table->string('rib')->nullable();
+            $table->string('receipt_path')->nullable();
 
             // pending/paid/failed
             $table->string('status')->default('pending')->index();
@@ -36,4 +39,3 @@ return new class extends Migration
         Schema::dropIfExists('course_purchases');
     }
 };
-

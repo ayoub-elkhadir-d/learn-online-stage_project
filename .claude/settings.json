@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php \"C:\\\\Users\\\\safiy\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--laragon-www-index-test\\\\2b956adc-584b-4a60-b896-b8235380b353\\\\scratchpad\\\\make_mp4.php\")",
+      "Bash(./vendor/bin/phpunit tests/Feature/LessonUploadVerifyTest.php --testdox)",
+      "Bash(php \"C:\\\\Users\\\\safiy\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--laragon-www-index-test\\\\2b956adc-584b-4a60-b896-b8235380b353\\\\scratchpad\\\\clean_db.php\")",
+      "Bash(php -r ' *)",
+      "Bash(DB_DATABASE=index_test_fresh_check php artisan migrate --force)",
+      "Bash(DB_DATABASE=index_test_fresh_check php artisan db:seed --force)"
+    ]
+  }
+}

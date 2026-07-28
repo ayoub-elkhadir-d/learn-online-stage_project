@@ -17,11 +17,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('role')->default('user')->index();
+            $table->timestamp('banned_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
-        });
-          Schema::table('custom_users', function (Blueprint $table) {
-            $table->index('email'); 
         });
     }
 

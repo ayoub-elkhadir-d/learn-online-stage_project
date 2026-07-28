@@ -26,5 +26,10 @@ class Course extends Model
     {
         return $this->hasMany(CoursePurchase::class);
     }
+
+    public function lessons(): HasMany
+    {
+        return $this->hasMany(Lesson::class);
+    }
 }
 
