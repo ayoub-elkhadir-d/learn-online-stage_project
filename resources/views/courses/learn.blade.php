@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $course->title }} — Learn</title>
+    <title>{{ $currentLesson ? $currentLesson->title . ' — ' : '' }}{{ $course->title }} — Learn</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -69,6 +69,7 @@
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
             margin-top: 1px;
+            transition: all .15s;
         }
         .lesson-item.active .num { background: #7c3aed; color: #fff; }
         .lesson-item .lesson-info { flex: 1; min-width: 0; }
@@ -82,6 +83,7 @@
             flex-direction: column;
             overflow-y: auto;
             background: #0f0e17;
+            position: relative;
         }
         .video-wrapper {
             background: #000;
@@ -90,12 +92,35 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
         .video-wrapper video {
             width: 100%;
             max-height: 65vh;
             outline: none;
         }
+        .video-loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .15s;
+        }
+        .video-loading-overlay.show { opacity: 1; pointer-events: all; }
+        .spinner-ring {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            border: 3px solid rgba(124,58,237,.25);
+            border-top-color: #a78bfa;
+            animation: spin .8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         .lesson-detail {
             padding: 1.75rem 2rem;
             max-width: 800px;
@@ -115,7 +140,7 @@
         }
 
         @media (max-width: 768px) {
-            .learn-layout { flex-direction: column; }
+            .learn-layout { flex-direction: column; height: auto; }
             .lesson-sidebar { width: 100%; min-width: unset; height: 220px; border-right: none; border-bottom: 1px solid rgba(255,255,255,.07); }
         }
     </style>
@@ -137,12 +162,14 @@
 <div class="learn-layout">
 
     {{-- Lesson sidebar --}}
-    <div class="lesson-sidebar">
+    <div class="lesson-sidebar" id="lessonSidebar">
         <div class="sidebar-header">Course Lessons · {{ $lessons->count() }} total</div>
 
         @foreach($lessons as $index => $lesson)
         <a href="{{ route('courses.learn', [$course->slug, 'lesson' => $lesson->id]) }}"
-           class="lesson-item {{ $currentLesson && $currentLesson->id === $lesson->id ? 'active' : '' }}">
+           class="lesson-item {{ $currentLesson && $currentLesson->id === $lesson->id ? 'active' : '' }}"
+           data-lesson-nav
+           data-lesson-id="{{ $lesson->id }}">
             <div class="num">{{ $index + 1 }}</div>
             <div class="lesson-info">
                 <div class="lesson-name">{{ $lesson->title }}</div>
@@ -155,60 +182,75 @@
     </div>
 
     {{-- Video + details --}}
-    <div class="video-area">
-        @if($currentLesson)
-        <div class="video-wrapper">
-            <video controls autoplay controlsList="nodownload" oncontextmenu="return false;">
-                <source src="{{ Storage::url($currentLesson->video_path) }}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-        <div class="lesson-detail">
-            <h4>{{ $currentLesson->title }}</h4>
-            @if($currentLesson->description)
-            <p>{{ $currentLesson->description }}</p>
-            @else
-            <p class="fst-italic">No description provided for this lesson.</p>
-            @endif
-
-            {{-- Prev / Next navigation --}}
-            @php
-                $ids = $lessons->pluck('id')->toArray();
-                $pos = array_search($currentLesson->id, $ids);
-                $prevLesson = $pos > 0 ? $lessons[$pos - 1] : null;
-                $nextLesson = $pos < count($ids) - 1 ? $lessons[$pos + 1] : null;
-            @endphp
-            <div class="d-flex gap-3 mt-4">
-                @if($prevLesson)
-                <a href="{{ route('courses.learn', [$course->slug, 'lesson' => $prevLesson->id]) }}"
-                   class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-chevron-left me-1"></i>Previous
-                </a>
-                @endif
-                @if($nextLesson)
-                <a href="{{ route('courses.learn', [$course->slug, 'lesson' => $nextLesson->id]) }}"
-                   class="btn btn-sm text-white" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none;border-radius:8px;">
-                    Next <i class="fas fa-chevron-right ms-1"></i>
-                </a>
-                @else
-                <div class="rounded-3 px-3 py-2 d-flex align-items-center gap-2"
-                     style="background:rgba(16,185,129,.15);color:#6ee7b7;font-size:13px;">
-                    <i class="fas fa-check-circle"></i> You've reached the last lesson!
-                </div>
-                @endif
-            </div>
-        </div>
-        @else
-        <div class="no-lessons">
-            <i class="fas fa-video fa-3x mb-3"></i>
-            <h6>No lessons available yet</h6>
-            <p style="font-size:13px;">The instructor hasn't added any lessons to this course yet. Check back later.</p>
-        </div>
-        @endif
+    <div class="video-area" id="videoArea">
+        @include('courses.partials.learn-lesson', ['course' => $course, 'lessons' => $lessons, 'currentLesson' => $currentLesson])
     </div>
 
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+(function () {
+    const videoArea = document.getElementById('videoArea');
+    const sidebar = document.getElementById('lessonSidebar');
+
+    function activateSidebarItem(lessonId) {
+        sidebar.querySelectorAll('.lesson-item').forEach(el => {
+            el.classList.toggle('active', String(el.dataset.lessonId) === String(lessonId));
+        });
+        const active = sidebar.querySelector('.lesson-item.active');
+        if (active) active.scrollIntoView({ block: 'nearest' });
+    }
+
+    function showLoading(show) {
+        const overlay = videoArea.querySelector('.video-loading-overlay');
+        if (overlay) overlay.classList.toggle('show', show);
+    }
+
+    function loadLesson(url, lessonId, push) {
+        showLoading(true);
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(res => res.text())
+            .then(html => {
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                const newArea = doc.getElementById('videoArea');
+                if (!newArea) { window.location.href = url; return; }
+
+                videoArea.innerHTML = newArea.innerHTML;
+                document.title = doc.title;
+                activateSidebarItem(lessonId);
+
+                if (push) history.pushState({ lessonId }, '', url);
+                bindVideoEvents();
+            })
+            .catch(() => { window.location.href = url; })
+            .finally(() => showLoading(false));
+    }
+
+    function bindVideoEvents() {
+        const video = videoArea.querySelector('video');
+        if (!video) return;
+        video.addEventListener('ended', function () {
+            const nextBtn = videoArea.querySelector('[data-next-lesson]');
+            if (nextBtn) loadLesson(nextBtn.href, nextBtn.dataset.lessonId, true);
+        });
+    }
+
+    document.addEventListener('click', function (e) {
+        const link = e.target.closest('[data-lesson-nav]');
+        if (!link) return;
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // let modified clicks open normally
+        e.preventDefault();
+        loadLesson(link.href, link.dataset.lessonId, true);
+    });
+
+    window.addEventListener('popstate', function (e) {
+        loadLesson(window.location.href, e.state ? e.state.lessonId : null, false);
+    });
+
+    bindVideoEvents();
+})();
+</script>
 </body>
 </html>

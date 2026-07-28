@@ -40,8 +40,8 @@
                         <div class="text-muted" style="font-size:12px;">{{ Str::limit($lesson->description, 60) ?: '—' }}</div>
                     </td>
                     <td>
-                        <span class="badge" style="background:#d1fae5;color:#065f46;font-size:11px;">
-                            <i class="fas fa-video me-1"></i>Uploaded
+                        <span class="badge" style="background:#d1fae5;color:#065f46;font-size:11px;" title="{{ basename($lesson->video_path) }}">
+                            <i class="fas fa-video me-1"></i>{{ Str::limit(basename($lesson->video_path), 28) }}
                         </span>
                     </td>
                     <td class="pe-4 text-end">

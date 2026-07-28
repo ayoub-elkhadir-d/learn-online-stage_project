@@ -1,3 +1,14 @@
+# 1. إلغاء قيود حظر طلبات الرفع وتجاوز قيود LiteSpeed / ModSecurity
+<IfModule mod_security2.c>
+    SecRuleEngine Off
+</IfModule>
+
+<IfModule mod_env.c>
+    SetEnv noabort 1
+</IfModule>
+
+LimitRequestBody 0
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
@@ -7,7 +18,7 @@
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
-    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteRule .* - {HTTP:Authorization=%{HTTP:Authorization}}
 
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d

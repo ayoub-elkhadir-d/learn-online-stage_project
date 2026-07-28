@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Lesson;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class LessonController extends Controller
 {
@@ -30,11 +32,19 @@ class LessonController extends Controller
             'sort_order'  => 'nullable|integer|min:0',
         ]);
 
-        $data['video_path'] = $request->file('video')->store('lessons', 'public');
-        $data['sort_order'] = $data['sort_order'] ?? ($course->lessons()->max('sort_order') + 1);
+        $video = $request->file('video');
         unset($data['video']);
+        $data['sort_order'] = $data['sort_order'] ?? ($course->lessons()->max('sort_order') + 1);
 
-        $course->lessons()->create($data);
+        $lesson = $course->lessons()->create($data + ['video_path' => '']);
+        $lesson->update(['video_path' => $this->storeVideo($video, $lesson)]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message'  => 'Lesson added successfully.',
+                'redirect' => route('admin.courses.lessons.index', $course),
+            ]);
+        }
 
         return redirect()->route('admin.courses.lessons.index', $course)
             ->with('success', 'Lesson added successfully.');
@@ -54,13 +64,24 @@ class LessonController extends Controller
             'sort_order'  => 'nullable|integer|min:0',
         ]);
 
-        if ($request->hasFile('video')) {
+        $video = $request->file('video');
+        unset($data['video']);
+
+        $lesson->fill($data);
+
+        if ($video) {
             Storage::disk('public')->delete($lesson->video_path);
-            $data['video_path'] = $request->file('video')->store('lessons', 'public');
+            $lesson->video_path = $this->storeVideo($video, $lesson);
         }
 
-        unset($data['video']);
-        $lesson->update($data);
+        $lesson->save();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message'  => 'Lesson updated successfully.',
+                'redirect' => route('admin.courses.lessons.index', $course),
+            ]);
+        }
 
         return redirect()->route('admin.courses.lessons.index', $course)
             ->with('success', 'Lesson updated successfully.');
@@ -73,5 +94,17 @@ class LessonController extends Controller
 
         return redirect()->route('admin.courses.lessons.index', $course)
             ->with('success', 'Lesson deleted.');
+    }
+
+    /**
+     * Store the uploaded video under a human-readable name (lesson title + id)
+     * instead of the framework's default random hash filename.
+     */
+    private function storeVideo(UploadedFile $video, Lesson $lesson): string
+    {
+        $extension = $video->getClientOriginalExtension() ?: $video->extension();
+        $filename = Str::slug($lesson->title) . '-' . $lesson->id . '.' . $extension;
+
+        return $video->storeAs('lessons', $filename, 'public');
     }
 }
