@@ -50,7 +50,7 @@ class VideoStreamController extends Controller
 
         $playlistTtl = now()->addMinutes((int) config('streaming.playlist_ttl_minutes'));
         $keyUrl = URL::temporarySignedRoute(
-            'lessons.hls.key',
+            'video.key',
             now()->addMinutes((int) config('streaming.key_ttl_minutes')),
             ['lesson' => $lesson->id]
         );
@@ -101,9 +101,14 @@ class VideoStreamController extends Controller
     {
         $this->authorize('learn', $lesson->course);
 
-        abort_unless($lesson->encryption_key, 404);
+        abort_unless($lesson->encryption_status === Lesson::ENCRYPTION_ENCRYPTED && $lesson->encryption_key_filename, 404);
 
-        $raw = base64_decode($lesson->encryption_key);
+        $disk = Storage::disk('private');
+        $relativePath = 'video-keys/' . $lesson->encryption_key_filename;
+
+        abort_unless($disk->exists($relativePath), 404);
+
+        $raw = $disk->get($relativePath);
 
         return response($raw, 200, [
             'Content-Type' => 'application/octet-stream',

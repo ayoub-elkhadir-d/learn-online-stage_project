@@ -14,19 +14,22 @@ use RuntimeException;
  * rendition (playlist + .ts segments), driving ffmpeg/ffprobe directly via
  * Illuminate\Process (array-args — no shell string interpolation).
  *
- * The AES key is generated fresh per lesson, handed to ffmpeg through an
- * ephemeral keyinfo file that's deleted immediately after the process exits,
- * and persisted only in the `lessons.encryption_key` column (encrypted at
- * rest via the app key). The playlist ffmpeg writes contains the literal
- * placeholder string KEY_URI_PLACEHOLDER in its #EXT-X-KEY line — the
- * streaming controller rewrites that (and every segment filename) into a
- * fresh signed URL each time the playlist is served, so nothing static or
- * guessable ever reaches the browser.
+ * The AES key is generated fresh per lesson (never reused — a new random
+ * key and a new random filename are produced on every transcode, including
+ * re-uploads) and, once ffmpeg has finished encrypting the segments with it,
+ * moved into a persistent file under storage/app/private/video-keys/ — never
+ * inside public/ or public_html/. Only the generated filename is stored on
+ * the lesson row, not the key bytes themselves. The playlist ffmpeg writes
+ * contains the literal placeholder string KEY_URI_PLACEHOLDER in its
+ * #EXT-X-KEY line — the streaming controller rewrites that (and every
+ * segment filename) into a fresh signed URL each time the playlist is
+ * served, so nothing static or guessable ever reaches the browser.
  */
 class HlsTranscoder
 {
     private const SEGMENT_SECONDS = 4;
     private const KEY_URI_PLACEHOLDER = 'KEY_URI_PLACEHOLDER';
+    private const KEYS_DIR = 'video-keys';
 
     public function transcode(Lesson $lesson): void
     {
@@ -39,11 +42,24 @@ class HlsTranscoder
             throw new RuntimeException("Source video missing for lesson {$lesson->id}: {$lesson->video_path}");
         }
 
-        $lesson->forceFill(['status' => Lesson::STATUS_PROCESSING])->save();
+        $lesson->forceFill([
+            'status' => Lesson::STATUS_PROCESSING,
+            'encryption_status' => Lesson::ENCRYPTION_PENDING,
+        ])->save();
+
+        // A re-upload never overwrites an existing key file's bytes — the old
+        // key (if any) is discarded and a brand new one is generated below.
+        if ($lesson->encryption_key_filename) {
+            $disk->delete(self::KEYS_DIR . '/' . $lesson->encryption_key_filename);
+        }
 
         $sourcePath = $disk->path($lesson->video_path);
         $hlsRelativeDir = "lessons/{$lesson->id}/hls";
         $outputDir = $disk->path($hlsRelativeDir);
+
+        $keysDir = $disk->path(self::KEYS_DIR);
+        $keyFilename = Str::random(40) . '.key';
+        $permanentKeyPath = $keysDir . DIRECTORY_SEPARATOR . $keyFilename;
 
         $tmpDir = $disk->path("tmp/hls-{$lesson->id}-" . Str::random(8));
         $keyPath = $tmpDir . DIRECTORY_SEPARATOR . 'key.bin';
@@ -52,6 +68,7 @@ class HlsTranscoder
         try {
             @mkdir($tmpDir, 0700, true);
             @mkdir($outputDir, 0700, true);
+            @mkdir($keysDir, 0700, true);
 
             $key = random_bytes(16);
             file_put_contents($keyPath, $key);
@@ -86,16 +103,26 @@ class HlsTranscoder
                 throw new RuntimeException("ffmpeg failed for lesson {$lesson->id}: " . $result->errorOutput());
             }
 
+            // Move (not copy) the exact key ffmpeg just used to encrypt the
+            // segments into its permanent home — the served key must match
+            // the one baked into the .ts files byte-for-byte.
+            rename($keyPath, $permanentKeyPath);
+
             $lesson->forceFill([
                 'status' => Lesson::STATUS_READY,
                 'duration_seconds' => $duration,
                 'hls_path' => $hlsRelativeDir,
-                'encryption_key' => base64_encode($key),
+                'encryption_key_filename' => $keyFilename,
+                'encryption_status' => Lesson::ENCRYPTION_ENCRYPTED,
+                'encryption_algorithm' => 'AES-128',
             ])->save();
         } catch (\Throwable $e) {
             Log::error("HLS transcode failed for lesson {$lesson->id}: {$e->getMessage()}");
             $disk->deleteDirectory($hlsRelativeDir);
-            $lesson->forceFill(['status' => Lesson::STATUS_FAILED])->save();
+            $lesson->forceFill([
+                'status' => Lesson::STATUS_FAILED,
+                'encryption_status' => Lesson::ENCRYPTION_FAILED,
+            ])->save();
             throw $e;
         } finally {
             @unlink($keyPath);

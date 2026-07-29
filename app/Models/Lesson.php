@@ -12,6 +12,10 @@ class Lesson extends Model
     public const STATUS_READY = 'ready';
     public const STATUS_FAILED = 'failed';
 
+    public const ENCRYPTION_PENDING = 'pending';
+    public const ENCRYPTION_ENCRYPTED = 'encrypted';
+    public const ENCRYPTION_FAILED = 'failed';
+
     protected $fillable = [
         'course_id',
         'title',
@@ -22,6 +26,9 @@ class Lesson extends Model
         'duration_seconds',
         'hls_path',
         'encryption_key',
+        'encryption_key_filename',
+        'encryption_status',
+        'encryption_algorithm',
     ];
 
     protected $casts = [
@@ -30,6 +37,7 @@ class Lesson extends Model
 
     protected $hidden = [
         'encryption_key',
+        'encryption_key_filename',
         'video_path',
         'hls_path',
     ];
