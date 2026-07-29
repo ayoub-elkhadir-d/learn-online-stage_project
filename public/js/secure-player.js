@@ -98,6 +98,11 @@
         video.addEventListener('playing', function () { toggleLoading(wrapperEl, false); });
         video.addEventListener('canplay', function () { toggleLoading(wrapperEl, false); });
         video.addEventListener('error', function () { toggleLoading(wrapperEl, false); });
+        // 'waiting' can fire at a segment boundary without a matching 'playing'
+        // afterward (an MSE/hls.js quirk) — timeupdate only fires while the
+        // video is genuinely advancing, so it's a foolproof backstop that
+        // guarantees the spinner clears once real playback resumes.
+        video.addEventListener('timeupdate', function () { toggleLoading(wrapperEl, false); });
 
         fetchBootstrap(bootstrapUrl)
             .then(function (data) {
