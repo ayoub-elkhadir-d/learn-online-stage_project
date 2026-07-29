@@ -29,10 +29,12 @@ class Lesson extends Model
         'encryption_key_filename',
         'encryption_status',
         'encryption_algorithm',
+        'encoding_error',
     ];
 
     protected $casts = [
         'encryption_key' => 'encrypted',
+        'encoding_error' => 'array',
     ];
 
     protected $hidden = [
