@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Lesson;
+use App\Services\Video\HlsTranscoder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -39,15 +40,17 @@ class LessonController extends Controller
         $lesson = $course->lessons()->create($data + ['video_path' => '']);
         $lesson->update(['video_path' => $this->storeVideo($video, $lesson)]);
 
+        $message = $this->transcode($lesson);
+
         if ($request->wantsJson()) {
             return response()->json([
-                'message'  => 'Lesson added successfully.',
+                'message'  => $message,
                 'redirect' => route('admin.courses.lessons.index', $course),
             ]);
         }
 
         return redirect()->route('admin.courses.lessons.index', $course)
-            ->with('success', 'Lesson added successfully.');
+            ->with('success', $message);
     }
 
     public function edit(Course $course, Lesson $lesson)
@@ -69,27 +72,37 @@ class LessonController extends Controller
 
         $lesson->fill($data);
 
-        if ($video) {
-            Storage::disk('public')->delete($lesson->video_path);
-            $lesson->video_path = $this->storeVideo($video, $lesson);
-        }
+        $message = 'Lesson updated successfully.';
 
-        $lesson->save();
+        if ($video) {
+            Storage::disk('private')->delete($lesson->video_path);
+            if ($lesson->hls_path) {
+                Storage::disk('private')->deleteDirectory($lesson->hls_path);
+            }
+            $lesson->video_path = $this->storeVideo($video, $lesson);
+            $lesson->save();
+            $message = $this->transcode($lesson);
+        } else {
+            $lesson->save();
+        }
 
         if ($request->wantsJson()) {
             return response()->json([
-                'message'  => 'Lesson updated successfully.',
+                'message'  => $message,
                 'redirect' => route('admin.courses.lessons.index', $course),
             ]);
         }
 
         return redirect()->route('admin.courses.lessons.index', $course)
-            ->with('success', 'Lesson updated successfully.');
+            ->with('success', $message);
     }
 
     public function destroy(Course $course, Lesson $lesson)
     {
-        Storage::disk('public')->delete($lesson->video_path);
+        Storage::disk('private')->delete($lesson->video_path);
+        if ($lesson->hls_path) {
+            Storage::disk('private')->deleteDirectory($lesson->hls_path);
+        }
         $lesson->delete();
 
         return redirect()->route('admin.courses.lessons.index', $course)
@@ -99,12 +112,35 @@ class LessonController extends Controller
     /**
      * Store the uploaded video under a human-readable name (lesson title + id)
      * instead of the framework's default random hash filename.
+     *
+     * Stored on the 'private' disk (storage/app/private/lessons), which has
+     * no public URL at all. It's only ever read server-side, by the HLS
+     * transcoder — never served directly to a browser.
      */
     private function storeVideo(UploadedFile $video, Lesson $lesson): string
     {
         $extension = $video->getClientOriginalExtension() ?: $video->extension();
         $filename = Str::slug($lesson->title) . '-' . $lesson->id . '.' . $extension;
 
-        return $video->storeAs('lessons', $filename, 'public');
+        return $video->storeAs('lessons/' . $lesson->id, $filename, 'private');
+    }
+
+    /**
+     * Transcode the lesson's freshly-uploaded source into encrypted HLS,
+     * synchronously (no queue worker configured for this app). A failure
+     * here doesn't lose the upload — the lesson row and source file are
+     * kept, just flagged 'failed', so the admin can retry by re-saving.
+     */
+    private function transcode(Lesson $lesson): string
+    {
+        try {
+            app(HlsTranscoder::class)->transcode($lesson);
+
+            return 'Lesson saved and video processed successfully.';
+        } catch (\Throwable $e) {
+            report($e);
+
+            return 'Lesson saved, but video processing failed. Please try re-uploading the video.';
+        }
     }
 }

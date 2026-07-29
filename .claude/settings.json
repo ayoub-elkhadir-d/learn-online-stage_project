@@ -18,7 +18,8 @@
       "Bash(powershell -Command \"Stop-Process -Id 1563 -Force\")",
       "Bash(php -l app/Http/Controllers/VideoController.php)",
       "Bash(php -l routes/web.php)",
-      "Bash(php -l app/Http/Controllers/Admin/LessonController.php)"
+      "Bash(php -l app/Http/Controllers/Admin/LessonController.php)",
+      "Bash(php \"C:\\\\Users\\\\safiy\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--laragon-www-index-test\\\\2b956adc-584b-4a60-b896-b8235380b353\\\\scratchpad\\\\cleanup_verify.php\")"
     ]
   }
 }

@@ -31,5 +31,17 @@ class Course extends Model
     {
         return $this->hasMany(Lesson::class);
     }
+
+    public function isPurchasedBy(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        return $this->purchases()
+            ->where('user_id', $user->id)
+            ->where('status', 'paid')
+            ->exists();
+    }
 }
 

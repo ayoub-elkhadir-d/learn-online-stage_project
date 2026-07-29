@@ -189,6 +189,8 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="{{ asset('js/vendor/hls.min.js') }}"></script>
+<script src="{{ asset('js/secure-player.js') }}"></script>
 <script>
 (function () {
     const videoArea = document.getElementById('videoArea');
@@ -209,6 +211,7 @@
 
     function loadLesson(url, lessonId, push) {
         showLoading(true);
+        if (window.SecurePlayer) window.SecurePlayer.destroy();
 
         fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(res => res.text())
@@ -222,28 +225,21 @@
                 activateSidebarItem(lessonId);
 
                 if (push) history.pushState({ lessonId }, '', url);
-                bindVideoEvents(true);
+                bindVideoEvents();
             })
             .catch(() => { window.location.href = url; })
             .finally(() => showLoading(false));
     }
 
-    function bindVideoEvents(isSwap) {
+    function bindVideoEvents() {
+        const player = videoArea.querySelector('[data-secure-player]');
         const video = videoArea.querySelector('video');
-        if (!video) return;
+        if (!player || !video) return;
 
-        if (isSwap) {
-            // Video/source tags inserted via innerHTML don't reliably start
-            // loading on their own — force it, then attempt to play.
-            video.load();
-            const playPromise = video.play();
-            if (playPromise && typeof playPromise.catch === 'function') {
-                playPromise.catch(() => {
-                    // Autoplay was blocked (no user gesture in scope) — that's fine,
-                    // the visible controls let the learner press play manually.
-                });
-            }
-        }
+        // The player has no <source> — SecurePlayer fetches a signed playlist
+        // URL and attaches hls.js itself. Needed on every load, not just AJAX
+        // swaps, since there's nothing for the browser to auto-load.
+        if (window.SecurePlayer) window.SecurePlayer.init(player);
 
         video.addEventListener('ended', function () {
             const nextBtn = videoArea.querySelector('[data-next-lesson]');

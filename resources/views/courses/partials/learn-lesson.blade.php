@@ -3,10 +3,7 @@
     <div class="video-loading-overlay">
         <div class="spinner-ring"></div>
     </div>
-    <video controls autoplay controlsList="nodownload" oncontextmenu="return false;">
-        <source src="{{ route('lessons.video', $currentLesson) }}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+    <x-video-player :lesson="$currentLesson" />
 </div>
 <div class="lesson-detail">
     <h4>{{ $currentLesson->title }}</h4>

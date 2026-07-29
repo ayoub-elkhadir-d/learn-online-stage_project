@@ -24,6 +24,7 @@
                     <th>Title</th>
                     <th>Description</th>
                     <th>Video</th>
+                    <th>Status</th>
                     <th class="pe-4 text-end">Actions</th>
                 </tr>
             </thead>
@@ -44,6 +45,20 @@
                             <i class="fas fa-video me-1"></i>{{ Str::limit(basename($lesson->video_path), 28) }}
                         </span>
                     </td>
+                    <td>
+                        @php
+                            $statusColors = [
+                                'pending' => ['#e2e8f0', '#475569'],
+                                'processing' => ['#fef3c7', '#92400e'],
+                                'ready' => ['#d1fae5', '#065f46'],
+                                'failed' => ['#fee2e2', '#991b1b'],
+                            ];
+                            [$bg, $fg] = $statusColors[$lesson->status] ?? $statusColors['pending'];
+                        @endphp
+                        <span class="badge" style="background:{{ $bg }};color:{{ $fg }};font-size:11px;">
+                            {{ ucfirst($lesson->status) }}
+                        </span>
+                    </td>
                     <td class="pe-4 text-end">
                         <a href="{{ route('admin.courses.lessons.edit', [$course, $lesson]) }}"
                            class="btn btn-sm btn-outline-primary me-1">
@@ -60,7 +75,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="text-center py-5">
+                    <td colspan="6" class="text-center py-5">
                         <i class="fas fa-video fa-2x mb-2 d-block" style="color:#a78bfa;"></i>
                         <span class="text-muted">No lessons yet.</span>
                         <a href="{{ route('admin.courses.lessons.create', $course) }}" class="d-block mt-2 text-decoration-none" style="color:#4f46e5;font-size:13px;">

@@ -40,15 +40,15 @@ class CourseController extends Controller
     {
         $course = Course::with(['lessons' => fn($q) => $q->orderBy('sort_order')])->where('slug', $slug)->firstOrFail();
 
+        if (! $course->isPurchasedBy(Auth::user())) {
+            return redirect()->route('courses.show', $slug)
+                ->with('status', 'You need to complete your purchase to access this course.');
+        }
+
         $purchase = CoursePurchase::where('user_id', Auth::id())
             ->where('course_id', $course->id)
             ->where('status', 'paid')
             ->first();
-
-        if (!$purchase) {
-            return redirect()->route('courses.show', $slug)
-                ->with('status', 'You need to complete your purchase to access this course.');
-        }
 
         $lessons = $course->lessons;
         $currentLesson = $lessons->firstWhere('id', request('lesson')) ?? $lessons->first();
