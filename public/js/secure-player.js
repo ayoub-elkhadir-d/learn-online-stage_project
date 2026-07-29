@@ -1,11 +1,11 @@
 /**
  * Secure lesson video player: bootstraps a signed HLS playlist via fetch
  * (never a raw storage path in the DOM), plays it through hls.js, and layers
- * on UI deterrents (watermark, context-menu/keyboard blocking, DevTools
- * heuristic, pause-on-blur). None of this is real DRM — a technical user
- * with DevTools open can still inspect network traffic. It raises the bar
- * against casual downloading (IDM, DownloadHelper, right-click-save), which
- * is the realistic threat here.
+ * on UI deterrents (context-menu/keyboard blocking, DevTools heuristic,
+ * pause-on-blur). None of this is real DRM — a technical user with DevTools
+ * open can still inspect network traffic. It raises the bar against casual
+ * downloading (IDM, DownloadHelper, right-click-save), which is the
+ * realistic threat here.
  *
  * Only one lesson plays at a time in this app, so a single module-level
  * `current` instance is torn down/recreated across the AJAX lesson-swap
@@ -14,7 +14,7 @@
 (function () {
     'use strict';
 
-    var current = null; // { hls, video, wrapperEl, watermarkTimer }
+    var current = null; // { hls, video, wrapperEl }
 
     function fetchBootstrap(url) {
         return fetch(url, {
@@ -77,21 +77,9 @@
         return null;
     }
 
-    function startWatermark(wrapperEl) {
-        var el = wrapperEl.querySelector('.secure-watermark');
-        if (!el) return null;
-
-        var userId = wrapperEl.dataset.userId || '';
-        var userEmail = wrapperEl.dataset.userEmail || '';
-
-        function place() {
-            el.textContent = 'User #' + userId + ' · ' + userEmail + ' · ' + new Date().toLocaleTimeString();
-            el.style.top = (5 + Math.random() * 80) + '%';
-            el.style.left = (5 + Math.random() * 70) + '%';
-        }
-
-        place();
-        return setInterval(place, 5000 + Math.random() * 5000);
+    function toggleLoading(wrapperEl, show) {
+        var el = wrapperEl.querySelector('[data-player-loading]');
+        if (el) el.classList.toggle('is-hidden', !show);
     }
 
     function init(wrapperEl) {
@@ -103,28 +91,30 @@
         var bootstrapUrl = wrapperEl.dataset.bootstrapUrl;
         if (!video || !bootstrapUrl) return;
 
-        current = {
-            hls: null,
-            video: video,
-            wrapperEl: wrapperEl,
-            watermarkTimer: startWatermark(wrapperEl),
-        };
+        current = { hls: null, video: video, wrapperEl: wrapperEl };
+
+        toggleLoading(wrapperEl, true);
+        video.addEventListener('waiting', function () { toggleLoading(wrapperEl, true); });
+        video.addEventListener('playing', function () { toggleLoading(wrapperEl, false); });
+        video.addEventListener('canplay', function () { toggleLoading(wrapperEl, false); });
+        video.addEventListener('error', function () { toggleLoading(wrapperEl, false); });
 
         fetchBootstrap(bootstrapUrl)
             .then(function (data) {
                 if (current && current.wrapperEl === wrapperEl && data.playlistUrl) {
                     current.hls = attachHls(video, data.playlistUrl);
+                } else {
+                    toggleLoading(wrapperEl, false);
                 }
             })
             .catch(function () {
                 // Not ready / not enrolled / expired — leave the player empty.
+                toggleLoading(wrapperEl, false);
             });
     }
 
     function destroy() {
         if (!current) return;
-
-        if (current.watermarkTimer) clearInterval(current.watermarkTimer);
 
         if (current.hls) {
             try { current.hls.destroy(); } catch (e) { /* noop */ }
