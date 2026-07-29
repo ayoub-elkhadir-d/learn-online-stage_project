@@ -77,11 +77,6 @@
         return null;
     }
 
-    function toggleLoading(wrapperEl, show) {
-        var el = wrapperEl.querySelector('[data-player-loading]');
-        if (el) el.classList.toggle('is-hidden', !show);
-    }
-
     function init(wrapperEl) {
         if (!wrapperEl) return;
 
@@ -93,28 +88,14 @@
 
         current = { hls: null, video: video, wrapperEl: wrapperEl };
 
-        toggleLoading(wrapperEl, true);
-        video.addEventListener('waiting', function () { toggleLoading(wrapperEl, true); });
-        video.addEventListener('playing', function () { toggleLoading(wrapperEl, false); });
-        video.addEventListener('canplay', function () { toggleLoading(wrapperEl, false); });
-        video.addEventListener('error', function () { toggleLoading(wrapperEl, false); });
-        // 'waiting' can fire at a segment boundary without a matching 'playing'
-        // afterward (an MSE/hls.js quirk) — timeupdate only fires while the
-        // video is genuinely advancing, so it's a foolproof backstop that
-        // guarantees the spinner clears once real playback resumes.
-        video.addEventListener('timeupdate', function () { toggleLoading(wrapperEl, false); });
-
         fetchBootstrap(bootstrapUrl)
             .then(function (data) {
                 if (current && current.wrapperEl === wrapperEl && data.playlistUrl) {
                     current.hls = attachHls(video, data.playlistUrl);
-                } else {
-                    toggleLoading(wrapperEl, false);
                 }
             })
             .catch(function () {
                 // Not ready / not enrolled / expired — leave the player empty.
-                toggleLoading(wrapperEl, false);
             });
     }
 

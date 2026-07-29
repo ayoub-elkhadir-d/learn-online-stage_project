@@ -17,29 +17,6 @@
         display: block;
     }
     .secure-video-player.player-blurred video { filter: blur(24px); }
-
-    .player-loading {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(0,0,0,.4);
-        z-index: 3;
-        opacity: 1;
-        transition: opacity .2s ease;
-        pointer-events: none;
-    }
-    .player-loading.is-hidden { opacity: 0; }
-    .player-spinner {
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        border: 3px solid rgba(255,255,255,.25);
-        border-top-color: #fff;
-        animation: player-spin .8s linear infinite;
-    }
-    @keyframes player-spin { to { transform: rotate(360deg); } }
 </style>
 @endonce
 
@@ -57,7 +34,4 @@
         controlsList="nodownload noremoteplayback"
         disablePictureInPicture
     ></video>
-    <div class="player-loading" data-player-loading>
-        <div class="player-spinner"></div>
-    </div>
 </div>
