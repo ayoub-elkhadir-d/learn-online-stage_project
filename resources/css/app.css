@@ -7,6 +7,8 @@
 
     --color-primary: #C46A2D;
     --color-primary-dark: #A6551F;
+    --color-primary-active: #8A431A;
+    --color-primary-soft: #F3E3D3;
     --color-accent: #D9A441;
     --color-success: #3F8C5A;
     --color-danger: #C74E4E;
@@ -59,7 +61,7 @@
     }
 
     .btn-primary {
-        @apply inline-flex items-center justify-center gap-2 rounded-xl bg-(--color-primary) px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-(--color-primary-dark) focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-primary);
+        @apply inline-flex items-center justify-center gap-2 rounded-xl bg-(--color-primary) px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-(--color-primary-dark) active:bg-(--color-primary-active) focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-primary);
     }
 
     .btn-secondary {

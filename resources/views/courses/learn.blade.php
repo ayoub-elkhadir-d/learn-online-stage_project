@@ -8,6 +8,24 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/learn.js'])
+    {{-- Learning-page-only accent override. Every utility class elsewhere in
+         the app reads these same custom properties (bg-(--color-primary) etc.),
+         so redeclaring the values here — scoped to this document only —
+         reskins just this page green without touching resources/css/app.css
+         or affecting the Dashboard/navbar/admin, which never load this block. --}}
+    <style>
+        :root {
+            --color-primary: #22C55E;
+            --color-primary-dark: #16A34A;
+            --color-primary-active: #15803D;
+            --color-primary-soft: #DCFCE7;
+            --color-accent: #16A34A;
+        }
+        .dark {
+            --color-primary: #166534;
+            --color-accent: #166534;
+        }
+    </style>
 </head>
 <body class="h-screen overflow-hidden bg-(--color-bg-light) font-sans text-(--color-text) antialiased dark:bg-(--color-bg-dark) dark:text-[#ECECEC]">
 
@@ -71,15 +89,15 @@
                    data-lesson-name="{{ strtolower($lesson->title) }}">
                     <span class="relative mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold {{ $currentLesson && $currentLesson->id === $lesson->id ? 'bg-(--color-primary) text-white' : 'bg-black/5 text-(--color-text-secondary) dark:bg-white/10' }}">
                         <span data-lesson-number>{{ $index + 1 }}</span>
-                        <span data-lesson-check class="absolute inset-0 hidden items-center justify-center rounded-full bg-(--color-success) text-white">
+                        <span data-lesson-check class="absolute inset-0 hidden items-center justify-center rounded-full bg-(--color-primary) text-white">
                             <x-icon name="check" class="h-3.5 w-3.5" />
                         </span>
                     </span>
                     <span class="min-w-0 flex-1">
                         <span class="block truncate text-sm font-medium {{ $currentLesson && $currentLesson->id === $lesson->id ? 'text-(--color-primary)' : '' }}">{{ $lesson->title }}</span>
                         <span class="mt-0.5 flex items-center gap-1.5 text-xs text-(--color-text-secondary)">
-                            <x-icon name="clock" class="h-3 w-3" />
-                            <span data-lesson-duration="{{ $lesson->id }}">—:—</span>
+                            <x-icon name="clock" class="h-3 w-3 shrink-0" />
+                            <span data-lesson-duration="{{ $lesson->id }}" class="tabular-nums">—:—</span>
                         </span>
                     </span>
                 </a>
@@ -227,6 +245,8 @@
         loadLesson(window.location.href, e.state ? e.state.lessonId : null, false);
     });
 
+    document.addEventListener('lesson:duration-known', paintDurations);
+
     document.querySelector('[data-lesson-search]').addEventListener('input', function (e) {
         const q = e.target.value.trim().toLowerCase();
         sidebar.querySelectorAll('[data-lesson-nav]').forEach(item => {
@@ -243,7 +263,19 @@
         this.classList.add('hidden');
     });
 
-    initLessonView();
+    // On the very first page load this inline script runs synchronously
+    // during HTML parsing, BEFORE the Vite `type="module"` bundles (which
+    // are deferred per spec) have executed — so window.LessonPlayerController
+    // / window.LessonProgress don't exist yet at this point. Calling
+    // initLessonView() immediately would throw silently and the player would
+    // never mount, leaving only the poster visible. Wait for DOMContentLoaded
+    // (which always fires after deferred/module scripts finish) unless the
+    // globals are already there.
+    if (window.LessonPlayerController && window.LessonProgress) {
+        initLessonView();
+    } else {
+        document.addEventListener('DOMContentLoaded', initLessonView, { once: true });
+    }
 })();
 </script>
 </body>

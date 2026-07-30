@@ -160,7 +160,7 @@ class LessonPlayer {
                                 <div class="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-white/40">Quality</div>
                                 ${qualities.length > 0
                                     ? qualities.map(q => `<button type="button" data-quality-option="${q.src}" class="flex w-full items-center justify-between px-3 py-1.5 hover:bg-white/10">${q.label}</button>`).join('')
-                                    : `<div class="flex items-center justify-between px-3 py-1.5 text-white/50">Auto <span class="text-(--color-primary))">${icon('check', 'h-3.5 w-3.5')}</span></div>`}
+                                    : `<div class="flex items-center justify-between px-3 py-1.5 text-white/50">Auto <span class="text-(--color-primary)">${icon('check', 'h-3.5 w-3.5')}</span></div>`}
                             </div>
                         </div>
 
@@ -257,14 +257,28 @@ class LessonPlayer {
             this.el.skeleton.classList.add('hidden');
             this.updateTime();
             window.LessonProgress.saveDuration(this.lessonId, v.duration);
+            // Let the sidebar refresh the just-discovered duration for THIS
+            // lesson immediately, instead of waiting for the next navigation.
+            document.dispatchEvent(new CustomEvent('lesson:duration-known'));
         });
 
-        v.addEventListener('waiting', () => this.el.buffering.classList.remove('hidden'));
-        v.addEventListener('playing', () => {
+        // The stream controller flushes in small chunks, which can fire brief
+        // `waiting` events under completely normal playback. Debounce the
+        // buffering overlay so those don't flash — only show it if a stall
+        // actually persists past 300ms, and cancel on any sign of progress.
+        const hideBuffering = () => {
+            clearTimeout(this._bufferingTimer);
             this.el.buffering.classList.add('hidden');
+        };
+        v.addEventListener('waiting', () => {
+            clearTimeout(this._bufferingTimer);
+            this._bufferingTimer = setTimeout(() => this.el.buffering.classList.remove('hidden'), 300);
+        });
+        v.addEventListener('playing', () => {
+            hideBuffering();
             this.el.error.classList.add('hidden');
         });
-        v.addEventListener('canplay', () => this.el.buffering.classList.add('hidden'));
+        v.addEventListener('canplay', hideBuffering);
 
         v.addEventListener('error', () => {
             this.el.skeleton.classList.add('hidden');
@@ -287,6 +301,7 @@ class LessonPlayer {
         v.addEventListener('timeupdate', () => {
             this.updateTime();
             this.updateBuffered();
+            hideBuffering(); // timeupdate firing proves we're not actually stalled
 
             const now = performance.now();
             if (now - this._lastSaveTime > 4000) {
@@ -632,7 +647,14 @@ document.addEventListener('dragstart', (e) => {
 let activePlayer = null;
 
 function mountLessonPlayer(root) {
-    if (!root) return;
+    if (!root) return activePlayer;
+    // Idempotent: never recreate the player for the lesson that's already
+    // mounted and still attached to the DOM (progress ticks, notes/bookmark
+    // edits, sidebar toggling, etc. must never trigger a rebuild — only an
+    // actual lesson change does, which always comes with a fresh DOM node).
+    if (activePlayer && activePlayer.lessonId === root.dataset.lessonId && activePlayer.root.isConnected) {
+        return activePlayer;
+    }
     if (activePlayer) activePlayer.destroy();
     activePlayer = new LessonPlayer(root);
     return activePlayer;
