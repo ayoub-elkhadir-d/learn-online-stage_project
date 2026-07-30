@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\PurchaseController;
-use App\Http\Controllers\VideoStreamController;
+use App\Http\Controllers\VideoController;
 use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\LessonController;
 
@@ -33,24 +33,9 @@ Route::middleware('user.only')->group(function () {
 // Authenticated users only (not admins)
 Route::middleware(['auth', 'user.only'])->group(function () {
     Route::get('/courses/{slug}/learn', [CourseController::class, 'learn'])->name('courses.learn');
-
-    Route::prefix('lessons/{lesson}/hls')->name('lessons.hls.')->group(function () {
-        Route::get('bootstrap', [VideoStreamController::class, 'bootstrap'])
-            ->middleware('throttle:60,1')->name('bootstrap');
-        Route::get('playlist.m3u8', [VideoStreamController::class, 'playlist'])
-            ->middleware(['signed', 'throttle:300,1'])->name('playlist');
-        Route::get('segments/{segment}', [VideoStreamController::class, 'segment'])
-            ->where('segment', '[A-Za-z0-9_\-]+\.ts')
-            ->middleware(['signed', 'throttle:1200,1'])->name('segment');
-    });
-
-    // Dedicated AES-128 key delivery endpoint. Kept outside the lessons/hls
-    // prefix at its own path per spec — still requires auth + user.only
-    // (this group) plus a short-lived signed signature (below), and the
-    // controller re-checks course purchase on every hit.
-    Route::get('/video/key/{lesson}', [VideoStreamController::class, 'key'])
-        ->middleware(['signed', 'throttle:30,1'])->name('video.key');
-
+    Route::get('/lessons/{lesson}/video', [VideoController::class, 'stream'])
+        ->middleware('throttle:120,1')
+        ->name('lessons.video');
     Route::get('/courses/{slug}/checkout', [CourseController::class, 'checkout'])->name('courses.checkout');
     Route::post('/courses/{slug}/purchase', [PurchaseController::class, 'purchase'])->name('courses.purchase');
 

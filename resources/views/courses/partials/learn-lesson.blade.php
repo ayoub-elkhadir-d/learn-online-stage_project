@@ -1,9 +1,12 @@
 @if($currentLesson)
-<div class="video-wrapper">
+<div class="video-wrapper" data-secure-player oncontextmenu="return false;">
     <div class="video-loading-overlay">
         <div class="spinner-ring"></div>
     </div>
-    <x-video-player :lesson="$currentLesson" />
+    <video controls controlsList="nodownload noremoteplayback" disablePictureInPicture playsinline>
+        <source src="{{ route('lessons.video', $currentLesson) }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 </div>
 <div class="lesson-detail">
     <h4>{{ $currentLesson->title }}</h4>

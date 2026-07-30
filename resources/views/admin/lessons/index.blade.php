@@ -24,7 +24,6 @@
                     <th>Title</th>
                     <th>Description</th>
                     <th>Video</th>
-                    <th>Status</th>
                     <th class="pe-4 text-end">Actions</th>
                 </tr>
             </thead>
@@ -45,26 +44,6 @@
                             <i class="fas fa-video me-1"></i>{{ Str::limit(basename($lesson->video_path), 28) }}
                         </span>
                     </td>
-                    <td>
-                        @php
-                            $statusColors = [
-                                'pending' => ['#e2e8f0', '#475569'],
-                                'processing' => ['#fef3c7', '#92400e'],
-                                'ready' => ['#d1fae5', '#065f46'],
-                                'failed' => ['#fee2e2', '#991b1b'],
-                            ];
-                            [$bg, $fg] = $statusColors[$lesson->status] ?? $statusColors['pending'];
-                        @endphp
-                        <span class="badge" style="background:{{ $bg }};color:{{ $fg }};font-size:11px;">
-                            {{ ucfirst($lesson->status) }}
-                        </span>
-                        @if($lesson->status === 'failed' && $lesson->encoding_error)
-                        <button type="button" class="btn btn-link btn-sm p-0 ms-1" style="font-size:11px;"
-                                data-bs-toggle="modal" data-bs-target="#errorModal-{{ $lesson->id }}">
-                            View error
-                        </button>
-                        @endif
-                    </td>
                     <td class="pe-4 text-end">
                         <a href="{{ route('admin.courses.lessons.edit', [$course, $lesson]) }}"
                            class="btn btn-sm btn-outline-primary me-1">
@@ -81,7 +60,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="text-center py-5">
+                    <td colspan="5" class="text-center py-5">
                         <i class="fas fa-video fa-2x mb-2 d-block" style="color:#a78bfa;"></i>
                         <span class="text-muted">No lessons yet.</span>
                         <a href="{{ route('admin.courses.lessons.create', $course) }}" class="d-block mt-2 text-decoration-none" style="color:#4f46e5;font-size:13px;">
@@ -94,71 +73,4 @@
         </table>
     </div>
 </div>
-
-@foreach($lessons as $lesson)
-    @if($lesson->status === 'failed' && $lesson->encoding_error)
-    @php $err = $lesson->encoding_error; @endphp
-    <div class="modal fade" id="errorModal-{{ $lesson->id }}" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content" style="border-radius:14px;">
-                <div class="modal-header">
-                    <h6 class="modal-title fw-bold">Encoding Error — {{ $lesson->title }}</h6>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" style="font-size:13px;">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-3">Failed at</dt>
-                        <dd class="col-sm-9">{{ data_get($err, 'failed_at', '—') }}</dd>
-
-                        <dt class="col-sm-3">Lesson ID</dt>
-                        <dd class="col-sm-9">{{ data_get($err, 'lesson_id', $lesson->id) }}</dd>
-
-                        <dt class="col-sm-3">Uploaded file</dt>
-                        <dd class="col-sm-9">{{ data_get($err, 'upload_filename', '—') }}</dd>
-
-                        <dt class="col-sm-3">Exception</dt>
-                        <dd class="col-sm-9"><code>{{ data_get($err, 'exception_class', '—') }}</code></dd>
-
-                        <dt class="col-sm-3">Message</dt>
-                        <dd class="col-sm-9">{{ data_get($err, 'exception_message', '—') }}</dd>
-
-                        @if(!is_null(data_get($err, 'exit_code')))
-                        <dt class="col-sm-3">ffmpeg exit code</dt>
-                        <dd class="col-sm-9">{{ data_get($err, 'exit_code') }}</dd>
-                        @endif
-                    </dl>
-
-                    @if(data_get($err, 'command'))
-                    <div class="mt-3">
-                        <div class="fw-semibold mb-1">Executed command</div>
-                        <pre class="bg-light p-2 rounded" style="font-size:11px;white-space:pre-wrap;word-break:break-all;">{{ data_get($err, 'command') }}</pre>
-                    </div>
-                    @endif
-
-                    @if(data_get($err, 'ffmpeg_stderr'))
-                    <div class="mt-3">
-                        <div class="fw-semibold mb-1">ffmpeg stderr</div>
-                        <pre class="bg-light p-2 rounded" style="font-size:11px;white-space:pre-wrap;max-height:200px;overflow:auto;">{{ data_get($err, 'ffmpeg_stderr') }}</pre>
-                    </div>
-                    @endif
-
-                    @if(data_get($err, 'ffmpeg_stdout'))
-                    <div class="mt-3">
-                        <div class="fw-semibold mb-1">ffmpeg stdout</div>
-                        <pre class="bg-light p-2 rounded" style="font-size:11px;white-space:pre-wrap;max-height:200px;overflow:auto;">{{ data_get($err, 'ffmpeg_stdout') }}</pre>
-                    </div>
-                    @endif
-
-                    @if(data_get($err, 'stack_trace'))
-                    <details class="mt-3">
-                        <summary class="fw-semibold" style="cursor:pointer;">Stack trace</summary>
-                        <pre class="bg-light p-2 rounded mt-2" style="font-size:10.5px;white-space:pre-wrap;max-height:250px;overflow:auto;">{{ data_get($err, 'stack_trace') }}</pre>
-                    </details>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
-@endforeach
 @endsection
