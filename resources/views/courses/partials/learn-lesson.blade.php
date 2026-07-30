@@ -14,7 +14,7 @@
     data-next-id="{{ $nextLesson->id ?? '' }}"
     data-next-title="{{ $nextLesson->title ?? '' }}"
     oncontextmenu="return false;"
-    class="relative aspect-video w-full max-h-[65vh] overflow-hidden bg-black sm:rounded-2xl"
+    class="relative aspect-video w-full max-h-[65vh] shrink-0 overflow-hidden bg-black sm:rounded-2xl"
 >
     <video playsinline poster="{{ $course->cover_image_path ? Storage::url($course->cover_image_path) : '' }}" class="h-full w-full">
         <source src="{{ route('lessons.video', $currentLesson) }}" type="video/mp4">
@@ -60,7 +60,10 @@
                 <x-icon name="bookmark" class="h-4 w-4 text-(--color-text-secondary)" />
                 Bookmarks
             </h2>
-            <ul data-bookmarks-list class="flex flex-col gap-1">
+            {{-- Fixed max-height + its own scroll — a long bookmark list must
+                 never push the video player around (see shrink-0 above; this
+                 is the belt-and-suspenders half of that fix). --}}
+            <ul data-bookmarks-list class="flex max-h-52 flex-col gap-1 overflow-y-auto pr-1">
                 <li data-bookmarks-empty class="text-xs text-(--color-text-secondary)">
                     Use the bookmark button on the player to save moments you want to revisit.
                 </li>

@@ -363,6 +363,11 @@ class LessonPlayer {
         el.bookmarkAdd.addEventListener('click', () => {
             window.LessonProgress.addBookmark(this.lessonId, v.currentTime);
             this.renderBookmarks();
+            // renderBookmarks() above only redraws the small timeline markers —
+            // the visible bookmarks LIST lives in the page-level script
+            // (learn.blade.php), which listens for this to update instantly
+            // instead of only refreshing on the next lesson navigation.
+            document.dispatchEvent(new CustomEvent('lesson:bookmarks-changed', { detail: { lessonId: this.lessonId } }));
         });
 
         if (el.captions) {
@@ -383,10 +388,11 @@ class LessonPlayer {
         });
 
         el.fullscreen.addEventListener('click', () => this.toggleFullscreen());
-        document.addEventListener('fullscreenchange', () => {
+        this._onFullscreenChange = () => {
             const isFs = document.fullscreenElement === this.root;
             el.fullscreen.innerHTML = icon(isFs ? 'minimize' : 'maximize', 'h-[18px] w-[18px]');
-        });
+        };
+        document.addEventListener('fullscreenchange', this._onFullscreenChange);
 
         // Timeline: click/drag to seek, hover to preview.
         let scrubbing = false;
@@ -400,31 +406,43 @@ class LessonPlayer {
             scrubbing = true;
             v.currentTime = seekFromEvent(e) * (v.duration || 0);
         });
-        window.addEventListener('pointermove', (e) => {
-            if (scrubbing) v.currentTime = seekFromEvent(e) * (v.duration || 0);
 
-            const rect = el.timeline.getBoundingClientRect();
-            const within = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top - 8 && e.clientY <= rect.bottom + 8;
-            if (within && v.duration) {
-                const ratio = seekFromEvent(e);
-                el.hoverPreview.classList.remove('hidden');
-                el.hoverPreview.style.left = `${ratio * 100}%`;
-                el.previewTime.textContent = formatTime(ratio * v.duration);
-                // Hover-preview thumbnail architecture: wire a sprite sheet via
-                // root.dataset.previewSprite (background-image + background-position
-                // math keyed to `ratio`). No sprite is configured for this dataset
-                // yet, so the thumb box stays hidden — this is the extension point.
-                if (this.root.dataset.previewSprite) {
-                    el.previewThumb.classList.remove('hidden');
-                    el.previewThumb.style.backgroundImage = `url(${this.root.dataset.previewSprite})`;
-                } else {
-                    el.previewThumb.classList.add('hidden');
-                }
-            } else if (!scrubbing) {
-                el.hoverPreview.classList.add('hidden');
+        // Hover preview is scoped to the timeline element itself — it only
+        // needs to run (and only pays the getBoundingClientRect() layout
+        // cost) while the pointer is actually over the timeline, not on
+        // every mouse movement across the whole page.
+        el.timeline.addEventListener('pointermove', (e) => {
+            if (!v.duration) return;
+            const ratio = seekFromEvent(e);
+            el.hoverPreview.classList.remove('hidden');
+            el.hoverPreview.style.left = `${ratio * 100}%`;
+            el.previewTime.textContent = formatTime(ratio * v.duration);
+            // Hover-preview thumbnail architecture: wire a sprite sheet via
+            // root.dataset.previewSprite (background-image + background-position
+            // math keyed to `ratio`). No sprite is configured for this dataset
+            // yet, so the thumb box stays hidden — this is the extension point.
+            if (this.root.dataset.previewSprite) {
+                el.previewThumb.classList.remove('hidden');
+                el.previewThumb.style.backgroundImage = `url(${this.root.dataset.previewSprite})`;
+            } else {
+                el.previewThumb.classList.add('hidden');
             }
         });
-        window.addEventListener('pointerup', () => { scrubbing = false; });
+        el.timeline.addEventListener('pointerleave', () => {
+            if (!scrubbing) el.hoverPreview.classList.add('hidden');
+        });
+
+        // Dragging can continue past the timeline's own bounds, so this one
+        // genuinely needs to listen on window — kept as cheap as possible
+        // (early-return, no layout read at all) whenever not actively
+        // scrubbing, which is true for the vast majority of playback time.
+        this._onWindowPointerMove = (e) => {
+            if (!scrubbing) return;
+            v.currentTime = seekFromEvent(e) * (v.duration || 0);
+        };
+        this._onWindowPointerUp = () => { scrubbing = false; };
+        window.addEventListener('pointermove', this._onWindowPointerMove);
+        window.addEventListener('pointerup', this._onWindowPointerUp);
 
         // Speed / settings menus
         this.overlay.querySelectorAll('[data-menu-toggle]').forEach(btn => {
@@ -441,10 +459,11 @@ class LessonPlayer {
         this.overlay.querySelectorAll('[data-speed-option]').forEach(btn => {
             btn.addEventListener('click', () => { v.playbackRate = parseFloat(btn.dataset.speedOption); });
         });
-        document.addEventListener('click', () => {
+        this._onDocumentClick = () => {
             this.overlay.querySelectorAll('[data-menu]').forEach(m => m.classList.add('hidden'));
             this._menuOpen = null;
-        });
+        };
+        document.addEventListener('click', this._onDocumentClick);
 
         // Auto-hide controls
         this.root.addEventListener('pointermove', () => this.showControls());
@@ -627,8 +646,22 @@ class LessonPlayer {
 
     destroy() {
         clearTimeout(this._hideTimer);
+        clearTimeout(this._bufferingTimer);
         clearInterval(this._countdownTimer);
+
+        // Every one of these was registered on window/document (not on this
+        // player's own DOM subtree), so they survive the AJAX innerHTML swap
+        // and must be removed explicitly — otherwise each lesson switch
+        // leaked a full set that kept firing forever against a stale video/
+        // element closure, with the pointermove handler's layout read being
+        // the most expensive one. That accumulation was the real cause of
+        // playback stalling more and more the longer a session went on.
         if (this._keyHandler) document.removeEventListener('keydown', this._keyHandler);
+        if (this._onFullscreenChange) document.removeEventListener('fullscreenchange', this._onFullscreenChange);
+        if (this._onDocumentClick) document.removeEventListener('click', this._onDocumentClick);
+        if (this._onWindowPointerMove) window.removeEventListener('pointermove', this._onWindowPointerMove);
+        if (this._onWindowPointerUp) window.removeEventListener('pointerup', this._onWindowPointerUp);
+
         if (this.video && !this.video.paused) {
             window.LessonProgress.savePosition(this.lessonId, this.video.currentTime);
             this.video.pause();
@@ -675,6 +708,12 @@ window.LessonPlayerController = {
             activePlayer.video.currentTime = seconds;
             activePlayer.video.play().catch(() => {});
         }
+    },
+    // Re-draws the small timeline bookmark markers from current localStorage
+    // state without touching the video element itself — used after a
+    // bookmark is removed from the sidebar list.
+    refreshBookmarks() {
+        if (activePlayer) activePlayer.renderBookmarks();
     },
 };
 

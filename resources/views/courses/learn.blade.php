@@ -169,12 +169,27 @@
             const li = document.createElement('li');
             li.setAttribute('data-bookmark-row', '');
             li.className = 'flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-black/5 dark:hover:bg-white/5';
+
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = 'flex flex-1 items-center gap-2 text-left';
-            btn.innerHTML = `<span class="rounded bg-(--color-primary)/10 px-1.5 py-0.5 text-xs font-semibold text-(--color-primary)">${window.LessonProgress.formatTime(b.time)}</span><span class="truncate text-(--color-text-secondary)">${b.label}</span>`;
+            btn.className = 'flex flex-1 items-center gap-2 text-left min-w-0';
+            btn.innerHTML = `<span class="rounded bg-(--color-primary)/10 px-1.5 py-0.5 text-xs font-semibold text-(--color-primary) shrink-0">${window.LessonProgress.formatTime(b.time)}</span><span class="truncate text-(--color-text-secondary)">${b.label}</span>`;
             btn.addEventListener('click', () => window.LessonPlayerController.seekTo(b.time));
             li.appendChild(btn);
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.setAttribute('aria-label', 'Remove bookmark');
+            removeBtn.className = 'shrink-0 rounded p-1 text-(--color-text-secondary) hover:bg-black/10 hover:text-(--color-danger) dark:hover:bg-white/10';
+            removeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.LessonProgress.removeBookmark(lessonId, b.createdAt);
+                renderBookmarksList(lessonId);
+                window.LessonPlayerController.refreshBookmarks();
+            });
+            li.appendChild(removeBtn);
+
             list.appendChild(li);
         });
     }
@@ -246,6 +261,9 @@
     });
 
     document.addEventListener('lesson:duration-known', paintDurations);
+    document.addEventListener('lesson:bookmarks-changed', function (e) {
+        renderBookmarksList(e.detail.lessonId);
+    });
 
     document.querySelector('[data-lesson-search]').addEventListener('input', function (e) {
         const q = e.target.value.trim().toLowerCase();
