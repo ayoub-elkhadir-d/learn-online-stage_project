@@ -26,7 +26,7 @@
      player above via a distinct surface color, rounded top corners, a top
      border, and a soft upward-cast shadow. --}}
 <div class="relative rounded-t-2xl border-t border-(--color-border) bg-(--color-card) shadow-[0_-8px_24px_-14px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-(--color-card-dark) dark:shadow-[0_-8px_24px_-14px_rgba(0,0,0,0.5)]">
-    <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+    <div class="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8 xl:max-w-4xl">
         <div class="mb-4 flex items-start justify-between gap-4">
             <h1 class="text-lg font-bold sm:text-xl">{{ $currentLesson->title }}</h1>
         </div>
@@ -37,37 +37,42 @@
             <p class="text-sm italic text-(--color-text-secondary)">No description provided for this lesson.</p>
         @endif
 
-        {{-- Notes --}}
-        <div class="mt-8">
-            <div class="mb-2 flex items-center justify-between">
-                <h2 class="flex items-center gap-1.5 text-sm font-bold">
-                    <x-icon name="edit" class="h-4 w-4 text-(--color-text-secondary)" />
-                    My Notes
-                </h2>
-                <span data-notes-status class="text-xs text-(--color-text-secondary)"></span>
+        {{-- Notes + Bookmarks share one card grid so they read as a matched
+             pair on wider screens instead of one long mobile-style stack. --}}
+        <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start">
+            {{-- Notes --}}
+            <div class="rounded-2xl border border-(--color-border) bg-black/[.015] p-4 dark:border-white/10 dark:bg-white/[.02]">
+                <div class="mb-2 flex items-center justify-between gap-3">
+                    <h2 class="flex items-center gap-1.5 text-sm font-bold">
+                        <x-icon name="edit" class="h-4 w-4 text-(--color-text-secondary)" />
+                        My Notes
+                    </h2>
+                    <span data-notes-status class="text-xs text-(--color-text-secondary)"></span>
+                </div>
+                <textarea
+                    data-notes-field
+                    rows="4"
+                    placeholder="Jot down anything worth remembering from this lesson..."
+                    class="input-field resize-y text-sm"
+                ></textarea>
             </div>
-            <textarea
-                data-notes-field
-                rows="4"
-                placeholder="Jot down anything worth remembering from this lesson..."
-                class="input-field resize-y text-sm"
-            ></textarea>
-        </div>
 
-        {{-- Bookmarks --}}
-        <div class="mt-6" data-bookmarks-panel>
-            <h2 class="mb-2 flex items-center gap-1.5 text-sm font-bold">
-                <x-icon name="bookmark" class="h-4 w-4 text-(--color-text-secondary)" />
-                Bookmarks
-            </h2>
-            {{-- Fixed max-height + its own scroll — a long bookmark list must
-                 never push the video player around (see shrink-0 above; this
-                 is the belt-and-suspenders half of that fix). --}}
-            <ul data-bookmarks-list class="flex max-h-52 flex-col gap-1 overflow-y-auto pr-1">
-                <li data-bookmarks-empty class="text-xs text-(--color-text-secondary)">
-                    Use the bookmark button on the player to save moments you want to revisit.
-                </li>
-            </ul>
+            {{-- Bookmarks --}}
+            <div class="rounded-2xl border border-(--color-border) bg-black/[.015] p-4 dark:border-white/10 dark:bg-white/[.02]" data-bookmarks-panel>
+                <h2 class="mb-2 flex items-center gap-1.5 text-sm font-bold">
+                    <x-icon name="bookmark" class="h-4 w-4 text-(--color-text-secondary)" />
+                    Bookmarks
+                </h2>
+                {{-- Fixed max-height + its own scrollbar — a long bookmark list
+                     must never resize the video player or this card itself
+                     (see shrink-0 on the player above; this is the
+                     belt-and-suspenders half of that fix). --}}
+                <ul data-bookmarks-list class="scrollbar-thin flex max-h-64 flex-col gap-0.5 overflow-y-auto pr-0.5">
+                    <li data-bookmarks-empty class="px-1 py-2 text-xs leading-relaxed text-(--color-text-secondary)">
+                        Use the bookmark button on the player to save moments you want to revisit.
+                    </li>
+                </ul>
+            </div>
         </div>
 
         {{-- Prev / Next navigation --}}

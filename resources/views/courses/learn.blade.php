@@ -67,13 +67,17 @@
     <div class="flex flex-1 overflow-hidden">
 
         {{-- Sidebar --}}
-        <aside data-sidebar class="fixed inset-y-0 left-0 z-40 mt-[57px] w-80 -translate-x-full overflow-y-auto border-r border-(--color-border) bg-(--color-card) transition-transform duration-200 lg:static lg:mt-0 lg:w-80 lg:translate-x-0 lg:shrink-0 dark:border-white/10 dark:bg-(--color-card-dark)">
-            <div class="sticky top-0 border-b border-(--color-border) bg-(--color-card) p-3 dark:border-white/10 dark:bg-(--color-card-dark)">
-                <div class="relative">
+        <aside data-sidebar class="scrollbar-thin fixed inset-y-0 left-0 z-40 mt-[57px] w-[85%] max-w-[320px] -translate-x-full overflow-y-auto border-r border-(--color-border) bg-(--color-card) transition-transform duration-200 lg:static lg:mt-0 lg:w-80 lg:max-w-none lg:translate-x-0 lg:shrink-0 dark:border-white/10 dark:bg-(--color-card-dark)">
+            <div class="sticky top-0 z-10 flex items-center gap-2 border-b border-(--color-border) bg-(--color-card) p-3 dark:border-white/10 dark:bg-(--color-card-dark)">
+                <div class="relative flex-1">
                     <x-icon name="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
                     <input type="search" data-lesson-search placeholder="Search lessons..." aria-label="Search lessons"
                            class="input-field !py-2 pl-9 text-sm">
                 </div>
+                <button type="button" data-sidebar-close aria-label="Close lesson list"
+                        class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-(--color-text-secondary) hover:bg-black/5 lg:hidden dark:hover:bg-white/10">
+                    <x-icon name="x" class="h-4.5 w-4.5" />
+                </button>
             </div>
 
             <div class="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-(--color-text-secondary)">
@@ -108,7 +112,7 @@
         <div data-sidebar-backdrop class="fixed inset-0 z-30 hidden bg-black/40 lg:hidden"></div>
 
         {{-- Video + details --}}
-        <main class="flex flex-1 flex-col overflow-y-auto" id="videoArea">
+        <main class="scrollbar-thin flex flex-1 flex-col overflow-y-auto" id="videoArea">
             @include('courses.partials.learn-lesson', ['course' => $course, 'lessons' => $lessons, 'currentLesson' => $currentLesson])
         </main>
     </div>
@@ -130,8 +134,7 @@
         });
         const active = sidebar.querySelector(`[data-lesson-id="${lessonId}"]`);
         if (active) active.scrollIntoView({ block: 'nearest' });
-        document.querySelector('[data-sidebar]').classList.add('-translate-x-full');
-        document.querySelector('[data-sidebar-backdrop]').classList.add('hidden');
+        closeMobileSidebar();
     }
 
     function updateProgress() {
@@ -158,6 +161,16 @@
         });
     }
 
+    // A bookmark's stored `label` defaults to just the formatted timestamp
+    // (see LessonProgress.addBookmark) — there's no capture UI for a real
+    // custom title yet, so treat "label === the time itself" as "no title"
+    // and show a readable ordinal instead of printing the time twice.
+    function bookmarkTitle(bookmark, timeStr, index) {
+        const label = (bookmark.label || '').trim();
+        const hasCustomTitle = label.length > 0 && label !== timeStr;
+        return hasCustomTitle ? label : `Bookmark ${index + 1}`;
+    }
+
     function renderBookmarksList(lessonId) {
         const list = document.querySelector('[data-bookmarks-list]');
         const empty = document.querySelector('[data-bookmarks-empty]');
@@ -165,22 +178,41 @@
         const bookmarks = window.LessonProgress.getBookmarks(lessonId);
         list.querySelectorAll('[data-bookmark-row]').forEach(el => el.remove());
         empty.classList.toggle('hidden', bookmarks.length > 0);
-        bookmarks.forEach(b => {
+        bookmarks.forEach((b, index) => {
+            const timeStr = window.LessonProgress.formatTime(b.time);
+
             const li = document.createElement('li');
             li.setAttribute('data-bookmark-row', '');
-            li.className = 'flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-black/5 dark:hover:bg-white/5';
+            li.className = 'flex items-start gap-1 rounded-xl px-1 py-1 transition-colors hover:bg-black/5 dark:hover:bg-white/5';
 
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = 'flex flex-1 items-center gap-2 text-left min-w-0';
-            btn.innerHTML = `<span class="rounded bg-(--color-primary)/10 px-1.5 py-0.5 text-xs font-semibold text-(--color-primary) shrink-0">${window.LessonProgress.formatTime(b.time)}</span><span class="truncate text-(--color-text-secondary)">${b.label}</span>`;
+            btn.className = 'flex min-w-0 flex-1 items-start gap-2.5 rounded-lg px-1.5 py-1.5 text-left';
+
+            const badge = document.createElement('span');
+            badge.className = 'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-(--color-primary)/10 text-(--color-primary)';
+            badge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5"><path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>';
+
+            const textWrap = document.createElement('span');
+            textWrap.className = 'min-w-0 flex-1';
+
+            const timeEl = document.createElement('span');
+            timeEl.className = 'block text-xs font-semibold tabular-nums text-(--color-primary)';
+            timeEl.textContent = timeStr;
+
+            const titleEl = document.createElement('span');
+            titleEl.className = 'mt-0.5 block truncate text-sm text-(--color-text) dark:text-white/90';
+            titleEl.textContent = bookmarkTitle(b, timeStr, index);
+
+            textWrap.append(timeEl, titleEl);
+            btn.append(badge, textWrap);
             btn.addEventListener('click', () => window.LessonPlayerController.seekTo(b.time));
             li.appendChild(btn);
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.setAttribute('aria-label', 'Remove bookmark');
-            removeBtn.className = 'shrink-0 rounded p-1 text-(--color-text-secondary) hover:bg-black/10 hover:text-(--color-danger) dark:hover:bg-white/10';
+            removeBtn.className = 'mt-0.5 shrink-0 rounded-lg p-1.5 text-(--color-text-secondary) transition-colors hover:bg-black/10 hover:text-(--color-danger) dark:hover:bg-white/10';
             removeBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
             removeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -272,14 +304,17 @@
         });
     });
 
+    function closeMobileSidebar() {
+        document.querySelector('[data-sidebar]').classList.add('-translate-x-full');
+        document.querySelector('[data-sidebar-backdrop]').classList.add('hidden');
+    }
+
     document.querySelector('[data-sidebar-toggle]').addEventListener('click', function () {
         document.querySelector('[data-sidebar]').classList.toggle('-translate-x-full');
         document.querySelector('[data-sidebar-backdrop]').classList.toggle('hidden');
     });
-    document.querySelector('[data-sidebar-backdrop]').addEventListener('click', function () {
-        document.querySelector('[data-sidebar]').classList.add('-translate-x-full');
-        this.classList.add('hidden');
-    });
+    document.querySelector('[data-sidebar-backdrop]').addEventListener('click', closeMobileSidebar);
+    document.querySelector('[data-sidebar-close]').addEventListener('click', closeMobileSidebar);
 
     // On the very first page load this inline script runs synchronously
     // during HTML parsing, BEFORE the Vite `type="module"` bundles (which

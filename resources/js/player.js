@@ -91,18 +91,18 @@ class LessonPlayer {
                 <button type="button" data-retry class="btn-primary text-sm">Try again</button>
             </div>
 
-            <div data-end-screen class="absolute inset-0 z-40 hidden flex-col items-center justify-center gap-4 bg-black/85 text-center px-6 backdrop-blur-sm">
+            <div data-end-screen class="absolute inset-0 z-40 hidden flex-col items-center justify-center gap-3 sm:gap-4 bg-black/85 text-center px-4 sm:px-6 backdrop-blur-sm">
                 <p class="text-xs font-semibold uppercase tracking-wider text-white/50">Lesson complete</p>
                 ${this.nextUrl ? `
-                <p class="text-lg font-bold text-white">Up next: ${this.escapeHtml(this.nextTitle)}</p>
+                <p class="max-w-full text-base sm:text-lg font-bold text-white">Up next: ${this.escapeHtml(this.nextTitle)}</p>
                 <p data-countdown-text class="text-sm text-white/60">Starting in <span data-countdown-n>5</span>s</p>
-                <div class="flex items-center gap-3">
+                <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                     <button type="button" data-replay class="btn-secondary !bg-white/10 !border-white/20 !text-white text-sm">${icon('rotate-ccw', 'h-4 w-4')} Replay</button>
                     <a href="${this.nextUrl}" data-lesson-nav data-lesson-id="${this.nextId}" data-cancel-autonext-link class="btn-primary text-sm">Next Lesson ${icon('rotate-cw', 'hidden')}</a>
                     <button type="button" data-cancel-autonext class="text-xs font-medium text-white/50 underline hover:text-white/80">Cancel</button>
                 </div>
                 ` : `
-                <p class="text-lg font-bold text-white">Nice work — you finished this lesson!</p>
+                <p class="max-w-full text-base sm:text-lg font-bold text-white">Nice work — you finished this lesson!</p>
                 <button type="button" data-replay class="btn-primary text-sm">${icon('rotate-ccw', 'h-4 w-4')} Watch again</button>
                 `}
             </div>
@@ -114,9 +114,9 @@ class LessonPlayer {
 
             <div data-topbar class="relative z-10 flex items-center justify-end p-3 opacity-0 transition-opacity"></div>
 
-            <div data-controlbar class="relative z-10 flex flex-col gap-1.5 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-3 pb-2 pt-8 opacity-0 transition-opacity">
+            <div data-controlbar class="relative z-10 flex flex-col gap-1 sm:gap-1.5 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-2 sm:px-3 pb-1.5 sm:pb-2 pt-8 opacity-0 transition-opacity">
 
-                <div data-timeline class="group/tl relative h-3 w-full cursor-pointer flex items-center">
+                <div data-timeline class="group/tl relative h-5 sm:h-3 w-full cursor-pointer flex items-center">
                     <div class="relative h-1 w-full rounded-full bg-white/25 group-hover/tl:h-1.5 transition-all">
                         <div data-buffered-fill class="absolute inset-y-0 left-0 rounded-full bg-white/40" style="width:0%"></div>
                         <div data-played-fill class="absolute inset-y-0 left-0 rounded-full bg-(--color-primary)" style="width:0%"></div>
@@ -129,7 +129,7 @@ class LessonPlayer {
                     </div>
                 </div>
 
-                <div class="flex items-center gap-1 sm:gap-2">
+                <div class="flex items-center gap-0.5 sm:gap-1.5">
                     <button type="button" data-play-pause aria-label="Play/Pause" class="player-btn">${icon('play', 'h-5 w-5')}</button>
                     <button type="button" data-skip-back aria-label="Replay 10 seconds" class="player-btn hidden sm:inline-flex" title="Replay 10s">${icon('rotate-ccw', 'h-[18px] w-[18px]')}</button>
                     <button type="button" data-skip-forward aria-label="Skip 10 seconds" class="player-btn hidden sm:inline-flex" title="Skip 10s">${icon('rotate-cw', 'h-[18px] w-[18px]')}</button>
@@ -142,7 +142,7 @@ class LessonPlayer {
 
                     <span data-time class="hidden text-xs font-medium tabular-nums text-white/90 sm:inline">0:00 / 0:00</span>
 
-                    <div class="ml-auto flex items-center gap-1">
+                    <div class="ml-auto flex items-center gap-0.5 sm:gap-1">
                         <button type="button" data-bookmark-add aria-label="Add bookmark" title="Bookmark this moment" class="player-btn">${icon('bookmark-plus', 'h-[18px] w-[18px]')}</button>
 
                         ${hasTracks ? `<button type="button" data-captions aria-label="Captions" class="player-btn" title="Captions">${icon('captions', 'h-[18px] w-[18px]')}</button>` : ''}
@@ -176,7 +176,7 @@ class LessonPlayer {
         if (!document.getElementById('player-btn-style')) {
             const style = document.createElement('style');
             style.id = 'player-btn-style';
-            style.textContent = '.player-btn{display:inline-flex;align-items:center;justify-content:center;height:2rem;width:2rem;border-radius:.5rem;color:rgba(255,255,255,.9);transition:background-color .15s} .player-btn:hover{background:rgba(255,255,255,.15)}';
+            style.textContent = '.player-btn{display:inline-flex;align-items:center;justify-content:center;height:2.25rem;width:2.25rem;flex-shrink:0;border-radius:.5rem;color:rgba(255,255,255,.9);transition:background-color .15s} .player-btn:hover{background:rgba(255,255,255,.15)}';
             document.head.appendChild(style);
         }
 
