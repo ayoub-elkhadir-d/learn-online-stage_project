@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+    --color-primary: #C46A2D;
+    --color-primary-dark: #A6551F;
+    --color-accent: #D9A441;
+    --color-success: #3F8C5A;
+    --color-danger: #C74E4E;
+
+    --color-bg-light: #F7F5F2;
+    --color-card: #FFFFFF;
+    --color-bg-dark: #181818;
+    --color-card-dark: #242424;
+
+    --color-text: #202020;
+    --color-text-secondary: #7A7A7A;
+    --color-border: #E8E5E1;
+
+    --shadow-soft: 0 1px 2px rgba(32, 32, 32, 0.04), 0 4px 16px rgba(32, 32, 32, 0.06);
+    --shadow-soft-dark: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow-lift: 0 8px 24px rgba(32, 32, 32, 0.1);
+}
+
+@layer base {
+    html {
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+        background-color: var(--color-bg-light);
+        color: var(--color-text);
+        transition: background-color .2s ease, color .2s ease;
+    }
+
+    .dark body {
+        background-color: var(--color-bg-dark);
+        color: #ECECEC;
+    }
+
+    ::selection {
+        background-color: color-mix(in srgb, var(--color-primary) 25%, transparent);
+    }
+}
+
+@layer components {
+    .surface {
+        background-color: var(--color-card);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .dark .surface {
+        background-color: var(--color-card-dark);
+        box-shadow: var(--shadow-soft-dark);
+    }
+
+    .btn-primary {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl bg-(--color-primary) px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-(--color-primary-dark) focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-primary);
+    }
+
+    .btn-secondary {
+        @apply inline-flex items-center justify-center gap-2 rounded-xl border border-(--color-border) bg-white px-4 py-2.5 text-sm font-semibold text-(--color-text) transition-colors hover:bg-(--color-bg-light) dark:border-white/10 dark:bg-(--color-card-dark) dark:text-white dark:hover:bg-white/5;
+    }
+
+    .input-field {
+        @apply w-full rounded-xl border border-(--color-border) bg-white px-4 py-2.5 text-sm text-(--color-text) placeholder:text-(--color-text-secondary) transition-colors focus:border-(--color-primary) focus:outline focus:outline-2 focus:outline-offset-1 focus:outline-(--color-primary)/30 dark:border-white/10 dark:bg-(--color-card-dark) dark:text-white;
+    }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fade-in .25s ease-out;
+}

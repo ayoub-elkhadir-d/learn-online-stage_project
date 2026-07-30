@@ -4,219 +4,187 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $currentLesson ? $currentLesson->title . ' — ' : '' }}{{ $course->title }} — Learn</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    @include('partials.navbar-styles')
-    <style>
-        * { font-family: 'Poppins', sans-serif; }
-        body { background: #0f0e17; color: #fff; }
-
-        .topbar {
-            background: #1a1829;
-            border-bottom: 1px solid rgba(255,255,255,.07);
-            padding: .75rem 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        .topbar .course-title { font-size: 14px; font-weight: 600; color: #e0e0ff; }
-        .topbar .back-link { color: rgba(255,255,255,.5); font-size: 13px; text-decoration: none; }
-        .topbar .back-link:hover { color: #fff; }
-
-        .learn-layout { display: flex; height: calc(100vh - 55px); }
-
-        /* Sidebar */
-        .lesson-sidebar {
-            width: 300px;
-            min-width: 300px;
-            background: #1a1829;
-            border-right: 1px solid rgba(255,255,255,.07);
-            overflow-y: auto;
-            flex-shrink: 0;
-        }
-        .sidebar-header {
-            padding: 1rem 1.25rem .75rem;
-            border-bottom: 1px solid rgba(255,255,255,.07);
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: rgba(255,255,255,.35);
-        }
-        .lesson-item {
-            display: flex;
-            align-items: flex-start;
-            gap: .75rem;
-            padding: .85rem 1.25rem;
-            border-bottom: 1px solid rgba(255,255,255,.04);
-            cursor: pointer;
-            text-decoration: none;
-            transition: background .15s;
-        }
-        .lesson-item:hover { background: rgba(255,255,255,.05); }
-        .lesson-item.active { background: rgba(79,70,229,.2); border-left: 3px solid #7c3aed; }
-        .lesson-item .num {
-            width: 26px; height: 26px;
-            border-radius: 50%;
-            background: rgba(255,255,255,.08);
-            color: rgba(255,255,255,.5);
-            font-size: 11px;
-            font-weight: 700;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-            margin-top: 1px;
-            transition: all .15s;
-        }
-        .lesson-item.active .num { background: #7c3aed; color: #fff; }
-        .lesson-item .lesson-info { flex: 1; min-width: 0; }
-        .lesson-item .lesson-info .lesson-name { font-size: 13px; font-weight: 500; color: #e0e0ff; line-height: 1.3; }
-        .lesson-item .lesson-info .lesson-desc { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* Video area */
-        .video-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            background: #0f0e17;
-            position: relative;
-        }
-        .video-wrapper {
-            background: #000;
-            width: 100%;
-            max-height: 65vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        .video-wrapper video {
-            width: 100%;
-            max-height: 65vh;
-            outline: none;
-        }
-        .video-wrapper {
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .video-wrapper video {
-            -webkit-user-drag: none;
-        }
-        .video-loading-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,.55);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 5;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .15s;
-        }
-        .video-loading-overlay.show { opacity: 1; pointer-events: all; }
-        .spinner-ring {
-            width: 42px; height: 42px;
-            border-radius: 50%;
-            border: 3px solid rgba(124,58,237,.25);
-            border-top-color: #a78bfa;
-            animation: spin .8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .lesson-detail {
-            padding: 1.75rem 2rem;
-            max-width: 800px;
-        }
-        .lesson-detail h4 { font-weight: 700; color: #e0e0ff; }
-        .lesson-detail p { color: rgba(255,255,255,.55); font-size: 14px; line-height: 1.8; }
-
-        .no-lessons {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255,255,255,.3);
-            text-align: center;
-            padding: 3rem;
-        }
-
-        @media (max-width: 768px) {
-            .learn-layout { flex-direction: column; height: auto; }
-            .lesson-sidebar { width: 100%; min-width: unset; height: 220px; border-right: none; border-bottom: 1px solid rgba(255,255,255,.07); }
-        }
-    </style>
+    @include('partials.theme-init')
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/learn.js'])
 </head>
-<body>
+<body class="h-screen overflow-hidden bg-(--color-bg-light) font-sans text-(--color-text) antialiased dark:bg-(--color-bg-dark) dark:text-[#ECECEC]">
 
-<div class="topbar">
-    <a href="{{ route('courses.show', $course->slug) }}" class="back-link">
-        <i class="fas fa-arrow-left me-2"></i>{{ $course->title }}
-    </a>
-    <div class="course-title d-none d-md-block">
-        <i class="fas fa-play-circle me-2" style="color:#7c3aed;"></i>Learning Mode
-    </div>
-    <a href="{{ route('dashboard') }}" class="back-link">
-        <i class="fas fa-th-large me-1"></i>My Courses
-    </a>
-</div>
+<div class="flex h-full flex-col">
 
-<div class="learn-layout">
+    {{-- Topbar --}}
+    <header class="flex shrink-0 items-center gap-3 border-b border-(--color-border) bg-(--color-card) px-4 py-3 dark:border-white/10 dark:bg-(--color-card-dark)">
+        <button type="button" data-sidebar-toggle aria-label="Toggle lesson list"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-(--color-text-secondary) hover:bg-black/5 lg:hidden dark:hover:bg-white/10">
+            <x-icon name="list" class="h-4.5 w-4.5" />
+        </button>
 
-    {{-- Lesson sidebar --}}
-    <div class="lesson-sidebar" id="lessonSidebar">
-        <div class="sidebar-header">Course Lessons · {{ $lessons->count() }} total</div>
-
-        @foreach($lessons as $index => $lesson)
-        <a href="{{ route('courses.learn', [$course->slug, 'lesson' => $lesson->id]) }}"
-           class="lesson-item {{ $currentLesson && $currentLesson->id === $lesson->id ? 'active' : '' }}"
-           data-lesson-nav
-           data-lesson-id="{{ $lesson->id }}">
-            <div class="num">{{ $index + 1 }}</div>
-            <div class="lesson-info">
-                <div class="lesson-name">{{ $lesson->title }}</div>
-                @if($lesson->description)
-                <div class="lesson-desc">{{ $lesson->description }}</div>
-                @endif
-            </div>
+        <a href="{{ route('courses.show', $course->slug) }}" class="flex min-w-0 items-center gap-2 text-sm text-(--color-text-secondary) hover:text-(--color-text) dark:hover:text-white">
+            <x-icon name="chevron-left" class="h-4 w-4 shrink-0" />
+            <span class="truncate font-medium">{{ $course->title }}</span>
         </a>
-        @endforeach
-    </div>
 
-    {{-- Video + details --}}
-    <div class="video-area" id="videoArea">
-        @include('courses.partials.learn-lesson', ['course' => $course, 'lessons' => $lessons, 'currentLesson' => $currentLesson])
-    </div>
+        <div class="ml-auto flex items-center gap-3">
+            <div class="hidden items-center gap-2 sm:flex">
+                <div class="h-1.5 w-28 overflow-hidden rounded-full bg-(--color-border) dark:bg-white/10">
+                    <div data-course-progress-bar class="h-full rounded-full bg-(--color-primary) transition-all" style="width:0%"></div>
+                </div>
+                <span data-course-progress-label class="text-xs font-medium text-(--color-text-secondary)">0%</span>
+            </div>
 
+            <button type="button" data-theme-toggle aria-label="Toggle dark mode"
+                    class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-(--color-text-secondary) hover:bg-black/5 dark:hover:bg-white/10">
+                <x-icon name="sun" class="hidden h-4.5 w-4.5 dark:block" />
+                <x-icon name="moon" class="block h-4.5 w-4.5 dark:hidden" />
+            </button>
+
+            <a href="{{ route('dashboard') }}" class="hidden items-center gap-1.5 text-sm font-medium text-(--color-text-secondary) hover:text-(--color-text) sm:inline-flex dark:hover:text-white">
+                <x-icon name="layout-grid" class="h-4 w-4" />
+                My Courses
+            </a>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+
+        {{-- Sidebar --}}
+        <aside data-sidebar class="fixed inset-y-0 left-0 z-40 mt-[57px] w-80 -translate-x-full overflow-y-auto border-r border-(--color-border) bg-(--color-card) transition-transform duration-200 lg:static lg:mt-0 lg:w-80 lg:translate-x-0 lg:shrink-0 dark:border-white/10 dark:bg-(--color-card-dark)">
+            <div class="sticky top-0 border-b border-(--color-border) bg-(--color-card) p-3 dark:border-white/10 dark:bg-(--color-card-dark)">
+                <div class="relative">
+                    <x-icon name="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
+                    <input type="search" data-lesson-search placeholder="Search lessons..." aria-label="Search lessons"
+                           class="input-field !py-2 pl-9 text-sm">
+                </div>
+            </div>
+
+            <div class="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-(--color-text-secondary)">
+                {{ $lessons->count() }} lesson(s)
+            </div>
+
+            <nav id="lessonSidebar" class="flex flex-col pb-4">
+                @foreach($lessons as $index => $lesson)
+                <a href="{{ route('courses.learn', [$course->slug, 'lesson' => $lesson->id]) }}"
+                   class="lesson-item group flex items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-black/[.03] dark:hover:bg-white/5 {{ $currentLesson && $currentLesson->id === $lesson->id ? 'bg-(--color-primary)/8 border-r-2 border-(--color-primary)' : '' }}"
+                   data-lesson-nav
+                   data-lesson-id="{{ $lesson->id }}"
+                   data-lesson-name="{{ strtolower($lesson->title) }}">
+                    <span class="relative mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold {{ $currentLesson && $currentLesson->id === $lesson->id ? 'bg-(--color-primary) text-white' : 'bg-black/5 text-(--color-text-secondary) dark:bg-white/10' }}">
+                        <span data-lesson-number>{{ $index + 1 }}</span>
+                        <span data-lesson-check class="absolute inset-0 hidden items-center justify-center rounded-full bg-(--color-success) text-white">
+                            <x-icon name="check" class="h-3.5 w-3.5" />
+                        </span>
+                    </span>
+                    <span class="min-w-0 flex-1">
+                        <span class="block truncate text-sm font-medium {{ $currentLesson && $currentLesson->id === $lesson->id ? 'text-(--color-primary)' : '' }}">{{ $lesson->title }}</span>
+                        <span class="mt-0.5 flex items-center gap-1.5 text-xs text-(--color-text-secondary)">
+                            <x-icon name="clock" class="h-3 w-3" />
+                            <span data-lesson-duration="{{ $lesson->id }}">—:—</span>
+                        </span>
+                    </span>
+                </a>
+                @endforeach
+            </nav>
+        </aside>
+
+        <div data-sidebar-backdrop class="fixed inset-0 z-30 hidden bg-black/40 lg:hidden"></div>
+
+        {{-- Video + details --}}
+        <main class="flex flex-1 flex-col overflow-y-auto" id="videoArea">
+            @include('courses.partials.learn-lesson', ['course' => $course, 'lessons' => $lessons, 'currentLesson' => $currentLesson])
+        </main>
+    </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-<script src="{{ asset('js/secure-player.js') }}"></script>
 <script>
 (function () {
     const videoArea = document.getElementById('videoArea');
     const sidebar = document.getElementById('lessonSidebar');
+    const courseId = {{ $course->id }};
+    const totalLessons = {{ $lessons->count() }};
 
     function activateSidebarItem(lessonId) {
         sidebar.querySelectorAll('.lesson-item').forEach(el => {
-            el.classList.toggle('active', String(el.dataset.lessonId) === String(lessonId));
+            const active = String(el.dataset.lessonId) === String(lessonId);
+            el.classList.toggle('bg-(--color-primary)/8', active);
+            el.classList.toggle('border-r-2', active);
+            el.classList.toggle('border-(--color-primary)', active);
         });
-        const active = sidebar.querySelector('.lesson-item.active');
+        const active = sidebar.querySelector(`[data-lesson-id="${lessonId}"]`);
         if (active) active.scrollIntoView({ block: 'nearest' });
+        document.querySelector('[data-sidebar]').classList.add('-translate-x-full');
+        document.querySelector('[data-sidebar-backdrop]').classList.add('hidden');
+    }
+
+    function updateProgress() {
+        const completed = window.LessonProgress.completedCount(courseId);
+        const pct = totalLessons > 0 ? Math.round((completed / totalLessons) * 100) : 0;
+        document.querySelector('[data-course-progress-bar]').style.width = pct + '%';
+        document.querySelector('[data-course-progress-label]').textContent = pct + '%';
+    }
+
+    function paintCompleted() {
+        sidebar.querySelectorAll('[data-lesson-nav]').forEach(item => {
+            if (window.LessonProgress.isCompleted(courseId, item.dataset.lessonId)) {
+                item.querySelector('[data-lesson-check]').classList.remove('hidden');
+                item.querySelector('[data-lesson-check]').classList.add('flex');
+            }
+        });
+        updateProgress();
+    }
+
+    function paintDurations() {
+        document.querySelectorAll('[data-lesson-duration]').forEach(el => {
+            const d = window.LessonProgress.getDuration(el.dataset.lessonDuration);
+            if (d) el.textContent = window.LessonProgress.formatTime(d);
+        });
+    }
+
+    function renderBookmarksList(lessonId) {
+        const list = document.querySelector('[data-bookmarks-list]');
+        const empty = document.querySelector('[data-bookmarks-empty]');
+        if (!list) return;
+        const bookmarks = window.LessonProgress.getBookmarks(lessonId);
+        list.querySelectorAll('[data-bookmark-row]').forEach(el => el.remove());
+        empty.classList.toggle('hidden', bookmarks.length > 0);
+        bookmarks.forEach(b => {
+            const li = document.createElement('li');
+            li.setAttribute('data-bookmark-row', '');
+            li.className = 'flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-black/5 dark:hover:bg-white/5';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'flex flex-1 items-center gap-2 text-left';
+            btn.innerHTML = `<span class="rounded bg-(--color-primary)/10 px-1.5 py-0.5 text-xs font-semibold text-(--color-primary)">${window.LessonProgress.formatTime(b.time)}</span><span class="truncate text-(--color-text-secondary)">${b.label}</span>`;
+            btn.addEventListener('click', () => window.LessonPlayerController.seekTo(b.time));
+            li.appendChild(btn);
+            list.appendChild(li);
+        });
+    }
+
+    function bindNotes(lessonId) {
+        const field = document.querySelector('[data-notes-field]');
+        const status = document.querySelector('[data-notes-status]');
+        if (!field) return;
+        field.value = window.LessonProgress.getNote(lessonId);
+        let timer;
+        field.addEventListener('input', () => {
+            status.textContent = 'Saving...';
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                window.LessonProgress.saveNote(lessonId, field.value);
+                status.textContent = 'Saved';
+                setTimeout(() => { if (status.textContent === 'Saved') status.textContent = ''; }, 1500);
+            }, 600);
+        });
     }
 
     function showLoading(show) {
-        const overlay = videoArea.querySelector('.video-loading-overlay');
-        if (overlay) overlay.classList.toggle('show', show);
+        videoArea.style.opacity = show ? '0.5' : '1';
     }
 
     function loadLesson(url, lessonId, push) {
         showLoading(true);
+        window.LessonPlayerController.destroy();
 
         fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(res => res.text())
@@ -230,39 +198,27 @@
                 activateSidebarItem(lessonId);
 
                 if (push) history.pushState({ lessonId }, '', url);
-                bindVideoEvents(true);
+                initLessonView();
             })
             .catch(() => { window.location.href = url; })
             .finally(() => showLoading(false));
     }
 
-    function bindVideoEvents(isSwap) {
-        const video = videoArea.querySelector('video');
-        if (!video) return;
-
-        if (isSwap) {
-            // Video/source tags inserted via innerHTML don't reliably start
-            // loading on their own — force it, then attempt to play.
-            video.load();
-            const playPromise = video.play();
-            if (playPromise && typeof playPromise.catch === 'function') {
-                playPromise.catch(() => {
-                    // Autoplay was blocked (no user gesture in scope) — that's fine,
-                    // the visible controls let the learner press play manually.
-                });
-            }
+    function initLessonView() {
+        const player = videoArea.querySelector('[data-secure-player]');
+        if (player) {
+            window.LessonPlayerController.mount(player);
+            bindNotes(player.dataset.lessonId);
+            renderBookmarksList(player.dataset.lessonId);
         }
-
-        video.addEventListener('ended', function () {
-            const nextBtn = videoArea.querySelector('[data-next-lesson]');
-            if (nextBtn) loadLesson(nextBtn.href, nextBtn.dataset.lessonId, true);
-        });
+        paintCompleted();
+        paintDurations();
     }
 
     document.addEventListener('click', function (e) {
         const link = e.target.closest('[data-lesson-nav]');
         if (!link) return;
-        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // let modified clicks open normally
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
         e.preventDefault();
         loadLesson(link.href, link.dataset.lessonId, true);
     });
@@ -271,7 +227,23 @@
         loadLesson(window.location.href, e.state ? e.state.lessonId : null, false);
     });
 
-    bindVideoEvents();
+    document.querySelector('[data-lesson-search]').addEventListener('input', function (e) {
+        const q = e.target.value.trim().toLowerCase();
+        sidebar.querySelectorAll('[data-lesson-nav]').forEach(item => {
+            item.classList.toggle('hidden', q.length > 0 && !item.dataset.lessonName.includes(q));
+        });
+    });
+
+    document.querySelector('[data-sidebar-toggle]').addEventListener('click', function () {
+        document.querySelector('[data-sidebar]').classList.toggle('-translate-x-full');
+        document.querySelector('[data-sidebar-backdrop]').classList.toggle('hidden');
+    });
+    document.querySelector('[data-sidebar-backdrop]').addEventListener('click', function () {
+        document.querySelector('[data-sidebar]').classList.add('-translate-x-full');
+        this.classList.add('hidden');
+    });
+
+    initLessonView();
 })();
 </script>
 </body>
