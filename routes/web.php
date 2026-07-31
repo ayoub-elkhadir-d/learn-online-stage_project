@@ -6,9 +6,21 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseAssetController;
 use App\Http\Controllers\CourseReviewController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\StorageController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\Admin\AdminCourseController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LessonController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\UserController;
+
+// Fallback for the "public" disk's Storage::url() links — see
+// app/Http/Controllers/StorageController.php for why this exists
+// alongside the storage:link symlink instead of replacing it.
+Route::get('/storage/{path}', [StorageController::class, 'show'])
+    ->where('path', '.*')
+    ->name('storage.show');
 
 // Auth routes (guests only)
 Route::middleware('guest')->group(function () {
@@ -72,14 +84,19 @@ Route::middleware('auth')->post('/logout', [AuthController::class, 'logout'])->n
 
 // Admin panel
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
     Route::resource('courses', AdminCourseController::class);
     Route::resource('courses.lessons', LessonController::class)->except(['show']);
+    Route::resource('categories', CategoryController::class)->except(['show']);
 
-    Route::get('/payments', [\App\Http\Controllers\Admin\PaymentController::class, 'index'])->name('payments.index');
-    Route::put('/payments/{purchase}/approve', [\App\Http\Controllers\Admin\PaymentController::class, 'approve'])->name('payments.approve');
-    Route::delete('/payments/{purchase}/reject', [\App\Http\Controllers\Admin\PaymentController::class, 'reject'])->name('payments.reject');
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::get('/payments/{purchase}', [PaymentController::class, 'show'])->name('payments.show');
+    Route::put('/payments/{purchase}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
+    Route::put('/payments/{purchase}/reject', [PaymentController::class, 'reject'])->name('payments.reject');
+    Route::put('/payments/{purchase}/cancel', [PaymentController::class, 'cancel'])->name('payments.cancel');
 
-    Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
-    Route::put('/users/{user}/ban', [\App\Http\Controllers\Admin\UserController::class, 'ban'])->name('users.ban');
-    Route::put('/users/{user}/unban', [\App\Http\Controllers\Admin\UserController::class, 'unban'])->name('users.unban');
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::put('/users/{user}/ban', [UserController::class, 'ban'])->name('users.ban');
+    Route::put('/users/{user}/unban', [UserController::class, 'unban'])->name('users.unban');
 });

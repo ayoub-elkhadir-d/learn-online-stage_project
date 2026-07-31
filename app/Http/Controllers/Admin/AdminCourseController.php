@@ -10,10 +10,18 @@ use Illuminate\Support\Str;
 
 class AdminCourseController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $courses = Course::with('category')->latest()->paginate(15);
-        return view('admin.courses.index', compact('courses'));
+        $courses = Course::with('category')
+            ->when($request->filled('q'), fn ($q) => $q->where('title', 'like', '%'.$request->q.'%'))
+            ->when($request->filled('category'), fn ($q) => $q->where('category_id', $request->category))
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $categories = Category::all();
+
+        return view('admin.courses.index', compact('courses', 'categories'));
     }
 
     public function create()

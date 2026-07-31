@@ -180,8 +180,13 @@
       "node_modules/vidstack/prod/chunks/vidstack-IMa-zkAV.js"
     ]
   },
+  "resources/css/admin.css": {
+    "file": "assets/admin-Dzc4g1jN.css",
+    "src": "resources/css/admin.css",
+    "isEntry": true
+  },
   "resources/css/app.css": {
-    "file": "assets/app-DzjCtN9G.css",
+    "file": "assets/app-n-2NXC9B.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -191,22 +196,22 @@
     "isEntry": true
   },
   "resources/css/course-details.css": {
-    "file": "assets/course-details-BLtqNDSX.css",
+    "file": "assets/course-details-DqAC30Cs.css",
     "src": "resources/css/course-details.css",
     "isEntry": true
   },
   "resources/css/courses-index.css": {
-    "file": "assets/courses-index-C0_ICQju.css",
+    "file": "assets/courses-index-DmKJJhtY.css",
     "src": "resources/css/courses-index.css",
     "isEntry": true
   },
   "resources/css/dashboard.css": {
-    "file": "assets/dashboard-DUb5wXVY.css",
+    "file": "assets/dashboard-fHCQ5I1H.css",
     "src": "resources/css/dashboard.css",
     "isEntry": true
   },
   "resources/css/learn.css": {
-    "file": "assets/learn-DsEHSzNV.css",
+    "file": "assets/learn-Bqy8EDjx.css",
     "src": "resources/css/learn.css",
     "isEntry": true
   },

@@ -9,14 +9,19 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $users = User::withCount(['purchases' => function ($q) {
                 $q->where('status', 'paid');
             }])
             ->where('role', 'user')
+            ->when($request->filled('q'), function ($q) use ($request) {
+                $term = $request->q;
+                $q->where(fn ($query) => $query->where('name', 'like', "%{$term}%")->orWhere('email', 'like', "%{$term}%"));
+            })
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
         $stats = [
             'total'      => User::where('role', 'user')->count(),

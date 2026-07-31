@@ -1,0 +1,74 @@
+/* Admin panel — reuses every shared token/component from app.css
+   (.btn-primary, .input-field, .lesson-card, --color-*). Only the handful
+   of things Tailwind utilities can't express live here. */
+
+/* ---- Collapsible desktop sidebar ----
+   [data-admin-sidebar] is the <aside>; the collapsed state is toggled by
+   adding .admin-sidebar-collapsed to the shell wrapper (see
+   admin/layout.blade.php's inline bootstrap script, same synchronous
+   pre-paint pattern as partials/theme-init.blade.php, to avoid a flash of
+   the wrong width on load). */
+[data-admin-sidebar] {
+    width: 17rem;
+    transition: width 0.2s ease;
+}
+
+.admin-sidebar-collapsed [data-admin-sidebar] {
+    width: 4.75rem;
+}
+
+.admin-sidebar-collapsed [data-sidebar-label],
+.admin-sidebar-collapsed [data-sidebar-brand-text],
+.admin-sidebar-collapsed [data-sidebar-section-label],
+.admin-sidebar-collapsed [data-sidebar-user-info] {
+    display: none;
+}
+
+.admin-sidebar-collapsed [data-sidebar-link] {
+    justify-content: center;
+}
+
+.admin-sidebar-collapsed [data-sidebar-collapse-icon] {
+    transform: rotate(180deg);
+}
+
+/* ---- Native <dialog> confirmation modals (Reject / Cancel Approval) ----
+   Tailwind utilities style the panel itself; the ::backdrop pseudo-element
+   and open/close motion have no Tailwind equivalent. */
+dialog[data-admin-modal] {
+    margin: auto;
+}
+
+dialog[data-admin-modal]::backdrop {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(2px);
+}
+
+@keyframes admin-modal-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+dialog[data-admin-modal][open] {
+    animation: admin-modal-in 0.18s ease-out;
+}
+
+/* ---- Sticky table header shadow ----
+   `sticky top-0` is plain Tailwind; the hairline-on-scroll effect below it
+   isn't expressible as a utility. */
+.admin-table thead th {
+    box-shadow: inset 0 -1px 0 var(--color-border);
+}
+
+.dark .admin-table thead th {
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* ---- Client-side validation state ----
+   A plain, easy-to-target class name for JS (the lesson form's XHR submit
+   handler marks/clears invalid fields after a 422 response) — Tailwind's
+   arbitrary-value class names are awkward to reference from
+   querySelector/classList at runtime. */
+.is-invalid-admin {
+    border-color: var(--color-danger) !important;
+}

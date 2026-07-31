@@ -11,7 +11,8 @@
     --color-primary-soft: color-mix(in srgb, #16A34A 12%, white);
     --color-accent: #16A34A;
     --color-success: #22C55E;
-    --color-danger: #DC2626;
+    --color-warning: #F59E0B;
+    --color-danger: #EF4444;
 
     --color-bg-light: #F8FAF8;
     --color-card: #FFFFFF;
@@ -78,6 +79,20 @@
 
     .input-field {
         @apply w-full rounded-xl border border-(--color-border) bg-white px-4 py-2.5 text-sm text-(--color-text) placeholder:text-(--color-text-secondary) transition-colors focus:border-(--color-primary) focus:outline focus:outline-2 focus:outline-offset-1 focus:outline-(--color-primary)/30 dark:border-white/10 dark:bg-(--color-card-dark) dark:text-white;
+    }
+
+    /* Shared card surface — used site-wide (public pages, checkout, and the
+       admin panel) so every card in the app is pixel-identical. Previously
+       duplicated per-page in learn.css / course-details.css. */
+    .lesson-card {
+        background-color: var(--color-card);
+        border: 1px solid var(--color-border);
+        border-radius: 1rem;
+        box-shadow: var(--shadow-card);
+    }
+
+    .dark .lesson-card {
+        background-color: var(--color-card-dark);
     }
 
     /* Slim, low-contrast scrollbar for panels that scroll independently of

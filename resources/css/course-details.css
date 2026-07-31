@@ -2,19 +2,6 @@
    design-system tokens now defined once in resources/css/app.css. Loaded
    after app.css in the @vite(...) call. */
 
-/* ---- Shared card surface — identical rule to the Learning page's
-   .lesson-card, reused verbatim so both pages render pixel-identical cards */
-.lesson-card {
-    background: var(--color-card);
-    border: 1px solid var(--color-border);
-    border-radius: 1rem;
-    box-shadow: var(--shadow-card);
-}
-
-.dark .lesson-card {
-    background: var(--color-card-dark);
-}
-
 /* ---- Hero cover ------------------------------------------------------ */
 .course-hero-cover {
     background: var(--color-bg-dark);

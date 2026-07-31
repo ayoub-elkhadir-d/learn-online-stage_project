@@ -3,201 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin') — ArtiWeb</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { font-family: 'Poppins', sans-serif; }
-        body { background: #f4f6fb; }
-
-        /* ── Sidebar ── */
-        .sidebar {
-            width: 240px;
-            min-height: 100vh;
-            background: linear-gradient(175deg, #1e1b4b 0%, #4f46e5 60%, #7c3aed 100%);
-            position: fixed;
-            top: 0; left: 0;
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar .sb-logo {
-            padding: 1.4rem 1.5rem 1.2rem;
-            border-bottom: 1px solid rgba(255,255,255,.1);
-        }
-        .sidebar .sb-logo small { color: rgba(255,255,255,.45); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
-        .sidebar .sb-section-label {
-            font-size: 10px;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            color: rgba(255,255,255,.35);
-            padding: 1.2rem 1.5rem .4rem;
-            font-weight: 600;
-        }
-        .sidebar .nav-link {
-            color: rgba(255,255,255,.7);
-            padding: .6rem 1rem;
-            border-radius: 10px;
-            margin: 2px 10px;
-            font-size: 13.5px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-            transition: all .2s;
-        }
-        .sidebar .nav-link .icon {
-            width: 32px; height: 32px;
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(255,255,255,.08);
-            font-size: 13px;
-            flex-shrink: 0;
-            transition: all .2s;
-        }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: #fff;
-            background: rgba(255,255,255,.12);
-        }
-        .sidebar .nav-link.active .icon,
-        .sidebar .nav-link:hover .icon {
-            background: rgba(255,255,255,.2);
-        }
-        .sidebar .sb-footer {
-            margin-top: auto;
-            padding: 1rem;
-            border-top: 1px solid rgba(255,255,255,.1);
-        }
-        .sidebar .sb-user {
-            display: flex;
-            align-items: center;
-            gap: .65rem;
-            padding: .6rem .75rem;
-            border-radius: 10px;
-            background: rgba(255,255,255,.08);
-        }
-        .sb-avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: rgba(255,255,255,.25);
-            color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-        .sb-user-info { flex: 1; min-width: 0; }
-        .sb-user-info .name { font-size: 12.5px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sb-user-info .role { font-size: 10px; color: rgba(255,255,255,.45); }
-        .btn-logout {
-            background: none; border: none; padding: 0;
-            color: rgba(255,255,255,.5);
-            font-size: 14px;
-            cursor: pointer;
-            transition: color .2s;
-            flex-shrink: 0;
-        }
-        .btn-logout:hover { color: #fff; }
-
-        /* ── Main ── */
-        .main-content { margin-left: 240px; padding: 1.75rem 2rem; }
-        .topbar {
-            background: #fff;
-            border-radius: 14px;
-            padding: .8rem 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 12px rgba(0,0,0,.05);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .topbar h6 { font-size: 15px; font-weight: 700; color: #1e1b4b; margin: 0; }
-        .topbar .breadcrumb { font-size: 12px; margin: 0; }
-
-        /* ── Cards & components ── */
-        .card { border: none; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-        .btn-primary { background: linear-gradient(135deg,#4f46e5,#7c3aed); border: none; border-radius: 8px; }
-        .btn-primary:hover { opacity: .9; }
-        .badge-category { background: #ede9fe; color: #6d28d9; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-        .form-control, .form-select { border-radius: 8px; border: 1.5px solid #e5e7eb; font-size: 14px; }
-        .form-control:focus, .form-select:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
-        .table thead th { font-size: 12px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: .5px; }
-        .table tbody tr:hover { background: #f9f8ff; }
-    </style>
+    <title>@yield('title', 'Dashboard') — Admin — ArtiWeb</title>
+    @include('partials.theme-init')
+    <script>
+        {{-- Synchronous pre-paint sidebar-collapse state, same reasoning as
+             partials/theme-init.blade.php: avoids a flash of the wrong
+             sidebar width on load. --}}
+        (function () {
+            if (localStorage.getItem('admin-sidebar-collapsed') === '1') {
+                document.documentElement.classList.add('admin-sidebar-collapsed');
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/css/admin.css', 'resources/js/app.js'])
+    @stack('head')
 </head>
-<body>
+<body class="min-h-screen bg-(--color-bg-light) font-sans text-(--color-text) antialiased dark:bg-(--color-bg-dark) dark:text-[#ECECEC]">
 
-<div class="sidebar">
-    <div class="sb-logo">
-        <img src="https://artiweb.ma/wp-content/uploads/2023/05/logo-1.png" alt="ArtiWeb"
-             style="height:34px; filter:brightness(0) invert(1); opacity:.9;">
-        <div><small>Admin Panel</small></div>
-    </div>
+@php
+    $navItems = [
+        ['route' => 'admin.dashboard', 'match' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'layout-dashboard'],
+        ['route' => 'admin.courses.index', 'match' => 'admin.courses.*', 'label' => 'Courses', 'icon' => 'book-open'],
+        ['route' => 'admin.categories.index', 'match' => 'admin.categories.*', 'label' => 'Categories', 'icon' => 'tag'],
+        ['route' => 'admin.payments.index', 'match' => 'admin.payments.*', 'label' => 'Payments', 'icon' => 'credit-card'],
+        ['route' => 'admin.users.index', 'match' => 'admin.users.*', 'label' => 'Users', 'icon' => 'users'],
+    ];
+@endphp
 
-    <div class="sb-section-label">Management</div>
-    <nav class="nav flex-column px-1">
-        <a class="nav-link {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}"
-           href="{{ route('admin.courses.index') }}">
-            <span class="icon"><i class="fas fa-book-open"></i></span>
-            Courses
-        </a>
-        <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
-           href="{{ route('admin.users.index') }}">
-            <span class="icon"><i class="fas fa-users"></i></span>
-            Users
-        </a>
-        <a class="nav-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}"
-           href="{{ route('admin.payments.index') }}">
-            <span class="icon"><i class="fas fa-credit-card"></i></span>
-            Payments
-        </a>
-    </nav>
+<div class="flex min-h-screen" data-admin-shell>
 
-    <div class="sb-footer">
-        <div class="sb-user">
-            <div class="sb-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
-            <div class="sb-user-info">
-                <div class="name">{{ auth()->user()->name }}</div>
-                <div class="role">Administrator</div>
+    {{-- Desktop sidebar --}}
+    <aside data-admin-sidebar class="sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-(--color-border) bg-(--color-card) lg:flex dark:border-white/10 dark:bg-(--color-card-dark)">
+        <a href="{{ route('admin.dashboard') }}" class="flex shrink-0 items-center gap-2.5 border-b border-(--color-border) px-4 py-4 dark:border-white/10">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-(--color-primary) text-sm font-bold text-white">A</span>
+            <span data-sidebar-brand-text class="min-w-0 truncate">
+                <span class="block text-sm font-bold text-(--color-text) dark:text-white">ArtiWeb</span>
+                <span class="block text-[11px] font-medium text-(--color-text-secondary)">Admin Panel</span>
+            </span>
+        </a>
+
+        <nav class="scrollbar-thin flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-4">
+            @include('admin.partials.sidebar-nav')
+        </nav>
+
+        <div class="shrink-0 border-t border-(--color-border) p-3 dark:border-white/10">
+            <div class="flex items-center gap-2.5 rounded-xl px-1.5 py-1.5">
+                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-(--color-primary)/10 text-xs font-bold text-(--color-primary)">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </span>
+                <span data-sidebar-user-info class="min-w-0 flex-1">
+                    <span class="block truncate text-xs font-semibold text-(--color-text) dark:text-white">{{ auth()->user()->name }}</span>
+                    <span class="block truncate text-[11px] text-(--color-text-secondary)">Administrator</span>
+                </span>
             </div>
+            <button type="button" data-sidebar-collapse-toggle title="Collapse sidebar"
+                    class="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-(--color-text-secondary) transition-colors hover:bg-black/5 hover:text-(--color-text) dark:hover:bg-white/5 dark:hover:text-white">
+                <x-icon name="chevrons-left" data-sidebar-collapse-icon class="h-[18px] w-[18px] shrink-0 transition-transform duration-200" />
+                <span data-sidebar-label>Collapse</span>
+            </button>
+        </div>
+    </aside>
+
+    {{-- Mobile off-canvas sidebar --}}
+    <div data-admin-mobile-backdrop class="fixed inset-0 z-40 hidden bg-black/40 lg:hidden"></div>
+    <aside data-admin-mobile-sidebar class="fixed inset-y-0 left-0 z-50 flex w-72 -translate-x-full flex-col overflow-y-auto border-r border-(--color-border) bg-(--color-card) transition-transform duration-200 lg:hidden dark:border-white/10 dark:bg-(--color-card-dark)">
+        <div class="flex shrink-0 items-center justify-between gap-2.5 border-b border-(--color-border) px-4 py-4 dark:border-white/10">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-(--color-primary) text-sm font-bold text-white">A</span>
+                <span>
+                    <span class="block text-sm font-bold text-(--color-text) dark:text-white">ArtiWeb</span>
+                    <span class="block text-[11px] font-medium text-(--color-text-secondary)">Admin Panel</span>
+                </span>
+            </a>
+            <button type="button" data-admin-mobile-close aria-label="Close menu"
+                    class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-(--color-text-secondary) hover:bg-black/5 dark:hover:bg-white/10">
+                <x-icon name="x" class="h-5 w-5" />
+            </button>
+        </div>
+        <nav class="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-4">
+            @include('admin.partials.sidebar-nav')
+        </nav>
+        <div class="shrink-0 border-t border-(--color-border) p-3 dark:border-white/10">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button class="btn-logout" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+                <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-(--color-danger) transition-colors hover:bg-(--color-danger)/10">
+                    <x-icon name="log-out" class="h-[18px] w-[18px] shrink-0" />
+                    Sign Out
+                </button>
             </form>
         </div>
+    </aside>
+
+    <div class="flex min-w-0 flex-1 flex-col">
+
+        {{-- Topbar --}}
+        <header class="sticky top-0 z-30 flex items-center gap-3 border-b border-(--color-border) bg-(--color-card)/90 px-4 py-3 backdrop-blur dark:border-white/10 dark:bg-(--color-card-dark)/90 sm:px-6">
+            <button type="button" data-admin-mobile-toggle aria-label="Open menu"
+                    class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-(--color-text-secondary) hover:bg-black/5 lg:hidden dark:hover:bg-white/10">
+                <x-icon name="menu" class="h-5 w-5" />
+            </button>
+
+            <h1 class="min-w-0 truncate text-base font-bold text-(--color-text) dark:text-white sm:text-lg">@yield('title', 'Dashboard')</h1>
+
+            <div class="ml-auto flex items-center gap-1.5 sm:gap-2">
+                <a href="{{ route('home') }}" target="_blank" class="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-(--color-text-secondary) transition-colors hover:bg-black/5 hover:text-(--color-text) sm:inline-flex dark:hover:bg-white/10 dark:hover:text-white">
+                    <x-icon name="globe" class="h-4 w-4" />
+                    View Site
+                </a>
+
+                <button type="button" data-theme-toggle aria-label="Toggle dark mode"
+                        class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-(--color-text-secondary) transition-colors hover:bg-black/5 hover:text-(--color-text) dark:hover:bg-white/10 dark:hover:text-white">
+                    <x-icon name="sun" class="hidden h-[18px] w-[18px] dark:block" />
+                    <x-icon name="moon" class="block h-[18px] w-[18px] dark:hidden" />
+                </button>
+
+                <div class="relative" data-dropdown>
+                    <button type="button" data-dropdown-toggle aria-haspopup="true" aria-expanded="false"
+                            class="flex items-center gap-2 rounded-lg py-1.5 pl-1.5 pr-2 transition-colors hover:bg-black/5 dark:hover:bg-white/10">
+                        <span class="flex h-7 w-7 items-center justify-center rounded-full bg-(--color-primary) text-xs font-semibold text-white">
+                            {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                        </span>
+                        <span class="hidden max-w-24 truncate text-sm font-medium md:inline">{{ auth()->user()->name }}</span>
+                        <x-icon name="chevron-down" class="hidden h-3.5 w-3.5 text-(--color-text-secondary) md:inline" />
+                    </button>
+
+                    <div data-dropdown-panel role="menu"
+                         class="absolute right-0 z-50 mt-2 hidden w-56 overflow-hidden rounded-xl border border-(--color-border) bg-(--color-card) py-1.5 shadow-lift dark:border-white/10 dark:bg-(--color-card-dark)">
+                        <div class="px-4 py-2.5">
+                            <div class="truncate text-sm font-semibold">{{ auth()->user()->name }}</div>
+                            <div class="truncate text-xs text-(--color-text-secondary)">{{ auth()->user()->email }}</div>
+                        </div>
+                        <div class="my-1 border-t border-(--color-border) dark:border-white/10"></div>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm text-(--color-danger) transition-colors hover:bg-(--color-danger)/10">
+                                <x-icon name="log-out" class="h-4 w-4" />
+                                Sign Out
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            @if(session('success'))
+                <div class="mb-5 flex items-center gap-2 rounded-xl border border-(--color-primary)/20 bg-(--color-primary)/10 px-4 py-3 text-sm text-(--color-primary-dark) dark:text-(--color-accent)" role="status">
+                    <x-icon name="check-circle" class="h-4 w-4 shrink-0" />
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="mb-5 flex items-center gap-2 rounded-xl border border-(--color-danger)/20 bg-(--color-danger)/10 px-4 py-3 text-sm text-(--color-danger)" role="alert">
+                    <x-icon name="alert-triangle" class="h-4 w-4 shrink-0" />
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="mb-5 rounded-xl border border-(--color-danger)/20 bg-(--color-danger)/10 px-4 py-3 text-sm text-(--color-danger)">
+                    <div class="flex items-center gap-2 font-semibold">
+                        <x-icon name="alert-triangle" class="h-4 w-4 shrink-0" />
+                        Please fix the following
+                    </div>
+                    <ul class="mt-1.5 list-disc pl-6 text-xs">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @yield('content')
+        </main>
     </div>
 </div>
 
-<div class="main-content">
-    <div class="topbar">
-        <h6>@yield('title', 'Dashboard')</h6>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{{ route('admin.courses.index') }}" class="text-decoration-none text-muted">Admin</a></li>
-                <li class="breadcrumb-item active text-muted">@yield('title', 'Dashboard')</li>
-            </ol>
-        </nav>
-    </div>
+<script>
+(function () {
+    // ---- Desktop sidebar collapse ----
+    var collapseBtn = document.querySelector('[data-sidebar-collapse-toggle]');
+    if (collapseBtn) {
+        collapseBtn.addEventListener('click', function () {
+            var collapsed = document.documentElement.classList.toggle('admin-sidebar-collapsed');
+            localStorage.setItem('admin-sidebar-collapsed', collapsed ? '1' : '0');
+        });
+    }
 
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show border-0" style="border-radius:12px;">
-            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+    // ---- Mobile off-canvas sidebar ----
+    var mobileSidebar = document.querySelector('[data-admin-mobile-sidebar]');
+    var mobileBackdrop = document.querySelector('[data-admin-mobile-backdrop]');
+    var mobileToggle = document.querySelector('[data-admin-mobile-toggle]');
+    var mobileClose = document.querySelector('[data-admin-mobile-close]');
 
-    @if($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show border-0" style="border-radius:12px;">
-            <ul class="mb-0 ps-3">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+    function openMobile() {
+        mobileSidebar.classList.remove('-translate-x-full');
+        mobileBackdrop.classList.remove('hidden');
+    }
+    function closeMobile() {
+        mobileSidebar.classList.add('-translate-x-full');
+        mobileBackdrop.classList.add('hidden');
+    }
 
-    @yield('content')
-</div>
+    if (mobileToggle) mobileToggle.addEventListener('click', openMobile);
+    if (mobileClose) mobileClose.addEventListener('click', closeMobile);
+    if (mobileBackdrop) mobileBackdrop.addEventListener('click', closeMobile);
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    // ---- Topbar user dropdown ----
+    document.querySelectorAll('[data-dropdown]').forEach(function (wrapper) {
+        var toggle = wrapper.querySelector('[data-dropdown-toggle]');
+        var panel = wrapper.querySelector('[data-dropdown-panel]');
+        toggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var isOpen = !panel.classList.contains('hidden');
+            document.querySelectorAll('[data-dropdown-panel]').forEach(function (p) { p.classList.add('hidden'); });
+            panel.classList.toggle('hidden', isOpen);
+            toggle.setAttribute('aria-expanded', String(!isOpen));
+        });
+    });
+    document.addEventListener('click', function () {
+        document.querySelectorAll('[data-dropdown-panel]').forEach(function (p) { p.classList.add('hidden'); });
+    });
+})();
+</script>
+
+@stack('scripts')
 </body>
 </html>

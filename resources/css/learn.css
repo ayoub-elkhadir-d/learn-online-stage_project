@@ -25,17 +25,8 @@ media-player {
     object-fit: cover;
 }
 
-/* ---- Shared surfaces ---------------------------------------------------- */
-.lesson-card {
-    background: var(--color-card);
-    border: 1px solid var(--color-border);
-    border-radius: 1rem;
-    box-shadow: var(--shadow-card);
-}
-
-.dark .lesson-card {
-    background: var(--color-card-dark);
-}
+/* ---- Shared surfaces ----------------------------------------------------
+   .lesson-card itself now lives in app.css (shared site-wide). */
 
 /* Deferred off-screen rendering for cards below the player — genuine
    browser-native lazy rendering, not a JS intersection-observer. */
