@@ -1,6 +1,6 @@
 {
-  "_prod-COoyOuwE.js": {
-    "file": "assets/prod-COoyOuwE.js",
+  "_prod-iujRMz4f.js": {
+    "file": "assets/prod-iujRMz4f.js",
     "name": "prod",
     "isDynamicEntry": true,
     "imports": [
@@ -12,22 +12,22 @@
       "node_modules/media-captions/dist/prod/errors.js"
     ]
   },
-  "_vidstack-CI5oafcm-DMWimXbY.js": {
-    "file": "assets/vidstack-CI5oafcm-DMWimXbY.js",
+  "_vidstack-CI5oafcm-CaB6og5Y.js": {
+    "file": "assets/vidstack-CI5oafcm-CaB6og5Y.js",
     "name": "vidstack-CI5oafcm",
     "imports": [
       "resources/js/learn.js"
     ]
   },
-  "_vidstack-CceZzgm4-C5hukAZ2.js": {
-    "file": "assets/vidstack-CceZzgm4-C5hukAZ2.js",
+  "_vidstack-CceZzgm4--ny3YPWz.js": {
+    "file": "assets/vidstack-CceZzgm4--ny3YPWz.js",
     "name": "vidstack-CceZzgm4",
     "imports": [
       "resources/js/learn.js"
     ]
   },
-  "_vidstack-DUnfBERX2-4xZ_qLDR.js": {
-    "file": "assets/vidstack-DUnfBERX2-4xZ_qLDR.js",
+  "_vidstack-DUnfBERX2-DRj8fnmU.js": {
+    "file": "assets/vidstack-DUnfBERX2-DRj8fnmU.js",
     "name": "vidstack-DUnfBERX2",
     "isDynamicEntry": true,
     "imports": [
@@ -38,40 +38,40 @@
     ]
   },
   "node_modules/media-captions/dist/prod/errors.js": {
-    "file": "assets/errors-CwweOYjA.js",
+    "file": "assets/errors-0JtHujfF.js",
     "name": "errors",
     "src": "node_modules/media-captions/dist/prod/errors.js",
     "isDynamicEntry": true,
     "imports": [
-      "_prod-COoyOuwE.js",
+      "_prod-iujRMz4f.js",
       "resources/js/learn.js"
     ]
   },
   "node_modules/media-captions/dist/prod/srt-parser.js": {
-    "file": "assets/srt-parser-DG9srZgJ.js",
+    "file": "assets/srt-parser-hhUcoc9_.js",
     "name": "srt-parser",
     "src": "node_modules/media-captions/dist/prod/srt-parser.js",
     "isDynamicEntry": true,
     "imports": [
-      "_prod-COoyOuwE.js",
+      "_prod-iujRMz4f.js",
       "resources/js/learn.js"
     ]
   },
   "node_modules/media-captions/dist/prod/ssa-parser.js": {
-    "file": "assets/ssa-parser-CDxi_y2L.js",
+    "file": "assets/ssa-parser-ueFfAsZg.js",
     "name": "ssa-parser",
     "src": "node_modules/media-captions/dist/prod/ssa-parser.js",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/learn.js",
-      "_prod-COoyOuwE.js"
+      "_prod-iujRMz4f.js"
     ],
     "dynamicImports": [
       "node_modules/media-captions/dist/prod/errors.js"
     ]
   },
   "node_modules/vidstack/prod/chunks/vidstack-BEi14iNw2.js": {
-    "file": "assets/vidstack-BEi14iNw2-C60Of4o3.js",
+    "file": "assets/vidstack-BEi14iNw2-DM26SkTV.js",
     "name": "vidstack-BEi14iNw2",
     "src": "node_modules/vidstack/prod/chunks/vidstack-BEi14iNw2.js",
     "isDynamicEntry": true,
@@ -86,7 +86,7 @@
     "isDynamicEntry": true
   },
   "node_modules/vidstack/prod/chunks/vidstack-CXo4cwSP2.js": {
-    "file": "assets/vidstack-CXo4cwSP2-CPBhxkFW.js",
+    "file": "assets/vidstack-CXo4cwSP2-DGnnEy8m.js",
     "name": "vidstack-CXo4cwSP2",
     "src": "node_modules/vidstack/prod/chunks/vidstack-CXo4cwSP2.js",
     "isDynamicEntry": true,
@@ -107,101 +107,101 @@
     "isDynamicEntry": true
   },
   "node_modules/vidstack/prod/providers/vidstack-audio.js": {
-    "file": "assets/vidstack-audio-CBiARusi.js",
+    "file": "assets/vidstack-audio-CiH7fVv6.js",
     "name": "vidstack-audio",
     "src": "node_modules/vidstack/prod/providers/vidstack-audio.js",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/learn.js",
-      "_vidstack-CI5oafcm-DMWimXbY.js"
+      "_vidstack-CI5oafcm-CaB6og5Y.js"
     ]
   },
   "node_modules/vidstack/prod/providers/vidstack-dash.js": {
-    "file": "assets/vidstack-dash-Bd6kGCwr.js",
+    "file": "assets/vidstack-dash-CO1I2CdK.js",
     "name": "vidstack-dash",
     "src": "node_modules/vidstack/prod/providers/vidstack-dash.js",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/learn.js",
       "node_modules/vidstack/prod/providers/vidstack-video.js",
-      "_vidstack-CI5oafcm-DMWimXbY.js"
+      "_vidstack-CI5oafcm-CaB6og5Y.js"
     ]
   },
   "node_modules/vidstack/prod/providers/vidstack-google-cast.js": {
-    "file": "assets/vidstack-google-cast-DwFoa-Be.js",
+    "file": "assets/vidstack-google-cast-DeR9NgNQ.js",
     "name": "vidstack-google-cast",
     "src": "node_modules/vidstack/prod/providers/vidstack-google-cast.js",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/learn.js",
-      "_vidstack-DUnfBERX2-4xZ_qLDR.js"
+      "_vidstack-DUnfBERX2-DRj8fnmU.js"
     ]
   },
   "node_modules/vidstack/prod/providers/vidstack-hls.js": {
-    "file": "assets/vidstack-hls-Bei57arM.js",
+    "file": "assets/vidstack-hls-C4DXrzrc.js",
     "name": "vidstack-hls",
     "src": "node_modules/vidstack/prod/providers/vidstack-hls.js",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/learn.js",
       "node_modules/vidstack/prod/providers/vidstack-video.js",
-      "_vidstack-CI5oafcm-DMWimXbY.js"
+      "_vidstack-CI5oafcm-CaB6og5Y.js"
     ]
   },
   "node_modules/vidstack/prod/providers/vidstack-video.js": {
-    "file": "assets/vidstack-video-DtE9rTt-.js",
+    "file": "assets/vidstack-video-D77MlDuv.js",
     "name": "vidstack-video",
     "src": "node_modules/vidstack/prod/providers/vidstack-video.js",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/learn.js",
-      "_vidstack-CI5oafcm-DMWimXbY.js"
+      "_vidstack-CI5oafcm-CaB6og5Y.js"
     ]
   },
   "node_modules/vidstack/prod/providers/vidstack-vimeo.js": {
-    "file": "assets/vidstack-vimeo-JuBlQwRN.js",
+    "file": "assets/vidstack-vimeo-Do-O1AyZ.js",
     "name": "vidstack-vimeo",
     "src": "node_modules/vidstack/prod/providers/vidstack-vimeo.js",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/learn.js",
-      "_vidstack-CceZzgm4-C5hukAZ2.js",
+      "_vidstack-CceZzgm4--ny3YPWz.js",
       "node_modules/vidstack/prod/chunks/vidstack-q-9soyHT.js"
     ]
   },
   "node_modules/vidstack/prod/providers/vidstack-youtube.js": {
-    "file": "assets/vidstack-youtube-DkkQrR12.js",
+    "file": "assets/vidstack-youtube-B4BxAlyc.js",
     "name": "vidstack-youtube",
     "src": "node_modules/vidstack/prod/providers/vidstack-youtube.js",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/learn.js",
-      "_vidstack-CceZzgm4-C5hukAZ2.js",
+      "_vidstack-CceZzgm4--ny3YPWz.js",
       "node_modules/vidstack/prod/chunks/vidstack-IMa-zkAV.js"
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-DUxQzequ.css",
+    "file": "assets/app-CRK9AUg8.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/css/course-details.css": {
-    "file": "assets/course-details-CQ1WKGZz.css",
+    "file": "assets/course-details-BLtqNDSX.css",
     "src": "resources/css/course-details.css",
     "isEntry": true
   },
   "resources/css/courses-index.css": {
-    "file": "assets/courses-index-BLWRbfxB.css",
+    "file": "assets/courses-index-C0_ICQju.css",
     "src": "resources/css/courses-index.css",
     "isEntry": true
   },
   "resources/css/dashboard.css": {
-    "file": "assets/dashboard-CxivhSie.css",
+    "file": "assets/dashboard-DUb5wXVY.css",
     "src": "resources/css/dashboard.css",
     "isEntry": true
   },
   "resources/css/learn.css": {
-    "file": "assets/learn-F9vNR_P_.css",
+    "file": "assets/learn-DsEHSzNV.css",
     "src": "resources/css/learn.css",
     "isEntry": true
   },
@@ -212,13 +212,13 @@
     "isEntry": true
   },
   "resources/js/learn.js": {
-    "file": "assets/learn-CbyfEdZ1.js",
+    "file": "assets/learn-Cq5BOTYS.js",
     "name": "learn",
     "src": "resources/js/learn.js",
     "isEntry": true,
     "dynamicImports": [
-      "_prod-COoyOuwE.js",
-      "_prod-COoyOuwE.js",
+      "_prod-iujRMz4f.js",
+      "_prod-iujRMz4f.js",
       "node_modules/vidstack/prod/providers/vidstack-audio.js",
       "node_modules/vidstack/prod/providers/vidstack-video.js",
       "node_modules/vidstack/prod/providers/vidstack-hls.js",
@@ -227,12 +227,12 @@
       "node_modules/vidstack/prod/chunks/vidstack-q-9soyHT.js",
       "node_modules/vidstack/prod/providers/vidstack-youtube.js",
       "node_modules/vidstack/prod/chunks/vidstack-IMa-zkAV.js",
-      "_vidstack-DUnfBERX2-4xZ_qLDR.js",
+      "_vidstack-DUnfBERX2-DRj8fnmU.js",
       "node_modules/vidstack/prod/chunks/vidstack-CXo4cwSP2.js",
       "node_modules/vidstack/prod/chunks/vidstack-BEi14iNw2.js",
       "node_modules/vidstack/prod/chunks/vidstack-BILrshkt2.js",
-      "_prod-COoyOuwE.js",
-      "_prod-COoyOuwE.js"
+      "_prod-iujRMz4f.js",
+      "_prod-iujRMz4f.js"
     ]
   }
 }
