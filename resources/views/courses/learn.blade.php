@@ -64,10 +64,17 @@
         </div>
     </header>
 
-    <div class="flex flex-1 overflow-hidden">
+    {{-- min-h-0 here is load-bearing: a flex item's default automatic
+         min-height is its content size, not 0, so without this override a
+         tall enough child (long lesson lists, long bookmark/notes content,
+         etc.) forces THIS row taller than the h-full column above it can
+         actually give it — which then forces the whole column, and the
+         body underneath it, to grow past the viewport instead of handing
+         that overflow to the internal `main` / `aside` scrollers below. --}}
+    <div class="flex min-h-0 flex-1 overflow-hidden">
 
         {{-- Sidebar --}}
-        <aside data-sidebar class="scrollbar-thin fixed inset-y-0 left-0 z-40 mt-[57px] w-[85%] max-w-[320px] -translate-x-full overflow-y-auto border-r border-(--color-border) bg-(--color-card) transition-transform duration-200 lg:static lg:mt-0 lg:w-80 lg:max-w-none lg:translate-x-0 lg:shrink-0 dark:border-white/10 dark:bg-(--color-card-dark)">
+        <aside data-sidebar class="scrollbar-thin fixed inset-y-0 left-0 z-40 mt-[57px] w-[85%] max-w-[320px] -translate-x-full overflow-y-auto border-r border-(--color-border) bg-(--color-card) transition-transform duration-200 lg:static lg:mt-0 lg:min-h-0 lg:w-80 lg:max-w-none lg:translate-x-0 lg:shrink-0 dark:border-white/10 dark:bg-(--color-card-dark)">
             <div class="sticky top-0 z-10 flex items-center gap-2 border-b border-(--color-border) bg-(--color-card) p-3 dark:border-white/10 dark:bg-(--color-card-dark)">
                 <div class="relative flex-1">
                     <x-icon name="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
@@ -111,8 +118,11 @@
 
         <div data-sidebar-backdrop class="fixed inset-0 z-30 hidden bg-black/40 lg:hidden"></div>
 
-        {{-- Video + details --}}
-        <main class="scrollbar-thin flex flex-1 flex-col overflow-y-auto" id="videoArea">
+        {{-- Video + details — min-h-0 is what actually lets this box stop
+             at the row's height and hand its own overflow to its internal
+             scrollbar instead of stretching the row (and everything above
+             it) to fit however much lesson content/notes/bookmarks it holds. --}}
+        <main class="scrollbar-thin flex min-h-0 flex-1 flex-col overflow-y-auto" id="videoArea">
             @include('courses.partials.learn-lesson', ['course' => $course, 'lessons' => $lessons, 'currentLesson' => $currentLesson])
         </main>
     </div>
