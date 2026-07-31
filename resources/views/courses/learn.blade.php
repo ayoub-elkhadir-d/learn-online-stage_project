@@ -15,6 +15,7 @@
     <script>
         window.__courseId = {{ $course->id }};
         window.__totalLessons = {{ $lessons->count() }};
+        window.__userName = @json(auth()->user()->name);
     </script>
 </head>
 <body class="learn-shell h-screen overflow-hidden bg-(--color-bg-light) font-sans text-(--color-text) antialiased dark:bg-(--color-bg-dark) dark:text-[#ECECEC]">

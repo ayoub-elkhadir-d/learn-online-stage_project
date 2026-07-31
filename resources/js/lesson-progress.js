@@ -75,12 +75,23 @@
             write('lp:speed', v);
         },
 
-        // ---- Notes (per lesson, debounced-save from the caller) ----
-        getNote(lessonId) {
-            return read(`lp:note:${lessonId}`, '');
+        // ---- Reviews (per lesson — rating + text, shown in the Ratings &
+        // Reviews tab). Client-side only, same as everything else here: no
+        // backend table, so reviews live per-browser rather than per-account. ----
+        getReviews(lessonId) {
+            return read(`lp:reviews:${lessonId}`, []);
         },
-        saveNote(lessonId, text) {
-            write(`lp:note:${lessonId}`, text);
+        addReview(lessonId, { rating, text, name }) {
+            const list = this.getReviews(lessonId);
+            list.push({
+                id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                rating: Math.max(1, Math.min(5, Math.round(rating))),
+                text: (text || '').trim(),
+                name: (name || 'You').trim(),
+                createdAt: Date.now(),
+            });
+            write(`lp:reviews:${lessonId}`, list);
+            return list;
         },
 
         // ---- Bookmarks (timestamped markers per lesson) ----

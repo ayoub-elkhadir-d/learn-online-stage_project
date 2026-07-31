@@ -1,9 +1,10 @@
 /**
  * Page-level orchestration for the learning page: sidebar (search, active
- * state, progress), AJAX lesson navigation, bookmarks panel, and notes
- * autosave. The Vidstack <media-player> element itself is never touched
- * here beyond calling window.LessonPlayerController.updateLesson() — see
- * player.js for everything playback-related.
+ * state, progress), AJAX lesson navigation, the Overview/Bookmarks/Ratings
+ * tabs below the player, and the bookmarks + reviews panels inside them.
+ * The Vidstack <media-player> element itself is never touched here beyond
+ * calling window.LessonPlayerController.updateLesson() — see player.js for
+ * everything playback-related.
  */
 
 const prefetchCache = new Map();
@@ -213,47 +214,195 @@ function bindBookmarksChrome() {
     });
 }
 
-// ---- Notes ---------------------------------------------------------------
+// ---- Content tabs (Overview / Bookmarks / Ratings & Reviews) --------------
 
-function bindNotes() {
-    const lessonId = currentLessonId();
-    const field = $('[data-notes-field]');
-    const status = $('[data-notes-status]');
-    const counter = $('[data-notes-count]');
-    if (!field || !lessonId) return;
+function bindTabs() {
+    const wrapper = $('[data-tabs]');
+    if (!wrapper) return;
 
-    field.value = window.LessonProgress.getNote(lessonId);
-    updateCounter();
+    const tabs = $$('[data-tab-btn]', wrapper);
+    const indicator = $('[data-tab-indicator]', wrapper);
 
-    let timer;
-    field.addEventListener('input', () => {
-        updateCounter();
-        setSaving();
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-            window.LessonProgress.saveNote(lessonId, field.value);
-            setSaved();
-        }, 600);
+    function activate(name, { focus = false } = {}) {
+        tabs.forEach(btn => {
+            const active = btn.dataset.tabBtn === name;
+            btn.setAttribute('aria-selected', String(active));
+            btn.tabIndex = active ? 0 : -1;
+            if (active && focus) btn.focus();
+            if (active && indicator) {
+                indicator.style.width = `${btn.offsetWidth}px`;
+                indicator.style.transform = `translateX(${btn.offsetLeft}px)`;
+            }
+        });
+        $$('[data-tab-panel]').forEach(panel => {
+            panel.hidden = panel.dataset.tabPanel !== name;
+        });
+    }
+
+    tabs.forEach((btn, i) => {
+        btn.addEventListener('click', () => activate(btn.dataset.tabBtn));
+        btn.addEventListener('keydown', (e) => {
+            let target = null;
+            if (e.key === 'ArrowRight') target = tabs[(i + 1) % tabs.length];
+            else if (e.key === 'ArrowLeft') target = tabs[(i - 1 + tabs.length) % tabs.length];
+            else if (e.key === 'Home') target = tabs[0];
+            else if (e.key === 'End') target = tabs[tabs.length - 1];
+            if (!target) return;
+            e.preventDefault();
+            activate(target.dataset.tabBtn, { focus: true });
+        });
     });
 
-    function updateCounter() {
-        if (counter) counter.textContent = `${field.value.length} / 2000`;
+    // Overview is always the tab shown first — this whole partial is
+    // freshly re-rendered on every lesson swap, so there's no stale state
+    // to restore here.
+    activate('overview');
+}
+
+// ---- Ratings & Reviews ----------------------------------------------------
+
+const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" class="h-full w-full" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function starsMarkup(rating, sizeClass) {
+    return Array.from({ length: 5 }, (_, i) => (
+        `<span class="${sizeClass} ${i < rating ? 'text-amber-400' : 'text-(--color-border) dark:text-white/15'}">${STAR_SVG}</span>`
+    )).join('');
+}
+
+function bindReviewStarInput(root) {
+    const buttons = $$('[data-star-input]', root);
+    let selected = 0;
+
+    function paint(upTo) {
+        buttons.forEach(btn => {
+            const filled = Number(btn.dataset.starInput) <= upTo;
+            btn.classList.toggle('text-amber-400', filled);
+            btn.querySelector('svg')?.classList.toggle('fill-current', filled);
+        });
     }
-    function setSaving() {
-        if (status) status.innerHTML = '<span class="saving-dot inline-block h-1.5 w-1.5 rounded-full bg-(--color-primary)"></span> Saving…';
+
+    buttons.forEach(btn => {
+        btn.addEventListener('mouseenter', () => paint(Number(btn.dataset.starInput)));
+        btn.addEventListener('click', () => {
+            selected = Number(btn.dataset.starInput);
+            paint(selected);
+        });
+    });
+    root.addEventListener('mouseleave', () => paint(selected));
+
+    return {
+        get: () => selected,
+        reset: () => { selected = 0; paint(0); },
+    };
+}
+
+function renderReviewSummary(lessonId) {
+    const reviews = window.LessonProgress.getReviews(lessonId);
+    const total = reviews.length;
+    const average = total ? reviews.reduce((sum, r) => sum + r.rating, 0) / total : 0;
+
+    const averageEl = $('[data-review-average]');
+    if (averageEl) averageEl.textContent = average.toFixed(1);
+
+    const starsEl = $('[data-review-average-stars]');
+    if (starsEl) starsEl.innerHTML = starsMarkup(Math.round(average), 'h-5 w-5');
+
+    const countEl = $('[data-review-count]');
+    if (countEl) countEl.textContent = total;
+
+    for (let star = 1; star <= 5; star++) {
+        const count = reviews.filter(r => r.rating === star).length;
+        const pct = total ? Math.round((count / total) * 100) : 0;
+        const bar = document.querySelector(`[data-review-bar="${star}"]`);
+        const pctEl = document.querySelector(`[data-review-bar-pct="${star}"]`);
+        if (bar) bar.style.width = `${pct}%`;
+        if (pctEl) pctEl.textContent = `${pct}%`;
     }
-    function setSaved() {
-        if (!status) return;
-        status.textContent = 'Saved';
-        setTimeout(() => { if (status.textContent === 'Saved') status.textContent = ''; }, 1500);
-    }
+}
+
+function renderReviewsList(lessonId) {
+    const list = $('[data-reviews-list]');
+    const empty = $('[data-reviews-empty]');
+    if (!list) return;
+
+    const reviews = window.LessonProgress.getReviews(lessonId).slice().sort((a, b) => b.createdAt - a.createdAt);
+
+    $$('[data-review-row]', list).forEach(el => el.remove());
+    if (empty) empty.classList.toggle('hidden', reviews.length > 0);
+
+    reviews.forEach(r => {
+        const card = document.createElement('div');
+        card.dataset.reviewRow = '';
+        card.className = 'lesson-card p-4 sm:p-5';
+        card.innerHTML = `
+            <div class="flex items-start gap-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-(--color-primary) text-xs font-semibold text-white">${escapeHtml((r.name || 'U').charAt(0).toUpperCase())}</span>
+                <div class="min-w-0 flex-1">
+                    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                        <span class="text-sm font-bold text-(--color-text) dark:text-white">${escapeHtml(r.name || 'Anonymous')}</span>
+                        <span class="text-xs text-(--color-text-secondary)">${escapeHtml(new Date(r.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }))}</span>
+                    </div>
+                    <div class="mt-1 flex items-center gap-0.5">${starsMarkup(r.rating, 'h-3.5 w-3.5')}</div>
+                    ${r.text ? `<p class="mt-2 text-sm leading-relaxed text-(--color-text-secondary)">${escapeHtml(r.text)}</p>` : ''}
+                </div>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+function bindReviewForm(lessonId, starController) {
+    const submitBtn = $('[data-review-submit]');
+    const textField = $('[data-review-text]');
+    const errorEl = $('[data-review-error]');
+    if (!submitBtn) return;
+
+    submitBtn.addEventListener('click', () => {
+        const rating = starController.get();
+        if (!rating) {
+            if (errorEl) errorEl.textContent = 'Please select a star rating.';
+            return;
+        }
+        if (errorEl) errorEl.textContent = '';
+
+        window.LessonProgress.addReview(lessonId, {
+            rating,
+            text: textField ? textField.value : '',
+            name: window.__userName,
+        });
+
+        if (textField) textField.value = '';
+        starController.reset();
+
+        renderReviewSummary(lessonId);
+        renderReviewsList(lessonId);
+    });
+}
+
+function bindReviews() {
+    const lessonId = currentLessonId();
+    if (!lessonId) return;
+
+    renderReviewSummary(lessonId);
+    renderReviewsList(lessonId);
+
+    const inputRoot = $('[data-review-star-input]');
+    const starController = inputRoot ? bindReviewStarInput(inputRoot) : { get: () => 0, reset: () => {} };
+    bindReviewForm(lessonId, starController);
 }
 
 // ---- Lesson navigation (AJAX swap, player instance preserved) -----------------
 
 function initLessonContentView() {
-    bindNotes();
+    bindTabs();
     renderBookmarksList();
+    bindReviews();
     paintProgress();
     paintCompleted();
 }
