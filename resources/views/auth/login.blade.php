@@ -1,65 +1,60 @@
 @extends('layouts.app')
-@section('title', 'Welcome Back - LearnHub')
-@section('subtitle', 'Sign in to continue learning')
-@section('content')
-<div class="text-center mb-4">
-    <h5 class="text-dark mb-2">Welcome Back!</h5>
-    <p class="text-muted">Sign in to access your courses</p>
-</div>
 
-<form method="POST" action="{{ route('login') }}">
+@section('title', 'Login — ArtiWeb')
+@section('heading', 'Welcome back')
+@section('subtitle', 'Sign in to continue learning')
+
+@section('content')
+<form method="POST" action="{{ route('login') }}" class="flex flex-col gap-4">
     @csrf
-    <div class="mb-3">
-        <label class="form-label">
-            <i class="fas fa-envelope me-2"></i>Email Address
-        </label>
-        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-               name="email" value="{{ old('email') }}" 
-               placeholder="Enter your email address" required>
-        @error('email')
-            <div class="invalid-feedback">
-                <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
-            </div>
-        @enderror
-    </div>
-    
-    <div class="mb-3">
-        <label class="form-label">
-            <i class="fas fa-lock me-2"></i>Password
-        </label>
-        <input type="password" class="form-control @error('password') is-invalid @enderror" 
-               name="password" placeholder="Enter your password" required>
-        @error('password')
-            <div class="invalid-feedback">
-                <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
-            </div>
-        @enderror
-    </div>
-    
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" name="remember" id="remember">
-            <label class="form-check-label" for="remember">
-                <i class="fas fa-heart me-1"></i>Remember me
-            </label>
+
+    <div>
+        <label for="email" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Email Address</label>
+        <div class="relative">
+            <x-icon name="mail" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
+            <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" required autofocus
+                   class="input-field pl-9 @error('email') border-(--color-danger)! @enderror">
         </div>
-        <a href="{{ route('password.request') }}" class="auth-link">
-            <i class="fas fa-key me-1"></i>Forgot Password?
+        @error('email')
+            <p class="mt-1.5 text-xs text-(--color-danger)">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div>
+        <label for="password" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Password</label>
+        <div class="relative">
+            <x-icon name="lock" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
+            <input type="password" id="password" name="password" placeholder="Enter your password" required
+                   class="input-field pl-9 @error('password') border-(--color-danger)! @enderror">
+        </div>
+        @error('password')
+            <p class="mt-1.5 text-xs text-(--color-danger)">{{ $message }}</p>
+        @enderror
+    </div>
+
+    <div class="flex items-center justify-between text-sm">
+        <label class="flex items-center gap-2 text-(--color-text-secondary)">
+            <input type="checkbox" name="remember" class="h-4 w-4 rounded border-(--color-border) accent-[var(--color-primary)]">
+            Remember me
+        </label>
+        <a href="{{ route('password.request') }}" class="font-medium text-(--color-primary) transition-colors hover:text-(--color-primary-dark)">
+            Forgot password?
         </a>
     </div>
-    
-    <button type="submit" class="btn btn-primary w-100 mb-4">
-        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+
+    <button type="submit" class="btn-primary mt-2 w-full">
+        Sign In
+        <x-icon name="arrow-right" class="h-4 w-4" />
     </button>
 </form>
 
-<div class="divider">
-    <span>New to LearnHub?</span>
+<div class="my-6 flex items-center gap-3 text-xs text-(--color-text-secondary)">
+    <div class="h-px flex-1 bg-(--color-border) dark:bg-white/10"></div>
+    <span>New to ArtiWeb?</span>
+    <div class="h-px flex-1 bg-(--color-border) dark:bg-white/10"></div>
 </div>
 
-<div class="text-center">
-    <a href="{{ route('register') }}" class="auth-link">
-        <i class="fas fa-user-plus me-2"></i>Create Account
-    </a>
-</div>
+<a href="{{ route('register') }}" class="btn-secondary w-full">
+    Create an account
+</a>
 @endsection

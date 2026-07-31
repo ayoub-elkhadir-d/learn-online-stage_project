@@ -14,11 +14,11 @@
 
 <x-navbar />
 
-@if(session('status'))
+@if(session('status') || session('success'))
     <div class="mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex items-center gap-2 rounded-xl border border-(--color-primary)/20 bg-(--color-primary)/10 px-4 py-3 text-sm text-(--color-primary-dark) dark:text-(--color-accent)" role="status">
-            <x-icon name="alert-circle" class="h-4 w-4 shrink-0" />
-            {{ session('status') }}
+            <x-icon name="{{ session('success') ? 'check-circle' : 'alert-circle' }}" class="h-4 w-4 shrink-0" />
+            {{ session('success') ?? session('status') }}
         </div>
     </div>
 @endif
@@ -26,6 +26,8 @@
 <main>
     @yield('content')
 </main>
+
+<x-footer />
 
 @stack('scripts')
 </body>

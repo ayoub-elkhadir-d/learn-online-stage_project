@@ -1,39 +1,33 @@
 @extends('layouts.app')
-@section('title', 'Reset Password - LearnHub')
-@section('subtitle', 'We\'ll help you get back in')
-@section('content')
-<div class="text-center mb-4">
-    <div class="mb-3">
-        <i class="fas fa-key fa-3x text-primary"></i>
-    </div>
-    <h5 class="text-dark mb-2">Forgot Your Password?</h5>
-    <p class="text-muted">Enter your email and we'll send you a reset link</p>
-</div>
 
-<form method="POST" action="{{ route('password.email') }}">
+@section('title', 'Forgot Password — ArtiWeb')
+@section('heading', 'Forgot your password?')
+@section('subtitle', 'Enter your email and we\'ll send you a reset link')
+
+@section('content')
+<form method="POST" action="{{ route('password.email') }}" class="flex flex-col gap-4">
     @csrf
-    <div class="mb-4">
-        <label class="form-label">
-            <i class="fas fa-envelope me-2"></i>Email Address
-        </label>
-        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-               name="email" value="{{ old('email') }}" 
-               placeholder="Enter your registered email" required>
+
+    <div>
+        <label for="email" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Email Address</label>
+        <div class="relative">
+            <x-icon name="mail" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
+            <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="Your registered email" required autofocus
+                   class="input-field pl-9 @error('email') border-(--color-danger)! @enderror">
+        </div>
         @error('email')
-            <div class="invalid-feedback">
-                <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
-            </div>
+            <p class="mt-1.5 text-xs text-(--color-danger)">{{ $message }}</p>
         @enderror
     </div>
-    
-    <button type="submit" class="btn btn-primary w-100 mb-4">
-        <i class="fas fa-paper-plane me-2"></i>Send Reset Link
+
+    <button type="submit" class="btn-primary mt-2 w-full">
+        Send Reset Link
+        <x-icon name="arrow-right" class="h-4 w-4" />
     </button>
 </form>
 
-<div class="text-center">
-    <a href="{{ route('login') }}" class="auth-link">
-        <i class="fas fa-arrow-left me-2"></i>Back to Login
-    </a>
-</div>
+<a href="{{ route('login') }}" class="mt-6 flex items-center justify-center gap-1.5 text-sm font-medium text-(--color-primary) transition-colors hover:text-(--color-primary-dark)">
+    <x-icon name="chevron-left" class="h-4 w-4" />
+    Back to login
+</a>
 @endsection

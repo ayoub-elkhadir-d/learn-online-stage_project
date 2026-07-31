@@ -3,39 +3,6 @@
 @import 'vidstack/player/styles/default/theme.css';
 @import 'vidstack/player/styles/default/layouts/video.css';
 
-/* ---- Learning-page design tokens ----------------------------------------
-   Scoped to this stylesheet (only ever loaded on the learn page), so it
-   reskins just this page without touching the site-wide orange theme in
-   resources/css/app.css. Loaded after app.css in the @vite(...) call, so
-   these :root values win the cascade for the same custom-property names
-   that .btn-primary / .input-field / .scrollbar-thin already read. */
-:root {
-    --color-bg-light: #F8FAF8;
-    --color-card: #FFFFFF;
-    --color-bg-dark: #0F172A;
-    --color-card-dark: #1E293B;
-
-    --color-primary: #16A34A;
-    --color-primary-dark: #15803D;
-    --color-primary-active: #15803D;
-    --color-primary-soft: color-mix(in srgb, #16A34A 12%, white);
-    --color-accent: #16A34A;
-    --color-success: #22C55E;
-    --color-danger: #DC2626;
-
-    --color-text: #0F172A;
-    --color-text-secondary: #64748B;
-    --color-border: #E5E7EB;
-
-    --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
-    --shadow-lift: 0 12px 32px rgba(15, 23, 42, 0.12);
-}
-
-.dark {
-    --color-text-secondary: #94A3B8;
-    --color-border: rgba(255, 255, 255, 0.08);
-}
-
 /* ---- Vidstack theme overrides -------------------------------------------
    Documented CSS variables for the Default Video Layout — brand color,
    focus ring, and corner radius. No component internals are touched. */

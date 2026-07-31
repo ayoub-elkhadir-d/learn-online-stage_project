@@ -1,0 +1,30 @@
+/* Auth pages (Login, Register, Forgot/Reset Password) — CSS-only decorative
+   background behind the centered card, same radial-gradient technique
+   already used in courses-index.css's .storefront-hero, plus a subtle glass
+   effect on the card itself. Loaded after app.css so these rules can read
+   the shared design tokens. */
+.auth-shell {
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 55% 55% at 12% 0%, color-mix(in srgb, var(--color-primary) 16%, transparent) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 60% at 100% 100%, color-mix(in srgb, var(--color-accent) 12%, transparent) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.auth-card {
+    position: relative;
+    background: color-mix(in srgb, var(--color-card) 70%, transparent);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.dark .auth-card {
+    background: color-mix(in srgb, var(--color-card-dark) 70%, transparent);
+}

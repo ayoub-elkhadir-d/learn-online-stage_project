@@ -12,6 +12,9 @@
     $isPaid = $purchase && $purchase->status === 'paid';
     $isPending = $purchase && $purchase->status === 'pending';
     $lessons = $course->lessons()->orderBy('sort_order')->get();
+    $reviewCount = $course->reviews()->count();
+    $avgRating = $reviewCount ? round($course->reviews()->avg('rating'), 1) : null;
+    $recentReviews = $reviewCount ? $course->reviews()->with('user')->latest()->take(3)->get() : collect();
 @endphp
 
 <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
@@ -36,10 +39,19 @@
                 @endif
             </div>
 
-            <span class="mt-6 inline-flex items-center gap-1.5 rounded-full bg-(--color-primary)/10 px-3 py-1 text-xs font-semibold text-(--color-primary)">
-                <x-icon name="layers" class="h-3.5 w-3.5" />
-                {{ $course->category->name }}
-            </span>
+            <div class="mt-6 flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-(--color-primary)/10 px-3 py-1 text-xs font-semibold text-(--color-primary)">
+                    <x-icon name="layers" class="h-3.5 w-3.5" />
+                    {{ $course->category->name }}
+                </span>
+                @if($avgRating !== null)
+                    <span class="inline-flex items-center gap-1 rounded-full bg-(--color-text)/8 px-3 py-1 text-xs font-semibold text-(--color-text) dark:bg-white/10 dark:text-white">
+                        <x-icon name="star" class="h-3.5 w-3.5 fill-current text-amber-400" />
+                        {{ number_format($avgRating, 1) }}
+                        <span class="font-normal text-(--color-text-secondary)">({{ $reviewCount }} {{ Str::plural('review', $reviewCount) }})</span>
+                    </span>
+                @endif
+            </div>
 
             <h1 class="mt-3 text-2xl font-extrabold tracking-tight text-(--color-text) dark:text-white sm:text-3xl">{{ $course->title }}</h1>
 
@@ -59,6 +71,18 @@
                     Updated {{ $course->updated_at->diffForHumans() }}
                 </span>
             </div>
+
+            @if($course->instructor_name)
+                <div class="mt-6 flex items-center gap-3 rounded-xl border border-(--color-border) p-4 dark:border-white/10">
+                    <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-(--color-primary)/10 text-sm font-bold text-(--color-primary)">
+                        {{ strtoupper(substr($course->instructor_name, 0, 1)) }}
+                    </span>
+                    <div class="min-w-0">
+                        <div class="text-[11px] font-semibold uppercase tracking-wide text-(--color-text-secondary)">Instructor</div>
+                        <div class="truncate text-sm font-bold text-(--color-text) dark:text-white">{{ $course->instructor_name }}</div>
+                    </div>
+                </div>
+            @endif
         </div>
 
         {{-- Enrollment card --}}
@@ -194,6 +218,35 @@
                         </details>
                     @endforeach
                 </div>
+            @endif
+        </div>
+
+        <div class="lesson-card p-5 sm:p-6">
+            <div class="flex items-center justify-between gap-3">
+                <h2 class="flex items-center gap-2 text-lg font-bold text-(--color-text) dark:text-white">
+                    <x-icon name="star" class="h-5 w-5 text-(--color-primary)" />
+                    Ratings &amp; Reviews
+                </h2>
+                @if($avgRating !== null)
+                    <span class="flex shrink-0 items-center gap-1 text-sm font-semibold text-(--color-text) dark:text-white">
+                        <x-icon name="star" class="h-4 w-4 fill-current text-amber-400" />
+                        {{ number_format($avgRating, 1) }}
+                        <span class="font-normal text-(--color-text-secondary)">({{ $reviewCount }})</span>
+                    </span>
+                @endif
+            </div>
+
+            @if($recentReviews->isEmpty())
+                <p class="mt-3 text-sm text-(--color-text-secondary)">No reviews yet — be the first to review this course after enrolling.</p>
+            @else
+                <div class="mt-4 flex flex-col gap-3">
+                    @foreach($recentReviews as $review)
+                        @include('courses.partials.reviews-review-card', ['review' => $review])
+                    @endforeach
+                </div>
+                @if($reviewCount > $recentReviews->count())
+                    <p class="mt-3 text-xs text-(--color-text-secondary)">See all {{ $reviewCount }} reviews from the Learning page after enrolling.</p>
+                @endif
             @endif
         </div>
     </div>

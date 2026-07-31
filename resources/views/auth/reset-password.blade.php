@@ -1,60 +1,51 @@
 @extends('layouts.app')
-@section('title', 'Set New Password - LearnHub')
-@section('subtitle', 'Create a secure password')
-@section('content')
-<div class="text-center mb-4">
-    <div class="mb-3">
-        <i class="fas fa-shield-alt fa-3x text-success"></i>
-    </div>
-    <h5 class="text-dark mb-2">Set New Password</h5>
-    <p class="text-muted">Choose a strong password for your account</p>
-</div>
 
-<form method="POST" action="{{ route('password.update') }}">
+@section('title', 'Reset Password — ArtiWeb')
+@section('heading', 'Set a new password')
+@section('subtitle', 'Choose a strong password for your account')
+
+@section('content')
+<form method="POST" action="{{ route('password.update') }}" class="flex flex-col gap-4">
     @csrf
     <input type="hidden" name="token" value="{{ $token }}">
-    
-    <div class="mb-3">
-        <label class="form-label">
-            <i class="fas fa-envelope me-2"></i>Email Address
-        </label>
-        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-               name="email" value="{{ old('email', request()->email) }}" 
-               placeholder="Confirm your email" required readonly>
+
+    <div>
+        <label for="email" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Email Address</label>
+        <div class="relative">
+            <x-icon name="mail" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
+            <input type="email" id="email" name="email" value="{{ old('email', request()->email) }}" required readonly
+                   class="input-field pl-9 cursor-not-allowed opacity-70 @error('email') border-(--color-danger)! @enderror">
+        </div>
         @error('email')
-            <div class="invalid-feedback">
-                <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
-            </div>
+            <p class="mt-1.5 text-xs text-(--color-danger)">{{ $message }}</p>
         @enderror
     </div>
-    
-    <div class="mb-3">
-        <label class="form-label">
-            <i class="fas fa-lock me-2"></i>New Password
-        </label>
-        <input type="password" class="form-control @error('password') is-invalid @enderror" 
-               name="password" placeholder="Enter new password" required>
+
+    <div>
+        <label for="password" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">New Password</label>
+        <div class="relative">
+            <x-icon name="lock" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
+            <input type="password" id="password" name="password" placeholder="At least 8 characters" required
+                   class="input-field pl-9 @error('password') border-(--color-danger)! @enderror">
+        </div>
         @error('password')
-            <div class="invalid-feedback">
-                <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
-            </div>
+            <p class="mt-1.5 text-xs text-(--color-danger)">{{ $message }}</p>
         @enderror
-        <small class="form-text text-muted mt-2">
-            <i class="fas fa-info-circle me-1"></i>Use at least 8 characters with mix of letters and numbers
-        </small>
+        <p class="mt-1.5 text-xs text-(--color-text-secondary)">Use at least 8 characters with a mix of letters and numbers.</p>
     </div>
-    
-    <div class="mb-4">
-        <label class="form-label">
-            <i class="fas fa-lock me-2"></i>Confirm New Password
-        </label>
-        <input type="password" class="form-control" 
-               name="password_confirmation" 
-               placeholder="Confirm new password" required>
+
+    <div>
+        <label for="password_confirmation" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Confirm New Password</label>
+        <div class="relative">
+            <x-icon name="lock" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
+            <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Re-enter new password" required
+                   class="input-field pl-9">
+        </div>
     </div>
-    
-    <button type="submit" class="btn btn-primary w-100 mb-4">
-        <i class="fas fa-check me-2"></i>Update Password
+
+    <button type="submit" class="btn-primary mt-2 w-full">
+        <x-icon name="check-circle" class="h-4 w-4" />
+        Update Password
     </button>
 </form>
 @endsection

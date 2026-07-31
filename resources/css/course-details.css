@@ -1,38 +1,6 @@
-/* Course Details page — reskins this page to the exact same green visual
-   system as the Learning page (see resources/css/learn.css), without
-   touching the site-wide orange theme in resources/css/app.css or the
-   Learning page itself. Loaded after app.css in the @vite(...) call, so
-   these :root values win the cascade for the same custom-property names
-   every shared component (.btn-primary, .input-field, x-navbar) already
-   reads — nothing here duplicates their rules, it only swaps the tokens. */
-:root {
-    --color-bg-light: #F8FAF8;
-    --color-card: #FFFFFF;
-    --color-bg-dark: #0F172A;
-    --color-card-dark: #1E293B;
-
-    --color-primary: #16A34A;
-    --color-primary-dark: #15803D;
-    --color-primary-active: #15803D;
-    --color-primary-soft: color-mix(in srgb, #16A34A 12%, white);
-    --color-accent: #16A34A;
-    --color-success: #22C55E;
-    --color-danger: #DC2626;
-
-    --color-text: #0F172A;
-    --color-text-secondary: #64748B;
-    --color-border: #E5E7EB;
-
-    --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
-    --shadow-soft: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
-    --shadow-soft-dark: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.35);
-    --shadow-lift: 0 12px 32px rgba(15, 23, 42, 0.12);
-}
-
-.dark {
-    --color-text-secondary: #94A3B8;
-    --color-border: rgba(255, 255, 255, 0.08);
-}
+/* Course Details page — component rules that build on the shared green
+   design-system tokens now defined once in resources/css/app.css. Loaded
+   after app.css in the @vite(...) call. */
 
 /* ---- Shared card surface — identical rule to the Learning page's
    .lesson-card, reused verbatim so both pages render pixel-identical cards */

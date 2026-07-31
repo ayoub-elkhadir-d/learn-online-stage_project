@@ -1,76 +1,71 @@
 @extends('layouts.app')
-@section('title', 'Create Account - ArtiWeb')
-@section('subtitle', 'Join the ArtiWeb community')
-@section('content')
-<div class="text-center mb-2">
-    <h6 class="text-dark mb-1 fw-bold">Create Your Account</h6>
-    <small class="text-muted">Start building amazing websites</small>
-</div>
 
-<form method="POST" action="{{ route('register') }}">
+@section('title', 'Create Account — ArtiWeb')
+@section('heading', 'Create your account')
+@section('subtitle', 'Start learning in-demand skills today')
+
+@section('content')
+<form method="POST" action="{{ route('register') }}" class="flex flex-col gap-4">
     @csrf
-    <div class="mb-2">
-        <label class="form-label">
-            <i class="fas fa-user me-2"></i>Full Name
-        </label>
-        <input type="text" class="form-control @error('name') is-invalid @enderror" 
-               name="name" value="{{ old('name') }}" 
-               placeholder="Enter your full name" required>
+
+    <div>
+        <label for="name" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Full Name</label>
+        <div class="relative">
+            <x-icon name="user" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
+            <input type="text" id="name" name="name" value="{{ old('name') }}" placeholder="Your full name" required autofocus
+                   class="input-field pl-9 @error('name') border-(--color-danger)! @enderror">
+        </div>
         @error('name')
-            <div class="invalid-feedback">
-                <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
-            </div>
+            <p class="mt-1.5 text-xs text-(--color-danger)">{{ $message }}</p>
         @enderror
     </div>
-    
-    <div class="mb-2">
-        <label class="form-label">
-            <i class="fas fa-envelope me-2"></i>Email Address
-        </label>
-        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-               name="email" value="{{ old('email') }}" 
-               placeholder="Enter your email address" required>
+
+    <div>
+        <label for="email" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Email Address</label>
+        <div class="relative">
+            <x-icon name="mail" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
+            <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" required
+                   class="input-field pl-9 @error('email') border-(--color-danger)! @enderror">
+        </div>
         @error('email')
-            <div class="invalid-feedback">
-                <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
-            </div>
+            <p class="mt-1.5 text-xs text-(--color-danger)">{{ $message }}</p>
         @enderror
     </div>
-    
-    <div class="mb-2">
-        <label class="form-label">
-            <i class="fas fa-lock me-2"></i>Password
-        </label>
-        <input type="password" class="form-control @error('password') is-invalid @enderror" 
-               name="password" placeholder="Choose a strong password" required>
+
+    <div>
+        <label for="password" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Password</label>
+        <div class="relative">
+            <x-icon name="lock" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
+            <input type="password" id="password" name="password" placeholder="At least 8 characters" required
+                   class="input-field pl-9 @error('password') border-(--color-danger)! @enderror">
+        </div>
         @error('password')
-            <div class="invalid-feedback">
-                <i class="fas fa-exclamation-circle me-1"></i>{{ $message }}
-            </div>
+            <p class="mt-1.5 text-xs text-(--color-danger)">{{ $message }}</p>
         @enderror
     </div>
-    
-    <div class="mb-3">
-        <label class="form-label">
-            <i class="fas fa-lock me-2"></i>Confirm Password
-        </label>
-        <input type="password" class="form-control" 
-               name="password_confirmation" 
-               placeholder="Confirm your password" required>
+
+    <div>
+        <label for="password_confirmation" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Confirm Password</label>
+        <div class="relative">
+            <x-icon name="lock" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
+            <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Re-enter your password" required
+                   class="input-field pl-9">
+        </div>
     </div>
-    
-    <button type="submit" class="btn btn-primary w-100 mb-3">
-        <i class="fas fa-user-plus me-2"></i>Create Account
+
+    <button type="submit" class="btn-primary mt-2 w-full">
+        Create Account
+        <x-icon name="arrow-right" class="h-4 w-4" />
     </button>
 </form>
 
-<div class="divider">
+<div class="my-6 flex items-center gap-3 text-xs text-(--color-text-secondary)">
+    <div class="h-px flex-1 bg-(--color-border) dark:bg-white/10"></div>
     <span>Already have an account?</span>
+    <div class="h-px flex-1 bg-(--color-border) dark:bg-white/10"></div>
 </div>
 
-<div class="text-center mt-2">
-    <a href="{{ route('login') }}" class="auth-link">
-        <i class="fas fa-sign-in-alt me-2"></i>Sign In Here
-    </a>
-</div>
+<a href="{{ route('login') }}" class="btn-secondary w-full">
+    Sign in instead
+</a>
 @endsection

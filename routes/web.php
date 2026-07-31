@@ -10,10 +10,6 @@ use App\Http\Controllers\VideoController;
 use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\LessonController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 // Auth routes (guests only)
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -26,8 +22,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 
-// Public course catalog — blocked for admins
+// Public course catalog — blocked for admins. The Courses page is also the
+// public landing page, so "/" renders the exact same controller action/view.
 Route::middleware('user.only')->group(function () {
+    Route::get('/', [CourseController::class, 'index'])->name('home');
     Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
     Route::get('/courses/{slug}', [CourseController::class, 'show'])->name('courses.show');
 });

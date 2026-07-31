@@ -27,13 +27,16 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
-        return redirect()->route('login')->with('success', 'Registration successful!');
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('courses.index'))->with('success', 'Registration successful!');
     }
 
     public function showLogin()
@@ -54,7 +57,7 @@ class AuthController extends Controller
             if ($user->role === 'admin') {
                 return redirect()->route('admin.courses.index');
             }
-            return redirect()->route('courses.index');
+            return redirect()->intended(route('courses.index'));
         }
 
         return back()->withErrors(['email' => 'Invalid credentials.']);
