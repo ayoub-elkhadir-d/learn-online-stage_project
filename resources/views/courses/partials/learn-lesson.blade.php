@@ -57,19 +57,18 @@
                 ></textarea>
             </div>
 
-            {{-- Bookmarks --}}
-            <div class="rounded-2xl border border-(--color-border) bg-black/[.015] p-4 dark:border-white/10 dark:bg-white/[.02]" data-bookmarks-panel>
-                <h2 class="mb-2 flex items-center gap-1.5 text-sm font-bold">
+            {{-- Bookmarks — the height lives HERE, on the card, not on the
+                 <ul>. The card is a fixed-height flex column: the heading is
+                 a normal (non-shrinking) flex item sized to its content, and
+                 the list is the only `flex-1 min-h-0` item, which is what
+                 makes it the sole thing that can ever scroll. Growing the
+                 list can't grow this card, and can't grow the page. --}}
+            <div class="flex h-[260px] min-h-0 flex-col rounded-2xl border border-(--color-border) bg-black/[.015] p-4 dark:border-white/10 dark:bg-white/[.02]" data-bookmarks-panel>
+                <h2 class="mb-2 flex shrink-0 items-center gap-1.5 text-sm font-bold">
                     <x-icon name="bookmark" class="h-4 w-4 text-(--color-text-secondary)" />
                     Bookmarks
                 </h2>
-                {{-- Fixed max-height + its own scrollbar — caps at roughly 3
-                     rows (~52px each) before scrolling takes over, and a
-                     long list must never resize the video player or this
-                     card itself (see shrink-0 on the player above, and
-                     min-h-0 on #videoArea/its row in learn.blade.php, which
-                     is the other half of that fix). --}}
-                <ul data-bookmarks-list class="scrollbar-thin flex max-h-[13rem] flex-col gap-0.5 overflow-y-auto pr-0.5">
+                <ul data-bookmarks-list class="scrollbar-thin flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto pr-0.5">
                     <li data-bookmarks-empty class="px-1 py-2 text-xs leading-relaxed text-(--color-text-secondary)">
                         Use the bookmark button on the player to save moments you want to revisit.
                     </li>
