@@ -1,0 +1,36 @@
+/* Shared pagination button styling — used by resources/views/vendor/pagination/custom.blade.php,
+   which is the app-wide default pagination view. Imported by every page-scoped
+   stylesheet that renders a ->links() control (dashboard, courses index) so the
+   control looks identical everywhere without duplicating the rules per page. */
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+a.pagination-btn:hover {
+    background-color: color-mix(in srgb, var(--color-primary) 8%, transparent);
+    color: var(--color-primary);
+    border-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
+}
+
+.dark .pagination-btn {
+    background: var(--color-card-dark);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.pagination-btn-active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+}

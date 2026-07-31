@@ -1,0 +1,238 @@
+{
+  "_prod-DaZ0BVGF.js": {
+    "file": "assets/prod-DaZ0BVGF.js",
+    "name": "prod",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js"
+    ],
+    "dynamicImports": [
+      "node_modules/media-captions/dist/prod/srt-parser.js",
+      "node_modules/media-captions/dist/prod/ssa-parser.js",
+      "node_modules/media-captions/dist/prod/errors.js"
+    ]
+  },
+  "_vidstack-CI5oafcm-DEMxTGih.js": {
+    "file": "assets/vidstack-CI5oafcm-DEMxTGih.js",
+    "name": "vidstack-CI5oafcm",
+    "imports": [
+      "resources/js/learn.js"
+    ]
+  },
+  "_vidstack-CceZzgm4-C-KFRZBy.js": {
+    "file": "assets/vidstack-CceZzgm4-C-KFRZBy.js",
+    "name": "vidstack-CceZzgm4",
+    "imports": [
+      "resources/js/learn.js"
+    ]
+  },
+  "_vidstack-DUnfBERX2-DCZI1OUT.js": {
+    "file": "assets/vidstack-DUnfBERX2-DCZI1OUT.js",
+    "name": "vidstack-DUnfBERX2",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js"
+    ],
+    "dynamicImports": [
+      "node_modules/vidstack/prod/providers/vidstack-google-cast.js"
+    ]
+  },
+  "node_modules/media-captions/dist/prod/errors.js": {
+    "file": "assets/errors-JjDWkJ8t.js",
+    "name": "errors",
+    "src": "node_modules/media-captions/dist/prod/errors.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_prod-DaZ0BVGF.js",
+      "resources/js/learn.js"
+    ]
+  },
+  "node_modules/media-captions/dist/prod/srt-parser.js": {
+    "file": "assets/srt-parser-D3N-GLCw.js",
+    "name": "srt-parser",
+    "src": "node_modules/media-captions/dist/prod/srt-parser.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_prod-DaZ0BVGF.js",
+      "resources/js/learn.js"
+    ]
+  },
+  "node_modules/media-captions/dist/prod/ssa-parser.js": {
+    "file": "assets/ssa-parser-C6Ncdu3e.js",
+    "name": "ssa-parser",
+    "src": "node_modules/media-captions/dist/prod/ssa-parser.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js",
+      "_prod-DaZ0BVGF.js"
+    ],
+    "dynamicImports": [
+      "node_modules/media-captions/dist/prod/errors.js"
+    ]
+  },
+  "node_modules/vidstack/prod/chunks/vidstack-BEi14iNw2.js": {
+    "file": "assets/vidstack-BEi14iNw2-Cp21_d4M.js",
+    "name": "vidstack-BEi14iNw2",
+    "src": "node_modules/vidstack/prod/chunks/vidstack-BEi14iNw2.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js"
+    ]
+  },
+  "node_modules/vidstack/prod/chunks/vidstack-BILrshkt2.js": {
+    "file": "assets/vidstack-BILrshkt2-DNoCuGkS.js",
+    "name": "vidstack-BILrshkt2",
+    "src": "node_modules/vidstack/prod/chunks/vidstack-BILrshkt2.js",
+    "isDynamicEntry": true
+  },
+  "node_modules/vidstack/prod/chunks/vidstack-CXo4cwSP2.js": {
+    "file": "assets/vidstack-CXo4cwSP2-QnM6irXH.js",
+    "name": "vidstack-CXo4cwSP2",
+    "src": "node_modules/vidstack/prod/chunks/vidstack-CXo4cwSP2.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js"
+    ]
+  },
+  "node_modules/vidstack/prod/chunks/vidstack-IMa-zkAV.js": {
+    "file": "assets/vidstack-IMa-zkAV-CMhVumyn.js",
+    "name": "vidstack-IMa-zkAV",
+    "src": "node_modules/vidstack/prod/chunks/vidstack-IMa-zkAV.js",
+    "isDynamicEntry": true
+  },
+  "node_modules/vidstack/prod/chunks/vidstack-q-9soyHT.js": {
+    "file": "assets/vidstack-q-9soyHT-De5UVHHq.js",
+    "name": "vidstack-q-9soyHT",
+    "src": "node_modules/vidstack/prod/chunks/vidstack-q-9soyHT.js",
+    "isDynamicEntry": true
+  },
+  "node_modules/vidstack/prod/providers/vidstack-audio.js": {
+    "file": "assets/vidstack-audio-l3FuAzCj.js",
+    "name": "vidstack-audio",
+    "src": "node_modules/vidstack/prod/providers/vidstack-audio.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js",
+      "_vidstack-CI5oafcm-DEMxTGih.js"
+    ]
+  },
+  "node_modules/vidstack/prod/providers/vidstack-dash.js": {
+    "file": "assets/vidstack-dash-GNXsRsfU.js",
+    "name": "vidstack-dash",
+    "src": "node_modules/vidstack/prod/providers/vidstack-dash.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js",
+      "node_modules/vidstack/prod/providers/vidstack-video.js",
+      "_vidstack-CI5oafcm-DEMxTGih.js"
+    ]
+  },
+  "node_modules/vidstack/prod/providers/vidstack-google-cast.js": {
+    "file": "assets/vidstack-google-cast-JgMjH0Fb.js",
+    "name": "vidstack-google-cast",
+    "src": "node_modules/vidstack/prod/providers/vidstack-google-cast.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js",
+      "_vidstack-DUnfBERX2-DCZI1OUT.js"
+    ]
+  },
+  "node_modules/vidstack/prod/providers/vidstack-hls.js": {
+    "file": "assets/vidstack-hls-CW9Czy-I.js",
+    "name": "vidstack-hls",
+    "src": "node_modules/vidstack/prod/providers/vidstack-hls.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js",
+      "node_modules/vidstack/prod/providers/vidstack-video.js",
+      "_vidstack-CI5oafcm-DEMxTGih.js"
+    ]
+  },
+  "node_modules/vidstack/prod/providers/vidstack-video.js": {
+    "file": "assets/vidstack-video-CXlEebBe.js",
+    "name": "vidstack-video",
+    "src": "node_modules/vidstack/prod/providers/vidstack-video.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js",
+      "_vidstack-CI5oafcm-DEMxTGih.js"
+    ]
+  },
+  "node_modules/vidstack/prod/providers/vidstack-vimeo.js": {
+    "file": "assets/vidstack-vimeo-CeVnrHMY.js",
+    "name": "vidstack-vimeo",
+    "src": "node_modules/vidstack/prod/providers/vidstack-vimeo.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js",
+      "_vidstack-CceZzgm4-C-KFRZBy.js",
+      "node_modules/vidstack/prod/chunks/vidstack-q-9soyHT.js"
+    ]
+  },
+  "node_modules/vidstack/prod/providers/vidstack-youtube.js": {
+    "file": "assets/vidstack-youtube-CLE7iT64.js",
+    "name": "vidstack-youtube",
+    "src": "node_modules/vidstack/prod/providers/vidstack-youtube.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/learn.js",
+      "_vidstack-CceZzgm4-C-KFRZBy.js",
+      "node_modules/vidstack/prod/chunks/vidstack-IMa-zkAV.js"
+    ]
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-g7nrQYjp.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/course-details.css": {
+    "file": "assets/course-details-CQ1WKGZz.css",
+    "src": "resources/css/course-details.css",
+    "isEntry": true
+  },
+  "resources/css/courses-index.css": {
+    "file": "assets/courses-index-BLWRbfxB.css",
+    "src": "resources/css/courses-index.css",
+    "isEntry": true
+  },
+  "resources/css/dashboard.css": {
+    "file": "assets/dashboard-1jX6Z6ys.css",
+    "src": "resources/css/dashboard.css",
+    "isEntry": true
+  },
+  "resources/css/learn.css": {
+    "file": "assets/learn-BIRX5uKp.css",
+    "src": "resources/css/learn.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-D_H6WCN_.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/learn.js": {
+    "file": "assets/learn-BgPyUmpS.js",
+    "name": "learn",
+    "src": "resources/js/learn.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "_prod-DaZ0BVGF.js",
+      "_prod-DaZ0BVGF.js",
+      "node_modules/vidstack/prod/providers/vidstack-audio.js",
+      "node_modules/vidstack/prod/providers/vidstack-video.js",
+      "node_modules/vidstack/prod/providers/vidstack-hls.js",
+      "node_modules/vidstack/prod/providers/vidstack-dash.js",
+      "node_modules/vidstack/prod/providers/vidstack-vimeo.js",
+      "node_modules/vidstack/prod/chunks/vidstack-q-9soyHT.js",
+      "node_modules/vidstack/prod/providers/vidstack-youtube.js",
+      "node_modules/vidstack/prod/chunks/vidstack-IMa-zkAV.js",
+      "_vidstack-DUnfBERX2-DCZI1OUT.js",
+      "node_modules/vidstack/prod/chunks/vidstack-CXo4cwSP2.js",
+      "node_modules/vidstack/prod/chunks/vidstack-BEi14iNw2.js",
+      "node_modules/vidstack/prod/chunks/vidstack-BILrshkt2.js",
+      "_prod-DaZ0BVGF.js",
+      "_prod-DaZ0BVGF.js"
+    ]
+  }
+}

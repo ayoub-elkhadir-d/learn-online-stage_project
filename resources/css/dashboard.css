@@ -1,0 +1,66 @@
+/* Dashboard ("My Courses") — reskins this page to the exact same green
+   visual system already established by course-details.css / learn.css,
+   without duplicating those tokens. Loaded after app.css, so these values
+   win the cascade for every shared component (.btn-primary, .surface,
+   x-navbar) that already reads the same custom-property names. */
+@import "./course-details.css";
+@import "./pagination.css";
+@import "./course-card.css";
+
+/* ---- Hero decoration — CSS-only radial glows, no images ---- */
+.dashboard-hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-card);
+}
+
+.dashboard-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 55% 70% at 12% 0%, color-mix(in srgb, var(--color-primary) 10%, transparent) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 60% at 100% 30%, color-mix(in srgb, var(--color-accent) 10%, transparent) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.dark .dashboard-hero {
+    background: var(--color-card-dark);
+}
+
+/* ---- Stat tiles ---- */
+.stat-tile {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+}
+
+.dark .stat-tile {
+    background: var(--color-card-dark);
+}
+
+/* ---- Progress bar ---- */
+.progress-track {
+    height: 0.375rem;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--color-text) 8%, transparent);
+    overflow: hidden;
+}
+
+.dark .progress-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 9999px;
+    background: var(--color-primary);
+    transition: width 0.4s ease;
+}

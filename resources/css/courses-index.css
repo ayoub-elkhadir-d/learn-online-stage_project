@@ -1,0 +1,73 @@
+/* Courses index (storefront) — same green visual system as course-details.css
+   / learn.css / dashboard.css, reusing rather than redefining the shared
+   tokens. Loaded after app.css so these values win the cascade. */
+@import "./course-details.css";
+@import "./pagination.css";
+@import "./course-card.css";
+
+/* ---- Hero decoration — CSS-only radial glows, no images ---- */
+.storefront-hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-card);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.storefront-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 60% 60% at 15% -10%, color-mix(in srgb, var(--color-primary) 14%, transparent) 0%, transparent 65%),
+        radial-gradient(ellipse 45% 55% at 100% 10%, color-mix(in srgb, var(--color-accent) 12%, transparent) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 50% at 50% 120%, color-mix(in srgb, var(--color-primary) 8%, transparent) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.storefront-hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--color-text) 4%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--color-text) 4%, transparent) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 90%);
+    pointer-events: none;
+}
+
+.dark .storefront-hero {
+    background: var(--color-card-dark);
+}
+
+/* ---- Category filter pills ---- */
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    white-space: nowrap;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.filter-pill:hover {
+    color: var(--color-primary);
+    border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+    background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+}
+
+.filter-pill.is-active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+}
+
+.dark .filter-pill {
+    background: var(--color-card-dark);
+}
+
