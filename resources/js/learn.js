@@ -4,3 +4,4 @@
  */
 import './lesson-progress';
 import './player';
+import './learn-page';

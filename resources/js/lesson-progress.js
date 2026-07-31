@@ -1,8 +1,8 @@
 /**
  * localStorage-backed learning progress. Deliberately client-side only (no
- * backend changes for this pass) — everything here persists per-browser,
- * not per-account across devices. Exposed as window.LessonProgress since
- * both player.js and inline page scripts need it.
+ * backend changes) — everything here persists per-browser, not per-account
+ * across devices. Exposed as window.LessonProgress since both player.js and
+ * learn-page.js need it.
  */
 (function () {
     'use strict';
@@ -84,13 +84,33 @@
         },
 
         // ---- Bookmarks (timestamped markers per lesson) ----
+        // Shape: { time, title, note, createdAt }. Older records only ever had
+        // `label` — normalized to `title` here on read so nothing already
+        // saved in a user's browser gets silently dropped by the rename.
         getBookmarks(lessonId) {
-            return read(`lp:bookmarks:${lessonId}`, []);
+            return read(`lp:bookmarks:${lessonId}`, []).map(b => ({
+                time: b.time,
+                title: (b.title ?? b.label ?? '').trim(),
+                note: b.note ?? '',
+                createdAt: b.createdAt,
+            }));
         },
-        addBookmark(lessonId, time, label) {
+        addBookmark(lessonId, time, title) {
             const list = this.getBookmarks(lessonId);
-            list.push({ time: Math.floor(time), label: label || this.formatTime(time), createdAt: Date.now() });
+            list.push({ time: Math.floor(time), title: (title || '').trim(), note: '', createdAt: Date.now() });
             list.sort((a, b) => a.time - b.time);
+            write(`lp:bookmarks:${lessonId}`, list);
+            return list;
+        },
+        updateBookmark(lessonId, createdAt, { title, note } = {}) {
+            const list = this.getBookmarks(lessonId).map(b => {
+                if (b.createdAt !== createdAt) return b;
+                return {
+                    ...b,
+                    title: title !== undefined ? title.trim() : b.title,
+                    note: note !== undefined ? note : b.note,
+                };
+            });
             write(`lp:bookmarks:${lessonId}`, list);
             return list;
         },
