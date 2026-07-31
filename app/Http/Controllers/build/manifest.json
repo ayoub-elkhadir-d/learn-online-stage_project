@@ -185,6 +185,11 @@
     "src": "resources/css/app.css",
     "isEntry": true
   },
+  "resources/css/auth.css": {
+    "file": "assets/auth-lpeWcQ2H.css",
+    "src": "resources/css/auth.css",
+    "isEntry": true
+  },
   "resources/css/course-details.css": {
     "file": "assets/course-details-BLtqNDSX.css",
     "src": "resources/css/course-details.css",
