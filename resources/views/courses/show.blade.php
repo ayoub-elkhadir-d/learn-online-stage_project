@@ -1,149 +1,225 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $course->title }} — ArtiWeb</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    @include('partials.navbar-styles')
-    <style>
-        * { font-family: 'Poppins', sans-serif; }
-        body { background: #f4f6fb; }
-        .hero {
-            background: linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);
-            color: white;
-            padding: 3rem 0;
-        }
-        .card { border: none; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
-        .badge-cat { background: rgba(255,255,255,.2); color: #fff; font-size:12px; font-weight:600; padding:4px 14px; border-radius:20px; }
-        .price-big { font-size:2rem; font-weight:700; color:#4f46e5; }
-        .cover-img { width:100%; max-height:320px; object-fit:cover; border-radius:16px; }
-        .cover-placeholder {
-            width:100%; height:240px;
-            background: linear-gradient(135deg,#ede9fe,#ddd6fe);
-            border-radius:16px;
-            display:flex; align-items:center; justify-content:center;
-        }
-        .btn-purchase {
-            background: linear-gradient(135deg,#4f46e5,#7c3aed);
-            border: none; border-radius: 10px;
-            padding: .8rem; font-weight: 600; font-size: 15px;
-            color: #fff; width: 100%;
-            transition: all .2s;
-        }
-        .btn-purchase:hover { opacity:.9; box-shadow: 0 6px 18px rgba(79,70,229,.35); color:#fff; }
-        .feature-list li { padding: .4rem 0; font-size: 13px; color: #6b7280; }
-        .feature-list li i { color: #10b981; width: 18px; }
-    </style>
-</head>
-<body>
+@extends('layouts.site')
 
-@include('partials.navbar')
+@section('title', $course->title . ' — ArtiWeb')
 
-<div class="hero">
-    <div class="container">
-        <a href="{{ route('courses.index') }}" class="text-white-50 text-decoration-none d-inline-flex align-items-center gap-1 mb-3" style="font-size:13px;">
-            <i class="fas fa-arrow-left"></i> Back to courses
-        </a>
-        <div class="d-flex align-items-center gap-3 flex-wrap">
-            <div>
-                <h2 class="fw-bold mb-1">{{ $course->title }}</h2>
-                <span class="badge-cat">{{ $course->category->name }}</span>
-            </div>
-        </div>
-    </div>
+@push('head')
+    @vite(['resources/css/course-details.css'])
+@endpush
+
+@section('content')
+
+@php
+    $isPaid = $purchase && $purchase->status === 'paid';
+    $isPending = $purchase && $purchase->status === 'pending';
+    $lessons = $course->lessons()->orderBy('sort_order')->get();
+@endphp
+
+<div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+    <a href="{{ route('courses.index') }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-(--color-text-secondary) transition-colors hover:text-(--color-text) dark:hover:text-white">
+        <x-icon name="chevron-left" class="h-4 w-4" />
+        Back to courses
+    </a>
 </div>
 
-<div class="container py-4">
+{{-- Hero --}}
+<div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-start">
 
-    @if(session('status'))
-        <div class="alert alert-info alert-dismissible fade show border-0" style="border-radius:12px;">
-            <i class="fas fa-info-circle me-2"></i>{{ session('status') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+        <div>
+            <div class="course-hero-cover relative aspect-video w-full">
+                @if($course->cover_image_path)
+                    <img src="{{ Storage::url($course->cover_image_path) }}" alt="{{ $course->title }}" class="h-full w-full" decoding="async" fetchpriority="high">
+                @else
+                    <div class="flex h-full w-full items-center justify-center bg-(--color-primary)/10">
+                        <x-icon name="graduation-cap" class="h-16 w-16 text-(--color-primary)/40" />
+                    </div>
+                @endif
+            </div>
 
-    <div class="row g-4">
-        <div class="col-lg-8">
-            @if($course->cover_image_path)
-                <img src="{{ Storage::url($course->cover_image_path) }}" class="cover-img mb-4" alt="{{ $course->title }}">
-            @else
-                <div class="cover-placeholder mb-4">
-                    <i class="fas fa-graduation-cap fa-4x" style="color:#a78bfa;"></i>
-                </div>
+            <span class="mt-6 inline-flex items-center gap-1.5 rounded-full bg-(--color-primary)/10 px-3 py-1 text-xs font-semibold text-(--color-primary)">
+                <x-icon name="layers" class="h-3.5 w-3.5" />
+                {{ $course->category->name }}
+            </span>
+
+            <h1 class="mt-3 text-2xl font-extrabold tracking-tight text-(--color-text) dark:text-white sm:text-3xl">{{ $course->title }}</h1>
+
+            @if($course->description)
+                <p class="mt-3 max-w-2xl text-sm leading-relaxed text-(--color-text-secondary) sm:text-base">
+                    {{ Str::limit($course->description, 180) }}
+                </p>
             @endif
 
-            <div class="card p-4">
-                <h5 class="fw-bold mb-3">About this course</h5>
-                <p style="line-height:1.85; color:#4b5563;">{{ $course->description ?: 'No description available.' }}</p>
+            <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-(--color-text-secondary)">
+                <span class="flex items-center gap-1.5">
+                    <x-icon name="book-open" class="h-4 w-4 text-(--color-primary)" />
+                    {{ $lessons->count() }} {{ Str::plural('lesson', $lessons->count()) }}
+                </span>
+                <span class="flex items-center gap-1.5">
+                    <x-icon name="calendar" class="h-4 w-4 text-(--color-primary)" />
+                    Updated {{ $course->updated_at->diffForHumans() }}
+                </span>
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="card p-4" style="position:sticky;top:80px;">
-                <div class="text-center mb-4">
-                    <div class="price-big">{{ $course->price_mad }} <span style="font-size:1rem;color:#9ca3af;">MAD</span></div>
-                    <small class="text-muted">One-time payment — lifetime access</small>
+        {{-- Enrollment card --}}
+        <div class="lesson-card p-6 lg:sticky lg:top-24">
+            <div class="text-center">
+                <div class="text-3xl font-extrabold text-(--color-text) dark:text-white">
+                    {{ $course->price_mad }} <span class="text-base font-medium text-(--color-text-secondary)">MAD</span>
                 </div>
+                <p class="mt-1 text-xs text-(--color-text-secondary)">One-time payment — lifetime access</p>
+            </div>
 
+            <div class="mt-5">
                 @auth
-                    @if($purchase && $purchase->status === 'paid')
-                        <div class="text-center mb-4">
-                            <div style="width:60px;height:60px;border-radius:50%;background:#d1fae5;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;">
-                                <i class="fas fa-check" style="color:#065f46;font-size:1.4rem;"></i>
-                            </div>
-                            <h6 class="fw-bold text-dark mb-1">You have access!</h6>
-                            <p class="text-muted" style="font-size:12px;">You purchased this course on {{ $purchase->purchased_at->format('d M Y') }}</p>
-                            <a href="{{ route('courses.learn', $course->slug) }}" class="btn-purchase d-block text-center text-decoration-none">
-                                <i class="fas fa-play me-2"></i>Start Learning
-                            </a>
+                    @if($isPaid)
+                        <div class="mb-4 flex flex-col items-center gap-2 text-center">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-(--color-success)/10 text-(--color-success)">
+                                <x-icon name="check" class="h-5 w-5" />
+                            </span>
+                            <h3 class="text-sm font-bold text-(--color-text) dark:text-white">You have access!</h3>
+                            <p class="text-xs text-(--color-text-secondary)">Purchased on {{ $purchase->purchased_at->format('d M Y') }}</p>
                         </div>
-                    @elseif($purchase && $purchase->status === 'pending')
-                        <div class="text-center mb-4">
-                            <div style="width:60px;height:60px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;">
-                                <i class="fas fa-clock" style="color:#92400e;font-size:1.4rem;"></i>
-                            </div>
-                            <h6 class="fw-bold text-dark mb-1">Payment Pending</h6>
-                            <p class="text-muted" style="font-size:12px;">Your payment is awaiting admin confirmation.</p>
-                            <div class="rounded-3 px-3 py-2" style="background:#fef3c7;font-size:12px;color:#92400e;">
-                                <i class="fas fa-info-circle me-1"></i>Reference: <strong>{{ $purchase->reference ?? 'N/A' }}</strong>
-                            </div>
+                        <a href="{{ route('courses.learn', $course->slug) }}" class="btn-primary w-full text-sm">
+                            <x-icon name="play" class="h-4 w-4" />
+                            Start Learning
+                        </a>
+                    @elseif($isPending)
+                        <div class="mb-4 flex flex-col items-center gap-2 text-center">
+                            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-(--color-accent)/10 text-(--color-accent)">
+                                <x-icon name="clock" class="h-5 w-5" />
+                            </span>
+                            <h3 class="text-sm font-bold text-(--color-text) dark:text-white">Payment Pending</h3>
+                            <p class="text-xs text-(--color-text-secondary)">Awaiting admin confirmation.</p>
+                        </div>
+                        <div class="rounded-lg bg-(--color-accent)/10 px-3 py-2.5 text-center text-xs text-(--color-accent)">
+                            Reference: <strong>{{ $purchase->reference ?? 'N/A' }}</strong>
                         </div>
                     @else
-                        <div class="text-center mb-4">
-                            <div style="width:60px;height:60px;border-radius:50%;background:#ede9fe;display:flex;align-items:center;justify-content:center;margin:0 auto .75rem;">
-                                <i class="fas fa-shopping-cart" style="color:#4f46e5;font-size:1.4rem;"></i>
-                            </div>
-                            <h6 class="fw-bold text-dark mb-1">Ready to purchase?</h6>
-                            <p class="text-muted" style="font-size:12px;">Complete the secure checkout form to submit your payment proof.</p>
-                            <a href="{{ route('courses.checkout', $course->slug) }}" class="btn-purchase d-block text-center text-decoration-none mb-3">
-                                <i class="fas fa-credit-card me-2"></i>Proceed to Checkout
-                            </a>
-                            <small class="text-muted" style="font-size:10px;">
-                                <i class="fas fa-lock me-1" style="color:#4f46e5;"></i>
-                                Secure payment — Admin confirmation required
-                            </small>
-                        </div>
+                        <a href="{{ route('courses.checkout', $course->slug) }}" class="btn-primary w-full text-sm">
+                            <x-icon name="credit-card" class="h-4 w-4" />
+                            Proceed to Checkout
+                        </a>
+                        <p class="mt-3 flex items-center justify-center gap-1 text-center text-[11px] text-(--color-text-secondary)">
+                            <x-icon name="shield" class="h-3.5 w-3.5 text-(--color-primary)" />
+                            Secure payment — Admin confirmation required
+                        </p>
                     @endif
                 @else
-                    <a href="{{ route('login') }}" class="btn-purchase d-block text-center text-decoration-none mb-3">
-                        <i class="fas fa-sign-in-alt me-2"></i>Login to Purchase
+                    <a href="{{ route('login') }}" class="btn-primary w-full text-sm">
+                        Login to Purchase
                     </a>
                 @endauth
-
-                <ul class="feature-list list-unstyled mb-0">
-                    <li><i class="fas fa-check-circle me-2"></i>Full course access</li>
-                    <li><i class="fas fa-check-circle me-2"></i>Certificate upon completion</li>
-                    <li><i class="fas fa-check-circle me-2"></i>Payment confirmed by admin</li>
-                    <li><i class="fas fa-check-circle me-2"></i>Lifetime access</li>
-                </ul>
             </div>
+
+            <ul class="mt-6 flex flex-col text-sm">
+                <li class="feature-row flex items-center gap-2.5 py-2.5 text-(--color-text-secondary)">
+                    <x-icon name="check-circle" class="h-4 w-4 shrink-0 text-(--color-primary)" />
+                    Full course access
+                </li>
+                <li class="feature-row flex items-center gap-2.5 py-2.5 text-(--color-text-secondary)">
+                    <x-icon name="check-circle" class="h-4 w-4 shrink-0 text-(--color-primary)" />
+                    Certificate upon completion
+                </li>
+                <li class="feature-row flex items-center gap-2.5 py-2.5 text-(--color-text-secondary)">
+                    <x-icon name="check-circle" class="h-4 w-4 shrink-0 text-(--color-primary)" />
+                    Payment confirmed by admin
+                </li>
+                <li class="feature-row flex items-center gap-2.5 py-2.5 text-(--color-text-secondary)">
+                    <x-icon name="check-circle" class="h-4 w-4 shrink-0 text-(--color-primary)" />
+                    Lifetime access
+                </li>
+            </ul>
         </div>
     </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+{{-- About + Course Content — same narrow reading column as the Learning
+     page's lesson content, so the two pages feel like one continuous flow. --}}
+<div class="mx-auto max-w-4xl px-4 pb-16 sm:px-6 lg:px-8">
+    <div class="flex flex-col gap-6">
+        <div class="lesson-card p-5 sm:p-6">
+            <h2 class="text-lg font-bold text-(--color-text) dark:text-white">About this course</h2>
+            <p class="mt-3 whitespace-pre-line text-sm leading-relaxed text-(--color-text-secondary)">{{ $course->description ?: 'No description available.' }}</p>
+        </div>
+
+        <div class="lesson-card overflow-hidden">
+            <div class="flex items-center justify-between gap-3 p-5 pb-4 sm:p-6 sm:pb-4">
+                <h2 class="flex items-center gap-2 text-lg font-bold text-(--color-text) dark:text-white">
+                    <x-icon name="video" class="h-5 w-5 text-(--color-primary)" />
+                    Course Content
+                </h2>
+                <span class="shrink-0 rounded-full bg-(--color-text)/8 px-2.5 py-1 text-xs font-semibold text-(--color-text-secondary) dark:bg-white/10">
+                    {{ $lessons->count() }} {{ Str::plural('lesson', $lessons->count()) }}
+                </span>
+            </div>
+
+            @if($lessons->isEmpty())
+                <p class="px-5 pb-6 text-sm text-(--color-text-secondary) sm:px-6">No lessons have been added to this course yet.</p>
+            @else
+                <div>
+                    @foreach($lessons as $index => $lesson)
+                        <details class="lesson-row-details group">
+                            <summary class="flex items-center gap-3 px-5 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--color-primary) sm:px-6">
+                                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-(--color-text)/8 text-xs font-bold text-(--color-text-secondary) dark:bg-white/10">
+                                    {{ $index + 1 }}
+                                </span>
+                                <span class="min-w-0 flex-1">
+                                    <span class="block truncate text-sm font-semibold text-(--color-text) dark:text-white/90">{{ $lesson->title }}</span>
+                                    <span class="mt-0.5 flex items-center gap-1.5 text-xs text-(--color-text-secondary)">
+                                        <x-icon name="clock" class="h-3 w-3" />
+                                        <span data-lesson-duration="{{ $lesson->id }}">—</span>
+                                    </span>
+                                </span>
+                                @if($isPaid)
+                                    <span data-lesson-check="{{ $lesson->id }}" class="hidden shrink-0 items-center text-(--color-success)">
+                                        <x-icon name="check-circle" class="h-4 w-4" />
+                                    </span>
+                                @else
+                                    <span class="shrink-0 text-(--color-text-secondary)" title="Purchase this course to unlock">
+                                        <x-icon name="lock" class="h-4 w-4" />
+                                    </span>
+                                @endif
+                                <x-icon name="chevron-down" data-chevron class="h-4 w-4 shrink-0 text-(--color-text-secondary)" />
+                            </summary>
+                            <div class="px-5 pb-5 pl-[3.75rem] text-sm leading-relaxed text-(--color-text-secondary) sm:px-6 sm:pl-[4.25rem]">
+                                {{ $lesson->description ?: 'No description provided for this lesson.' }}
+                                @if($isPaid)
+                                    <a href="{{ route('courses.learn', [$course->slug, 'lesson' => $lesson->id]) }}" class="mt-3 flex w-fit items-center gap-1.5 text-sm font-semibold text-(--color-primary) transition-colors hover:text-(--color-primary-dark)">
+                                        <x-icon name="play" class="h-3.5 w-3.5" />
+                                        Watch lesson
+                                    </a>
+                                @endif
+                            </div>
+                        </details>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+(function () {
+    try {
+        var courseId = {{ $course->id }};
+        var completed = JSON.parse(localStorage.getItem('lp:completed:' + courseId) || '[]');
+        completed.forEach(function (lessonId) {
+            var el = document.querySelector('[data-lesson-check="' + lessonId + '"]');
+            if (el) { el.classList.remove('hidden'); el.classList.add('flex'); }
+        });
+        document.querySelectorAll('[data-lesson-duration]').forEach(function (el) {
+            var raw = localStorage.getItem('lp:duration:' + el.dataset.lessonDuration);
+            if (!raw) return;
+            var seconds = parseInt(raw, 10);
+            if (!seconds) return;
+            var m = Math.floor(seconds / 60), s = seconds % 60;
+            el.textContent = m + ':' + String(s).padStart(2, '0');
+        });
+    } catch (e) { /* localStorage unavailable — skip silently */ }
+})();
+</script>
+@endpush
+
+@endsection

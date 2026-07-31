@@ -8,6 +8,7 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/css/learn.css',
+                'resources/css/course-details.css',
                 'resources/js/app.js',
                 'resources/js/learn.js',
             ],
