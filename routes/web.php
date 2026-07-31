@@ -34,7 +34,11 @@ Route::middleware('user.only')->group(function () {
 Route::middleware(['auth', 'user.only'])->group(function () {
     Route::get('/courses/{slug}/learn', [CourseController::class, 'learn'])->name('courses.learn');
     Route::get('/lessons/{lesson}/video', [VideoController::class, 'stream'])
-        ->middleware('throttle:120,1')
+        // A single <video> element issues many Range requests per lesson
+        // (buffer refills, seeking), especially on mobile where buffering
+        // is more conservative — 120/min was getting hit mid-playback on
+        // long videos and looked like stalling/failed loads.
+        ->middleware('throttle:600,1')
         ->name('lessons.video');
     Route::get('/courses/{slug}/checkout', [CourseController::class, 'checkout'])->name('courses.checkout');
     Route::post('/courses/{slug}/purchase', [PurchaseController::class, 'purchase'])->name('courses.purchase');

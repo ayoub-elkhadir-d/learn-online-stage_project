@@ -13,7 +13,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  * through a public URL — this controller is the only path to the bytes,
  * and it never reveals the real filesystem path to the client. Every
  * request re-checks that the viewer is authenticated and actually paid for
- * the course; nothing is cached client-side or by intermediate proxies.
+ * the course. The response is cacheable by the viewer's own browser only
+ * (Cache-Control: private) so re-seeking/replaying doesn't re-stream
+ * already-downloaded bytes; shared caches/CDNs/proxies must not store it.
  */
 class VideoController extends Controller
 {
@@ -43,7 +45,13 @@ class VideoController extends Controller
         $headers = [
             'Content-Type' => $mime,
             'Accept-Ranges' => 'bytes',
-            'Cache-Control' => 'no-store, private',
+            // 'private' still forbids shared/CDN caches from storing this,
+            // but lets the viewer's own browser reuse already-downloaded
+            // ranges (seeking back, replaying) instead of re-fetching them
+            // over the network every time — 'no-store' was forcing a full
+            // re-stream from disk on every seek/replay.
+            'Cache-Control' => 'private, max-age=86400',
+            'Last-Modified' => gmdate('D, d M Y H:i:s', filemtime($path)).' GMT',
             'X-Content-Type-Options' => 'nosniff',
             'Referrer-Policy' => 'no-referrer',
             'Content-Disposition' => 'inline',
@@ -70,6 +78,11 @@ class VideoController extends Controller
         $headers['Content-Length'] = $length;
 
         return response()->stream(function () use ($path, $start, $length) {
+            // Long videos can take longer to fully stream than PHP's default
+            // execution time limit allows; that would truncate the response
+            // mid-file and present to the player as a stall/failed load.
+            set_time_limit(0);
+
             $stream = fopen($path, 'rb');
             if ($stream === false) {
                 return;
@@ -77,11 +90,25 @@ class VideoController extends Controller
 
             fseek($stream, $start);
             $remaining = $length;
+            // 1MB chunks instead of 8KB — the previous size meant a 500MB
+            // video needed ~60k fread()+flush() round-trips, which throttled
+            // real throughput far below what the connection could sustain
+            // and starved the player's buffer.
+            $chunkSize = 1024 * 1024;
 
             while ($remaining > 0 && ! feof($stream)) {
-                $read = min(8192, $remaining);
+                if (connection_aborted()) {
+                    break;
+                }
+
+                $read = min($chunkSize, $remaining);
                 echo fread($stream, $read);
+
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
                 flush();
+
                 $remaining -= $read;
             }
 

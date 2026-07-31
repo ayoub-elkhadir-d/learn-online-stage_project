@@ -119,21 +119,23 @@
                     $nextLesson = $pos < count($ids) - 1 ? $lessons[$pos + 1] : null;
                     $lessonNumber = $pos !== false ? $pos + 1 : 1;
                 @endphp
-                <div class="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
+                <div class="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-8 lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl">
                     @include('courses.partials.learn-player', [
                         'course' => $course,
                         'currentLesson' => $currentLesson,
                         'nextLesson' => $nextLesson,
                     ])
-                    <div id="lessonContent" class="mt-6 space-y-6">
-                        @include('courses.partials.learn-content', [
-                            'course' => $course,
-                            'lessons' => $lessons,
-                            'currentLesson' => $currentLesson,
-                            'prevLesson' => $prevLesson,
-                            'nextLesson' => $nextLesson,
-                            'lessonNumber' => $lessonNumber,
-                        ])
+                    <div class="mx-auto w-full max-w-4xl">
+                        <div id="lessonContent" class="mt-6 space-y-6">
+                            @include('courses.partials.learn-content', [
+                                'course' => $course,
+                                'lessons' => $lessons,
+                                'currentLesson' => $currentLesson,
+                                'prevLesson' => $prevLesson,
+                                'nextLesson' => $nextLesson,
+                                'lessonNumber' => $lessonNumber,
+                            ])
+                        </div>
                     </div>
                 </div>
             @else
