@@ -335,19 +335,15 @@ function bindReviewsPanel(mount) {
 
     if (submitBtn) {
         submitBtn.addEventListener('click', () => {
-            const body = textField ? textField.value.trim() : '';
+            const comment = textField ? textField.value.trim() : '';
             if (!selected) {
                 if (errorEl) errorEl.textContent = 'Please select a star rating.';
-                return;
-            }
-            if (body.length < 3) {
-                if (errorEl) errorEl.textContent = 'Please write a few words about the course.';
                 return;
             }
             if (errorEl) errorEl.textContent = '';
             submitBtn.disabled = true;
 
-            window.axios.post(`/courses/${window.__courseSlug}/reviews`, { rating: selected, body })
+            window.axios.post(`/courses/${window.__courseSlug}/reviews`, { rating: selected, comment })
                 .then(res => repaintReviewsPanel(res.data))
                 .catch(err => {
                     if (errorEl) errorEl.textContent = err.response?.data?.message || 'Something went wrong. Please try again.';

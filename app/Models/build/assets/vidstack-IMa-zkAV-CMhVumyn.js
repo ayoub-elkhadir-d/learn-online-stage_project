@@ -1,0 +1,1 @@
+const t=/(?:youtu\.be|youtube|youtube\.com|youtube-nocookie\.com)(?:\/shorts)?\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|)((?:\w|-){11})/;function u(e){var o;return(o=e.match(t))==null?void 0:o[1]}export{u as resolveYouTubeVideoId};

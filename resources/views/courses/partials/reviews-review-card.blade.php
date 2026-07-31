@@ -21,7 +21,9 @@
                     <x-icon name="star" class="h-3.5 w-3.5 {{ $i <= $review->rating ? 'fill-current text-amber-400' : 'text-(--color-border) dark:text-white/15' }}" />
                 @endfor
             </div>
-            <p class="mt-2 whitespace-pre-line text-sm leading-relaxed text-(--color-text-secondary)">{{ $review->body }}</p>
+            @if($review->comment)
+                <p class="mt-2 whitespace-pre-line text-sm leading-relaxed text-(--color-text-secondary)">{{ $review->comment }}</p>
+            @endif
         </div>
     </div>
 </div>

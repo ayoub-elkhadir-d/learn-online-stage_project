@@ -68,7 +68,7 @@
                     maxlength="2000"
                     placeholder="Share your thoughts about this course..."
                     class="input-field mt-3 resize-y text-sm"
-                >{{ $myReview->body ?? '' }}</textarea>
+                >{{ $myReview->comment ?? '' }}</textarea>
                 <div class="mt-3 flex items-center justify-between gap-3">
                     <span class="text-xs text-(--color-danger)" data-review-error></span>
                     <button type="button" data-review-submit data-initial-rating="{{ $myReview->rating ?? 0 }}" class="btn-primary ml-auto shrink-0 text-sm">

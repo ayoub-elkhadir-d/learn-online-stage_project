@@ -32,7 +32,7 @@ class CourseReviewController extends Controller
 
         $data = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'body' => 'required|string|min:3|max:2000',
+            'comment' => 'nullable|string|max:2000',
         ]);
 
         CourseReview::updateOrCreate(
