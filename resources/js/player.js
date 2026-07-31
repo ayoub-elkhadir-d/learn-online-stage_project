@@ -440,9 +440,30 @@ class LessonPlayer {
             if (!scrubbing) return;
             v.currentTime = seekFromEvent(e) * (v.duration || 0);
         };
-        this._onWindowPointerUp = () => { scrubbing = false; };
+        // A scrub ends with a pointerup that can land outside the timeline
+        // (the drag listener above is on window), and the browser then fires
+        // a plain "click" on whatever element the drag started/ended over —
+        // without this flag that stray click would immediately toggle
+        // play/pause right after the user finishes dragging the scrubber.
+        let suppressNextClick = false;
+        this._onWindowPointerUp = () => {
+            if (scrubbing) suppressNextClick = true;
+            scrubbing = false;
+        };
         window.addEventListener('pointermove', this._onWindowPointerMove);
         window.addEventListener('pointerup', this._onWindowPointerUp);
+
+        // Click-to-play/pause on the video surface itself (YouTube-style).
+        // Scoped to the overlay background only — any click that lands on an
+        // actual control, menu, or the end/error screens is left alone so it
+        // keeps doing its own thing instead of also toggling playback.
+        this.overlay.addEventListener('click', (e) => {
+            if (suppressNextClick) { suppressNextClick = false; return; }
+            if (e.target.closest('[data-topbar], [data-controlbar], [data-menu], button, a, input')) return;
+            if (!el.endScreen.classList.contains('hidden')) return;
+            if (!el.error.classList.contains('hidden')) return;
+            this.togglePlay();
+        });
 
         // Speed / settings menus
         this.overlay.querySelectorAll('[data-menu-toggle]').forEach(btn => {
