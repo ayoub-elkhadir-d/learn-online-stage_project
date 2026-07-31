@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CourseAsset extends Model
 {
     /**
-     * Recognized attachment types — drives which icon the timeline card
+     * Recognized atmlkolktachment types — drives which icon the timeline card
      * renders. 'text' means a plain announcement with no attachment.
      */
     public const TYPES = [
