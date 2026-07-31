@@ -60,13 +60,28 @@
         <x-icon name="arrow-right" class="h-4 w-4 shrink-0 text-(--color-primary)" />
     </a>
 
-    <div class="mb-4 flex items-center justify-between">
+    {{-- Recently Viewed — populated client-side from localStorage, hidden until there's history --}}
+    <div class="mb-8 hidden" data-recently-viewed-section>
+        <h2 class="mb-3 text-lg font-bold text-(--color-text) dark:text-white">Recently Viewed</h2>
+        <div class="recent-scroll" data-recently-viewed-list></div>
+    </div>
+
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-lg font-bold">My Courses</h2>
         <a href="{{ route('courses.index') }}" class="btn-secondary text-sm">
             <x-icon name="layout-grid" class="h-4 w-4" />
             Browse More
         </a>
     </div>
+
+    @if(! $purchases->isEmpty())
+        <div class="mb-5 flex flex-wrap items-center gap-2" data-status-filters>
+            <button type="button" class="status-pill is-active" data-status-filter="all">All</button>
+            <button type="button" class="status-pill" data-status-filter="in-progress">In Progress</button>
+            <button type="button" class="status-pill" data-status-filter="completed">Completed</button>
+            <button type="button" class="status-pill" data-status-filter="not-started">Not Started</button>
+        </div>
+    @endif
 
     @if($purchases->isEmpty())
         <div class="lesson-card flex flex-col items-center px-6 py-20 text-center">
@@ -92,6 +107,7 @@
                 <div
                     class="course-card group flex flex-col overflow-hidden"
                     data-course-card
+                    data-status="{{ $purchase->status === 'paid' ? 'not-started' : 'pending' }}"
                     data-course-id="{{ $purchase->course_id }}"
                     data-lessons="@json($lessons->map(fn($l) => ['id' => $l->id, 'title' => $l->title])->values())"
                 >
@@ -110,6 +126,14 @@
                             <span class="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-(--color-success) px-2.5 py-1 text-[11px] font-semibold text-white shadow">
                                 <x-icon name="check" class="h-3 w-3" />Active
                             </span>
+                            @if($lessonsCount > 0)
+                                <svg class="absolute bottom-3 right-3 drop-shadow" viewBox="0 0 36 36" width="40" height="40" data-progress-ring role="img" aria-label="Course progress">
+                                    <circle class="progress-ring-track" cx="18" cy="18" r="15.5" fill="none" stroke-width="3"></circle>
+                                    <circle class="progress-ring-fill" data-progress-ring-fill cx="18" cy="18" r="15.5" fill="none" stroke-width="3"
+                                            stroke-linecap="round" stroke-dasharray="97.39" stroke-dashoffset="97.39" transform="rotate(-90 18 18)"></circle>
+                                    <text data-progress-ring-text x="18" y="21" text-anchor="middle" class="progress-ring-label">0%</text>
+                                </svg>
+                            @endif
                         @else
                             <span class="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-(--color-accent) px-2.5 py-1 text-[11px] font-semibold text-white shadow">
                                 <x-icon name="clock" class="h-3 w-3" />Pending
@@ -150,12 +174,17 @@
                             </div>
                         @endif
 
-                        <div class="mt-auto pt-4">
+                        <div class="mt-auto flex flex-col gap-2 pt-4">
                             @if($purchase->status === 'paid')
                                 <a href="{{ route('courses.learn', $purchase->course->slug) }}" data-continue-link class="btn-primary w-full text-sm">
                                     <x-icon name="play" class="h-4 w-4" />
                                     <span data-continue-cta>Start Learning</span>
                                 </a>
+                                <button type="button" disabled title="Certificates are coming soon" data-certificate-badge
+                                        class="hidden w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-(--color-border) px-4 py-2 text-xs font-semibold text-(--color-text-secondary) opacity-70 dark:border-white/10">
+                                    <x-icon name="shield" class="h-3.5 w-3.5" />
+                                    Certificate — Coming Soon
+                                </button>
                             @else
                                 <div class="flex items-center gap-2 rounded-lg bg-(--color-accent)/10 px-3 py-2 text-xs text-(--color-accent)">
                                     <x-icon name="alert-circle" class="h-3.5 w-3.5 shrink-0" />
@@ -200,8 +229,12 @@
     var totalLessons = 0;
 
     document.querySelectorAll('[data-course-card]').forEach(function (card) {
+        // Pending (unpaid) purchases have no real progress — they're excluded
+        // from the status filters entirely rather than miscategorized.
+        if (card.dataset.status === 'pending') return;
+
         var courseId = card.dataset.courseId;
-        var lessons = read('lessons:' + courseId, null);
+        var lessons = [];
         try {
             lessons = JSON.parse(card.dataset.lessons || '[]');
         } catch (e) {
@@ -222,16 +255,24 @@
         var continueEl = card.querySelector('[data-continue-label]');
         var ctaEl = card.querySelector('[data-continue-cta]');
         var linkEl = card.querySelector('[data-continue-link]');
+        var ringFill = card.querySelector('[data-progress-ring-fill]');
+        var ringText = card.querySelector('[data-progress-ring-text]');
+        var certBadge = card.querySelector('[data-certificate-badge]');
 
         if (fill) fill.style.width = percent + '%';
         if (percentEl) percentEl.textContent = percent + '%';
         if (labelEl) labelEl.textContent = completedCount + ' of ' + lessons.length + ' lesson' + (lessons.length === 1 ? '' : 's');
+        if (ringFill) ringFill.style.strokeDashoffset = String(97.39 * (1 - percent / 100));
+        if (ringText) ringText.textContent = percent + '%';
+
+        card.dataset.status = percent >= 100 ? 'completed' : (percent > 0 ? 'in-progress' : 'not-started');
 
         var nextLesson = lessons.find(function (l) { return completed.indexOf(l.id) === -1; });
 
         if (percent >= 100) {
             if (continueEl) continueEl.textContent = 'Course completed';
             if (ctaEl) ctaEl.textContent = 'Review Course';
+            if (certBadge) { certBadge.classList.remove('hidden'); certBadge.classList.add('flex'); }
         } else if (completedCount > 0) {
             if (continueEl && nextLesson) continueEl.textContent = 'Continue with: ' + nextLesson.title;
             if (ctaEl) ctaEl.textContent = 'Continue Learning';
@@ -243,6 +284,48 @@
             linkEl.href = url.toString();
         }
     });
+
+    // ---- Status filter pills ----
+    var filterButtons = Array.prototype.slice.call(document.querySelectorAll('[data-status-filter]'));
+    filterButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            filterButtons.forEach(function (b) { b.classList.remove('is-active'); });
+            btn.classList.add('is-active');
+
+            var status = btn.dataset.statusFilter;
+            document.querySelectorAll('[data-course-card]').forEach(function (card) {
+                var matches = status === 'all' || card.dataset.status === status;
+                card.classList.toggle('hidden', !matches);
+            });
+        });
+    });
+
+    // ---- Recently Viewed ----
+    var recentlyViewed = read('lp:recently-viewed', []);
+    if (recentlyViewed.length) {
+        var section = document.querySelector('[data-recently-viewed-section]');
+        var list = document.querySelector('[data-recently-viewed-list]');
+        if (section && list) {
+            recentlyViewed.forEach(function (item) {
+                var chip = document.createElement('a');
+                chip.href = item.url;
+                chip.className = 'recent-chip flex items-center gap-3 p-3.5';
+                chip.innerHTML =
+                    '<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--color-primary)/10 text-(--color-primary)">' +
+                        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4.5 w-4.5"><polygon points="6 3 20 12 6 21 6 3"/></svg>' +
+                    '</span>' +
+                    '<span class="min-w-0 flex-1">' +
+                        '<span class="block truncate text-xs font-bold text-(--color-text)"></span>' +
+                        '<span class="block truncate text-[11px] text-(--color-text-secondary)"></span>' +
+                    '</span>';
+                var titles = chip.querySelectorAll('span.block');
+                titles[0].textContent = item.courseTitle || 'Untitled course';
+                titles[1].textContent = item.lessonTitle || '';
+                list.appendChild(chip);
+            });
+            section.classList.remove('hidden');
+        }
+    }
 
     // ---- Hero stat tiles ----
     var progressStat = document.querySelector('[data-stat-progress]');

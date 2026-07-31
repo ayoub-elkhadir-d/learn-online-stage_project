@@ -237,6 +237,9 @@ function bindTabs() {
         $$('[data-tab-panel]').forEach(panel => {
             panel.hidden = panel.dataset.tabPanel !== name;
         });
+
+        if (name === 'assets') loadAssetsPanel();
+        if (name === 'reviews') loadReviewsPanel();
     }
 
     tabs.forEach((btn, i) => {
@@ -259,142 +262,231 @@ function bindTabs() {
     activate('overview');
 }
 
-// ---- Ratings & Reviews ----------------------------------------------------
+// ---- Course-scoped tab panels (Assets, Ratings & Reviews) -----------------
+// Both are scoped to the course, not the lesson, so they're fetched once per
+// course and cached in memory here — switching lessons repaints instantly
+// from the cache (via bindTabs()'s activate()) instead of re-fetching data
+// that hasn't changed.
 
-const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" class="h-full w-full" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
+const panelCache = new Map(); // `${name}:${courseId}` -> rendered HTML
+const panelPending = new Set(); // same keys, marks an in-flight fetch
 
-function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
+function panelKey(name) {
+    return `${name}:${currentCourseId()}`;
 }
 
-function starsMarkup(rating, sizeClass) {
-    return Array.from({ length: 5 }, (_, i) => (
-        `<span class="${sizeClass} ${i < rating ? 'text-amber-400' : 'text-(--color-border) dark:text-white/15'}">${STAR_SVG}</span>`
-    )).join('');
+function loadReviewsPanel() {
+    const mount = $('[data-reviews-mount]');
+    if (!mount) return;
+
+    const key = panelKey('reviews');
+    if (panelCache.has(key)) {
+        mount.innerHTML = panelCache.get(key);
+        bindReviewsPanel(mount);
+        return;
+    }
+    if (panelPending.has(key)) return;
+    panelPending.add(key);
+
+    window.axios.get(`/courses/${window.__courseSlug}/reviews`)
+        .then(res => {
+            panelCache.set(key, res.data);
+            const freshMount = $('[data-reviews-mount]');
+            if (freshMount) {
+                freshMount.innerHTML = res.data;
+                bindReviewsPanel(freshMount);
+            }
+        })
+        .catch(() => {
+            const freshMount = $('[data-reviews-mount]');
+            if (freshMount) freshMount.innerHTML = '<div class="lesson-card p-6 text-center text-sm text-(--color-danger)">Couldn’t load reviews. Please try again.</div>';
+        })
+        .finally(() => panelPending.delete(key));
 }
 
-function bindReviewStarInput(root) {
-    const buttons = $$('[data-star-input]', root);
-    let selected = 0;
+function bindReviewsPanel(mount) {
+    const starRoot = $('[data-review-star-input]', mount);
+    const submitBtn = $('[data-review-submit]', mount);
+    const deleteBtn = $('[data-review-delete]', mount);
+    const textField = $('[data-review-text]', mount);
+    const errorEl = $('[data-review-error]', mount);
 
-    function paint(upTo) {
-        buttons.forEach(btn => {
+    let selected = submitBtn ? Number(submitBtn.dataset.initialRating || 0) : 0;
+
+    function paintStars(upTo) {
+        if (!starRoot) return;
+        $$('[data-star-input]', starRoot).forEach(btn => {
             const filled = Number(btn.dataset.starInput) <= upTo;
             btn.classList.toggle('text-amber-400', filled);
             btn.querySelector('svg')?.classList.toggle('fill-current', filled);
         });
     }
 
-    buttons.forEach(btn => {
-        btn.addEventListener('mouseenter', () => paint(Number(btn.dataset.starInput)));
-        btn.addEventListener('click', () => {
-            selected = Number(btn.dataset.starInput);
-            paint(selected);
+    if (starRoot) {
+        $$('[data-star-input]', starRoot).forEach(btn => {
+            btn.addEventListener('mouseenter', () => paintStars(Number(btn.dataset.starInput)));
+            btn.addEventListener('click', () => {
+                selected = Number(btn.dataset.starInput);
+                paintStars(selected);
+            });
         });
-    });
-    root.addEventListener('mouseleave', () => paint(selected));
+        starRoot.addEventListener('mouseleave', () => paintStars(selected));
+    }
 
-    return {
-        get: () => selected,
-        reset: () => { selected = 0; paint(0); },
-    };
+    if (submitBtn) {
+        submitBtn.addEventListener('click', () => {
+            const body = textField ? textField.value.trim() : '';
+            if (!selected) {
+                if (errorEl) errorEl.textContent = 'Please select a star rating.';
+                return;
+            }
+            if (body.length < 3) {
+                if (errorEl) errorEl.textContent = 'Please write a few words about the course.';
+                return;
+            }
+            if (errorEl) errorEl.textContent = '';
+            submitBtn.disabled = true;
+
+            window.axios.post(`/courses/${window.__courseSlug}/reviews`, { rating: selected, body })
+                .then(res => repaintReviewsPanel(res.data))
+                .catch(err => {
+                    if (errorEl) errorEl.textContent = err.response?.data?.message || 'Something went wrong. Please try again.';
+                })
+                .finally(() => { submitBtn.disabled = false; });
+        });
+    }
+
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+            if (!window.confirm('Delete your review?')) return;
+            deleteBtn.disabled = true;
+            window.axios.delete(`/courses/${window.__courseSlug}/reviews`)
+                .then(res => repaintReviewsPanel(res.data))
+                .catch(() => { deleteBtn.disabled = false; });
+        });
+    }
+
+    bindReviewsLoadMore(mount);
 }
 
-function renderReviewSummary(lessonId) {
-    const reviews = window.LessonProgress.getReviews(lessonId);
-    const total = reviews.length;
-    const average = total ? reviews.reduce((sum, r) => sum + r.rating, 0) / total : 0;
-
-    const averageEl = $('[data-review-average]');
-    if (averageEl) averageEl.textContent = average.toFixed(1);
-
-    const starsEl = $('[data-review-average-stars]');
-    if (starsEl) starsEl.innerHTML = starsMarkup(Math.round(average), 'h-5 w-5');
-
-    const countEl = $('[data-review-count]');
-    if (countEl) countEl.textContent = total;
-
-    for (let star = 1; star <= 5; star++) {
-        const count = reviews.filter(r => r.rating === star).length;
-        const pct = total ? Math.round((count / total) * 100) : 0;
-        const bar = document.querySelector(`[data-review-bar="${star}"]`);
-        const pctEl = document.querySelector(`[data-review-bar-pct="${star}"]`);
-        if (bar) bar.style.width = `${pct}%`;
-        if (pctEl) pctEl.textContent = `${pct}%`;
+function repaintReviewsPanel(html) {
+    panelCache.set(panelKey('reviews'), html);
+    const mount = $('[data-reviews-mount]');
+    if (mount) {
+        mount.innerHTML = html;
+        bindReviewsPanel(mount);
     }
 }
 
-function renderReviewsList(lessonId) {
-    const list = $('[data-reviews-list]');
-    const empty = $('[data-reviews-empty]');
-    if (!list) return;
+function bindReviewsLoadMore(mount) {
+    const btn = mount.querySelector('[data-reviews-load-more]');
+    if (!btn || btn.dataset.bound) return;
+    btn.dataset.bound = '1';
 
-    const reviews = window.LessonProgress.getReviews(lessonId).slice().sort((a, b) => b.createdAt - a.createdAt);
+    btn.addEventListener('click', () => {
+        const page = Number(btn.dataset.page);
+        btn.disabled = true;
+        btn.textContent = 'Loading…';
 
-    $$('[data-review-row]', list).forEach(el => el.remove());
-    if (empty) empty.classList.toggle('hidden', reviews.length > 0);
+        window.axios.get(`/courses/${window.__courseSlug}/reviews/more`, { params: { page } })
+            .then(res => {
+                const temp = document.createElement('div');
+                temp.innerHTML = res.data;
+                const newButton = temp.querySelector('[data-reviews-load-more]');
+                if (newButton) newButton.remove();
 
-    reviews.forEach(r => {
-        const card = document.createElement('div');
-        card.dataset.reviewRow = '';
-        card.className = 'lesson-card p-4 sm:p-5';
-        card.innerHTML = `
-            <div class="flex items-start gap-3">
-                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-(--color-primary) text-xs font-semibold text-white">${escapeHtml((r.name || 'U').charAt(0).toUpperCase())}</span>
-                <div class="min-w-0 flex-1">
-                    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                        <span class="text-sm font-bold text-(--color-text) dark:text-white">${escapeHtml(r.name || 'Anonymous')}</span>
-                        <span class="text-xs text-(--color-text-secondary)">${escapeHtml(new Date(r.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }))}</span>
-                    </div>
-                    <div class="mt-1 flex items-center gap-0.5">${starsMarkup(r.rating, 'h-3.5 w-3.5')}</div>
-                    ${r.text ? `<p class="mt-2 text-sm leading-relaxed text-(--color-text-secondary)">${escapeHtml(r.text)}</p>` : ''}
-                </div>
-            </div>
-        `;
-        list.appendChild(card);
+                const cards = mount.querySelector('[data-reviews-cards]');
+                if (cards) Array.from(temp.children).forEach(card => cards.appendChild(card));
+
+                const wrapper = mount.querySelector('[data-reviews-load-more-wrapper]');
+                if (wrapper) {
+                    wrapper.innerHTML = '';
+                    if (newButton) {
+                        wrapper.appendChild(newButton);
+                        bindReviewsLoadMore(mount);
+                    }
+                }
+
+                panelCache.set(panelKey('reviews'), mount.innerHTML);
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.textContent = 'Load more reviews';
+            });
     });
 }
 
-function bindReviewForm(lessonId, starController) {
-    const submitBtn = $('[data-review-submit]');
-    const textField = $('[data-review-text]');
-    const errorEl = $('[data-review-error]');
-    if (!submitBtn) return;
+// ---- Assets -----------------------------------------------------------
 
-    submitBtn.addEventListener('click', () => {
-        const rating = starController.get();
-        if (!rating) {
-            if (errorEl) errorEl.textContent = 'Please select a star rating.';
-            return;
-        }
-        if (errorEl) errorEl.textContent = '';
+function loadAssetsPanel() {
+    const mount = $('[data-assets-mount]');
+    if (!mount) return;
 
-        window.LessonProgress.addReview(lessonId, {
-            rating,
-            text: textField ? textField.value : '',
-            name: window.__userName,
-        });
+    const key = panelKey('assets');
+    if (panelCache.has(key)) {
+        mount.innerHTML = panelCache.get(key);
+        bindAssetsPanel(mount);
+        return;
+    }
+    if (panelPending.has(key)) return;
+    panelPending.add(key);
 
-        if (textField) textField.value = '';
-        starController.reset();
-
-        renderReviewSummary(lessonId);
-        renderReviewsList(lessonId);
-    });
+    window.axios.get(`/courses/${window.__courseSlug}/assets`)
+        .then(res => {
+            panelCache.set(key, res.data);
+            const freshMount = $('[data-assets-mount]');
+            if (freshMount) {
+                freshMount.innerHTML = res.data;
+                bindAssetsPanel(freshMount);
+            }
+        })
+        .catch(() => {
+            const freshMount = $('[data-assets-mount]');
+            if (freshMount) freshMount.innerHTML = '<div class="lesson-card p-6 text-center text-sm text-(--color-danger)">Couldn’t load resources. Please try again.</div>';
+        })
+        .finally(() => panelPending.delete(key));
 }
 
-function bindReviews() {
-    const lessonId = currentLessonId();
-    if (!lessonId) return;
+function bindAssetsPanel(mount) {
+    bindAssetsLoadMore(mount);
+}
 
-    renderReviewSummary(lessonId);
-    renderReviewsList(lessonId);
+function bindAssetsLoadMore(mount) {
+    const btn = mount.querySelector('[data-assets-load-more]');
+    if (!btn || btn.dataset.bound) return;
+    btn.dataset.bound = '1';
 
-    const inputRoot = $('[data-review-star-input]');
-    const starController = inputRoot ? bindReviewStarInput(inputRoot) : { get: () => 0, reset: () => {} };
-    bindReviewForm(lessonId, starController);
+    btn.addEventListener('click', () => {
+        const page = Number(btn.dataset.page);
+        btn.disabled = true;
+        btn.textContent = 'Loading…';
+
+        window.axios.get(`/courses/${window.__courseSlug}/assets/more`, { params: { page } })
+            .then(res => {
+                const temp = document.createElement('div');
+                temp.innerHTML = res.data;
+                const newButton = temp.querySelector('[data-assets-load-more]');
+                if (newButton) newButton.remove();
+
+                const cards = mount.querySelector('[data-assets-cards]');
+                if (cards) Array.from(temp.children).forEach(card => cards.appendChild(card));
+
+                const wrapper = mount.querySelector('[data-assets-load-more-wrapper]');
+                if (wrapper) {
+                    wrapper.innerHTML = '';
+                    if (newButton) {
+                        wrapper.appendChild(newButton);
+                        bindAssetsLoadMore(mount);
+                    }
+                }
+
+                panelCache.set(panelKey('assets'), mount.innerHTML);
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.textContent = 'Load more';
+            });
+    });
 }
 
 // ---- Lesson navigation (AJAX swap, player instance preserved) -----------------
@@ -402,7 +494,6 @@ function bindReviews() {
 function initLessonContentView() {
     bindTabs();
     renderBookmarksList();
-    bindReviews();
     paintProgress();
     paintCompleted();
 }

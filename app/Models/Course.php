@@ -15,6 +15,8 @@ class Course extends Model
         'slug',
         'price_mad',
         'cover_image_path',
+        'instructor_name',
+        'difficulty',
     ];
 
     public function category(): BelongsTo
@@ -30,6 +32,16 @@ class Course extends Model
     public function lessons(): HasMany
     {
         return $this->hasMany(Lesson::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(CourseReview::class);
+    }
+
+    public function assets(): HasMany
+    {
+        return $this->hasMany(CourseAsset::class)->latest();
     }
 
     public function isPurchasedBy(?User $user): bool

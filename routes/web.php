@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseAssetController;
+use App\Http\Controllers\CourseReviewController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\Admin\AdminCourseController;
@@ -42,6 +44,18 @@ Route::middleware(['auth', 'user.only'])->group(function () {
         ->name('lessons.video');
     Route::get('/courses/{slug}/checkout', [CourseController::class, 'checkout'])->name('courses.checkout');
     Route::post('/courses/{slug}/purchase', [PurchaseController::class, 'purchase'])->name('courses.purchase');
+
+    // Ratings & Reviews — read/write panel embedded in the Learning page's
+    // "Ratings & Reviews" tab, fetched/mutated via AJAX (HTML fragments).
+    Route::get('/courses/{course:slug}/reviews', [CourseReviewController::class, 'index'])->name('courses.reviews.index');
+    Route::get('/courses/{course:slug}/reviews/more', [CourseReviewController::class, 'loadMore'])->name('courses.reviews.more');
+    Route::post('/courses/{course:slug}/reviews', [CourseReviewController::class, 'store'])->name('courses.reviews.store');
+    Route::delete('/courses/{course:slug}/reviews', [CourseReviewController::class, 'destroy'])->name('courses.reviews.destroy');
+
+    // Assets — read-only instructor resource timeline in the Learning
+    // page's "Assets" tab. No write endpoints yet (admin panel comes later).
+    Route::get('/courses/{course:slug}/assets', [CourseAssetController::class, 'index'])->name('courses.assets.index');
+    Route::get('/courses/{course:slug}/assets/more', [CourseAssetController::class, 'loadMore'])->name('courses.assets.more');
 
     Route::get('/dashboard', function () {
         $purchases = \App\Models\CoursePurchase::with(['course.category'])

@@ -99,7 +99,8 @@ function bindEvents() {
         window.LessonProgress.savePosition(state.lessonId, playerEl.currentTime);
         window.LessonProgress.addTimeSpent(4);
         if (state.courseId) {
-            window.LessonProgress.setContinueLearning(window.location.href, document.title.split(' — ')[0] || document.title);
+            const titleParts = document.title.split(' — ');
+            window.LessonProgress.setContinueLearning(window.location.href, titleParts[0] || document.title, state.courseId, titleParts[1]);
         }
 
         if (playerEl.duration && playerEl.currentTime / playerEl.duration > COMPLETE_THRESHOLD && state.courseId) {

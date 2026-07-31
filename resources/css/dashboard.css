@@ -64,3 +64,82 @@
     background: var(--color-primary);
     transition: width 0.4s ease;
 }
+
+/* ---- Progress ring (compact circular readout, overlaid on the card cover) ---- */
+.progress-ring-track {
+    stroke: color-mix(in srgb, white 35%, transparent);
+}
+
+.progress-ring-fill {
+    stroke: #fff;
+    transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-ring-label {
+    fill: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    font-family: var(--font-sans);
+}
+
+/* ---- My Courses filter pills ---- */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.status-pill:hover {
+    color: var(--color-primary);
+    border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
+}
+
+.status-pill.is-active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #fff;
+}
+
+.dark .status-pill {
+    background: var(--color-card-dark);
+}
+
+/* ---- Recently viewed strip ---- */
+.recent-scroll {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 0.25rem;
+}
+
+.recent-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.recent-chip {
+    flex-shrink: 0;
+    width: 15rem;
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recent-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+}
+
+.dark .recent-chip {
+    background: var(--color-card-dark);
+}

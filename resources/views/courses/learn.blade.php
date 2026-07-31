@@ -14,6 +14,7 @@
     @vite(['resources/css/app.css', 'resources/css/learn.css', 'resources/js/app.js', 'resources/js/learn.js'])
     <script>
         window.__courseId = {{ $course->id }};
+        window.__courseSlug = @json($course->slug);
         window.__totalLessons = {{ $lessons->count() }};
         window.__userName = @json(auth()->user()->name);
     </script>
@@ -22,38 +23,33 @@
 
 <div class="flex h-full flex-col">
 
-    {{-- Topbar --}}
-    <header class="flex shrink-0 items-center gap-3 border-b border-(--color-border) bg-(--color-card) px-4 py-3 dark:bg-(--color-card-dark)">
+    {{-- Shared site navbar — same component used on every other page, so the
+         Learning page no longer has its own one-off header. Its own
+         scroll-shrink effect is a no-op here since this page's <body> never
+         scrolls (only <main> below does), which is harmless. --}}
+    <x-navbar />
+
+    {{-- Lesson sub-bar: mobile curriculum toggle, back-to-course breadcrumb,
+         and the course progress readout — everything the shared navbar
+         doesn't already cover. --}}
+    <div class="flex shrink-0 items-center gap-3 border-b border-(--color-border) bg-(--color-card) px-4 py-2.5 dark:border-white/10 dark:bg-(--color-card-dark)">
         <button type="button" data-sidebar-toggle aria-label="Toggle lesson list"
-                class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-(--color-text-secondary) transition-colors hover:bg-black/5 lg:hidden dark:hover:bg-white/10">
-            <x-icon name="list" class="h-5 w-5" />
+                class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-(--color-text-secondary) transition-colors hover:bg-black/5 lg:hidden dark:hover:bg-white/10">
+            <x-icon name="list" class="h-4.5 w-4.5" />
         </button>
 
-        <a href="{{ route('courses.show', $course->slug) }}" class="flex min-w-0 items-center gap-2 text-sm text-(--color-text-secondary) transition-colors hover:text-(--color-text) dark:hover:text-white">
+        <a href="{{ route('courses.show', $course->slug) }}" class="flex min-w-0 items-center gap-1.5 text-sm text-(--color-text-secondary) transition-colors hover:text-(--color-text) dark:hover:text-white">
             <x-icon name="chevron-left" class="h-4 w-4 shrink-0" />
             <span class="truncate font-semibold text-(--color-text) dark:text-white">{{ $course->title }}</span>
         </a>
 
-        <div class="ml-auto flex items-center gap-3">
-            <div class="hidden items-center gap-2 sm:flex">
-                <div class="h-1.5 w-32 overflow-hidden rounded-full bg-(--color-border)">
-                    <div data-progress-bar class="h-full rounded-full bg-(--color-primary) transition-all duration-300" style="width:0%"></div>
-                </div>
-                <span data-progress-pct class="text-xs font-semibold tabular-nums text-(--color-text-secondary)">0%</span>
+        <div class="ml-auto hidden items-center gap-2 sm:flex">
+            <div class="h-1.5 w-32 overflow-hidden rounded-full bg-(--color-border)">
+                <div data-progress-bar class="h-full rounded-full bg-(--color-primary) transition-all duration-300" style="width:0%"></div>
             </div>
-
-            <button type="button" data-theme-toggle aria-label="Toggle dark mode"
-                    class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-(--color-text-secondary) transition-colors hover:bg-black/5 dark:hover:bg-white/10">
-                <x-icon name="sun" class="hidden h-4.5 w-4.5 dark:block" />
-                <x-icon name="moon" class="block h-4.5 w-4.5 dark:hidden" />
-            </button>
-
-            <a href="{{ route('dashboard') }}" class="hidden items-center gap-1.5 text-sm font-medium text-(--color-text-secondary) transition-colors hover:text-(--color-text) sm:inline-flex dark:hover:text-white">
-                <x-icon name="layout-grid" class="h-4 w-4" />
-                My Courses
-            </a>
+            <span data-progress-pct class="text-xs font-semibold tabular-nums text-(--color-text-secondary)">0%</span>
         </div>
-    </header>
+    </div>
 
     {{-- min-h-0 is load-bearing here: without it, a flex item's automatic
          min-height is its content size (not 0), so a tall sidebar/content

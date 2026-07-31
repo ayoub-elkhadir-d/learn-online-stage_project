@@ -75,25 +75,6 @@
             write('lp:speed', v);
         },
 
-        // ---- Reviews (per lesson — rating + text, shown in the Ratings &
-        // Reviews tab). Client-side only, same as everything else here: no
-        // backend table, so reviews live per-browser rather than per-account. ----
-        getReviews(lessonId) {
-            return read(`lp:reviews:${lessonId}`, []);
-        },
-        addReview(lessonId, { rating, text, name }) {
-            const list = this.getReviews(lessonId);
-            list.push({
-                id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-                rating: Math.max(1, Math.min(5, Math.round(rating))),
-                text: (text || '').trim(),
-                name: (name || 'You').trim(),
-                createdAt: Date.now(),
-            });
-            write(`lp:reviews:${lessonId}`, list);
-            return list;
-        },
-
         // ---- Bookmarks (timestamped markers per lesson) ----
         // Shape: { time, title, note, createdAt }. Older records only ever had
         // `label` — normalized to `title` here on read so nothing already
@@ -167,9 +148,18 @@
             return daysSinceActive > 1 ? 0 : streak;
         },
 
-        // ---- Continue learning pointer (read by the Dashboard) ----
-        setContinueLearning(url, title) {
+        // ---- Continue learning pointer + recently-viewed history (both
+        // read by the Dashboard) ----
+        setContinueLearning(url, title, courseId, courseTitle) {
             write('continue-learning', { url, title, timestamp: Date.now() });
+
+            if (!courseId) return;
+            const list = read('lp:recently-viewed', []).filter(item => item.courseId !== courseId);
+            list.unshift({ courseId, courseTitle: courseTitle || title, lessonTitle: title, url, timestamp: Date.now() });
+            write('lp:recently-viewed', list.slice(0, 8));
+        },
+        getRecentlyViewed() {
+            return read('lp:recently-viewed', []);
         },
 
         // ---- Helpers ----

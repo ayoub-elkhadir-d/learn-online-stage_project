@@ -16,6 +16,9 @@
         <button type="button" role="tab" class="tab-btn" id="tab-bookmarks" aria-controls="panel-bookmarks" aria-selected="false" tabindex="-1" data-tab-btn="bookmarks">
             Bookmarks
         </button>
+        <button type="button" role="tab" class="tab-btn" id="tab-assets" aria-controls="panel-assets" aria-selected="false" tabindex="-1" data-tab-btn="assets">
+            Assets
+        </button>
         <button type="button" role="tab" class="tab-btn" id="tab-reviews" aria-controls="panel-reviews" aria-selected="false" tabindex="-1" data-tab-btn="reviews">
             Ratings &amp; Reviews
         </button>
@@ -105,69 +108,24 @@
     </div>
 </div>
 
-{{-- Ratings & Reviews --}}
-<div id="panel-reviews" role="tabpanel" aria-labelledby="tab-reviews" class="tab-panel space-y-6" data-tab-panel="reviews" hidden>
-
-    {{-- Summary --}}
-    <div class="lesson-card defer-render p-5 sm:p-6">
-        <h2 class="mb-4 flex items-center gap-1.5 text-sm font-bold text-(--color-text) dark:text-white">
-            <x-icon name="star" class="h-4 w-4 text-(--color-text-secondary)" />
-            Ratings &amp; Reviews
-        </h2>
-        <div class="flex flex-col gap-6 sm:flex-row sm:items-center">
-            <div class="flex shrink-0 flex-col items-center gap-1.5 sm:w-40 sm:border-r sm:border-(--color-border) sm:pr-6">
-                <span class="text-4xl font-extrabold leading-none text-(--color-text) dark:text-white" data-review-average>0.0</span>
-                <div class="flex items-center gap-0.5" data-review-average-stars></div>
-                <span class="text-xs text-(--color-text-secondary)"><span data-review-count>0</span> ratings</span>
-            </div>
-            <div class="flex-1 space-y-1.5">
-                @for ($star = 5; $star >= 1; $star--)
-                    <div class="flex items-center gap-2 text-xs">
-                        <span class="flex w-6 shrink-0 items-center gap-1 font-medium text-(--color-text-secondary)">{{ $star }}<x-icon name="star" class="h-3 w-3 fill-current" /></span>
-                        <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-(--color-border)">
-                            <div class="h-full rounded-full bg-(--color-primary) transition-all duration-300" data-review-bar="{{ $star }}" style="width:0%"></div>
-                        </div>
-                        <span class="w-9 shrink-0 text-right font-semibold text-(--color-text-secondary)" data-review-bar-pct="{{ $star }}">0%</span>
-                    </div>
-                @endfor
-            </div>
+{{-- Assets — instructor resource timeline, fetched via AJAX and cached
+     per-course in learn-page.js so switching lessons doesn't re-fetch it. --}}
+<div id="panel-assets" role="tabpanel" aria-labelledby="tab-assets" class="tab-panel" data-tab-panel="assets" hidden>
+    <div data-assets-mount>
+        <div class="lesson-card flex items-center justify-center gap-2 p-8 text-sm text-(--color-text-secondary)">
+            <x-icon name="loader" class="h-4 w-4 animate-spin text-(--color-primary)" />
+            Loading resources…
         </div>
     </div>
+</div>
 
-    {{-- Write a review --}}
-    <div class="lesson-card defer-render p-5 sm:p-6">
-        <h3 class="mb-3 text-sm font-bold text-(--color-text) dark:text-white">Write a Review</h3>
-        <div class="flex items-center gap-1" data-review-star-input>
-            @for ($star = 1; $star <= 5; $star++)
-                <button type="button" data-star-input="{{ $star }}" aria-label="Rate {{ $star }} star{{ $star > 1 ? 's' : '' }}" class="review-star-btn">
-                    <x-icon name="star" class="h-7 w-7" />
-                </button>
-            @endfor
-        </div>
-        <textarea
-            data-review-text
-            rows="3"
-            maxlength="600"
-            placeholder="Share your thoughts about this lesson..."
-            class="input-field mt-3 resize-y text-sm"
-        ></textarea>
-        <div class="mt-3 flex items-center justify-between gap-3">
-            <span class="text-xs text-(--color-danger)" data-review-error></span>
-            <button type="button" data-review-submit class="btn-primary ml-auto shrink-0 text-sm">
-                <x-icon name="check" class="h-4 w-4" />
-                Submit Review
-            </button>
-        </div>
-    </div>
-
-    {{-- Review list --}}
-    <div data-reviews-list class="space-y-4">
-        <div data-reviews-empty class="lesson-card flex flex-col items-center px-6 py-14 text-center">
-            <span class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-(--color-primary)/10 text-(--color-primary)">
-                <x-icon name="star" class="h-7 w-7" />
-            </span>
-            <h3 class="text-sm font-bold text-(--color-text) dark:text-white">No reviews yet</h3>
-            <p class="mt-1 text-xs text-(--color-text-secondary)">Be the first to rate this lesson.</p>
+{{-- Ratings & Reviews — real, database-backed, one review per user per
+     course. Fetched via AJAX and cached per-course, same as Assets. --}}
+<div id="panel-reviews" role="tabpanel" aria-labelledby="tab-reviews" class="tab-panel" data-tab-panel="reviews" hidden>
+    <div data-reviews-mount>
+        <div class="lesson-card flex items-center justify-center gap-2 p-8 text-sm text-(--color-text-secondary)">
+            <x-icon name="loader" class="h-4 w-4 animate-spin text-(--color-primary)" />
+            Loading reviews…
         </div>
     </div>
 </div>
