@@ -7,6 +7,7 @@
 
         <a href="{{ route('courses.index') }}" class="flex shrink-0 items-center gap-2">
             <img src="https://artiweb.ma/wp-content/uploads/2023/05/logo-1.png" alt="ArtiWeb" class="h-8 w-auto">
+            <span class="text-base font-extrabold tracking-tight text-(--color-text) dark:text-white">ArtiWeb</span>
         </a>
 
         <div class="hidden md:flex md:flex-1 md:items-center md:justify-center">

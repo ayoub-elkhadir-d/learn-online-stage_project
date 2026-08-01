@@ -100,7 +100,10 @@
                 Receipt
             </h3>
             @if($payment->receipt_path)
-                <a href="{{ Storage::url($payment->receipt_path) }}" target="_blank" class="mt-3 block overflow-hidden rounded-xl border border-(--color-border) dark:border-white/10">
+                <button type="button" data-receipt-trigger
+                        data-receipt-url="{{ Storage::url($payment->receipt_path) }}"
+                        data-receipt-type="{{ $isImage ? 'image' : 'pdf' }}"
+                        class="mt-3 block w-full overflow-hidden rounded-xl border border-(--color-border) transition-colors hover:border-(--color-primary)/40 dark:border-white/10">
                     @if($isImage)
                         <img src="{{ Storage::url($payment->receipt_path) }}" alt="Payment receipt" class="h-48 w-full object-cover">
                     @else
@@ -109,11 +112,14 @@
                             <span class="text-xs font-semibold">Open PDF receipt</span>
                         </div>
                     @endif
-                </a>
-                <a href="{{ Storage::url($payment->receipt_path) }}" target="_blank" class="btn-secondary mt-3 w-full !py-2 text-xs">
-                    <x-icon name="download" class="h-3.5 w-3.5" />
-                    Open Full Size
-                </a>
+                </button>
+                <button type="button" data-receipt-trigger
+                        data-receipt-url="{{ Storage::url($payment->receipt_path) }}"
+                        data-receipt-type="{{ $isImage ? 'image' : 'pdf' }}"
+                        class="btn-secondary mt-3 w-full !py-2 text-xs">
+                    <x-icon name="maximize-2" class="h-3.5 w-3.5" />
+                    View Full Size
+                </button>
             @else
                 <p class="mt-3 text-sm text-(--color-text-secondary)">No receipt uploaded.</p>
             @endif

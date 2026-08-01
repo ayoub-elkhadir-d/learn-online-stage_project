@@ -17,24 +17,32 @@
     <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
     <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
     <div class="storefront-hero-grid" aria-hidden="true"></div>
+    <div class="hero-shape hero-shape-1" aria-hidden="true"></div>
+    <div class="hero-shape hero-shape-2" aria-hidden="true"></div>
+    <div class="hero-shape hero-shape-3" aria-hidden="true"></div>
+    <div class="hero-line hero-line-1" aria-hidden="true"></div>
+    <div class="hero-line hero-line-2" aria-hidden="true"></div>
+    <div class="hero-dot hero-dot-1" aria-hidden="true"></div>
+    <div class="hero-dot hero-dot-2" aria-hidden="true"></div>
+    <div class="hero-dot hero-dot-3" aria-hidden="true"></div>
 
-    <div class="relative mx-auto max-w-4xl px-4 py-8 text-center sm:px-6 sm:py-10 lg:px-8">
+    <div class="relative mx-auto max-w-4xl px-4 py-6 text-center sm:px-6 sm:py-8 lg:px-8">
         <span class="inline-flex items-center gap-1.5 rounded-full bg-(--color-primary)/15 px-3.5 py-1.5 text-xs font-semibold text-(--color-accent)">
             <x-icon name="flame" class="h-3.5 w-3.5" />
             Professional Training Courses
         </span>
 
-        <h1 class="mt-4 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
-            Learn new skills,<br class="hidden sm:block">
-            <span class="text-(--color-accent)">grow your career</span>
+        <h1 class="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
+            Start your journey with<br class="hidden sm:block">
+            <span class="brand-shimmer">ArtiWeb</span> Academy
         </h1>
 
-        <p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-[#CBD5E1] sm:text-base">
+        <p class="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-[#CBD5E1] sm:text-base">
             Expert-led courses designed to help you master in-demand skills. One-time payment, lifetime access.
         </p>
 
         {{-- Search — filters the courses currently shown on this page --}}
-        <div class="mx-auto mt-5 max-w-xl">
+        <div class="mx-auto mt-4 max-w-xl">
             <div class="relative">
                 <x-icon name="search" class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#94A3B8]" />
                 <input
@@ -48,7 +56,7 @@
         </div>
 
         {{-- Category filters --}}
-        <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+        <div class="mt-3 flex flex-wrap items-center justify-center gap-2">
             <a href="{{ route('courses.index') }}" class="filter-pill {{ !request('category') ? 'is-active' : '' }}">
                 <x-icon name="layout-grid" class="h-3.5 w-3.5" />
                 All
@@ -63,8 +71,10 @@
     </div>
 </div>
 
-{{-- Grid --}}
-<div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+{{-- Body — a single category filter (from a pill / "View All") shows the
+     classic paginated grid for that one category; the unfiltered default
+     view groups courses by category into Udemy-style horizontal rows. --}}
+<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 
     @if($courses->isEmpty())
         <div class="lesson-card flex flex-col items-center px-6 py-20 text-center">
@@ -74,90 +84,20 @@
             <h3 class="text-lg font-bold text-(--color-text) dark:text-white">No courses found</h3>
             <p class="mt-1.5 max-w-sm text-sm text-(--color-text-secondary)">Try a different category or check back later.</p>
         </div>
-    @else
-        <div class="mb-6 flex items-center gap-3">
+
+    @elseif(request('category'))
+
+        <div class="mb-6 flex items-center gap-3" data-animate="fade-up">
             <h2 class="text-lg font-bold text-(--color-text) dark:text-white">Available Courses</h2>
             <span class="rounded-full bg-(--color-text)/8 px-2.5 py-1 text-xs font-semibold text-(--color-text-secondary) dark:bg-white/10">
                 {{ $courses->total() }} {{ Str::plural('course', $courses->total()) }}
             </span>
         </div>
 
-        <div id="courseGrid" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            @foreach($courses as $course)
-                @php
-                    $lessonsCount = $course->lessons()->count();
-                    $studentsCount = $course->purchases()->where('status', 'paid')->count();
-                    $reviewCount = $course->reviews()->count();
-                    $avgRating = $reviewCount ? round($course->reviews()->avg('rating'), 1) : null;
-                    $isEnrolled = auth()->check() && $course->isPurchasedBy(auth()->user());
-                    $difficultyStyle = [
-                        'beginner' => 'bg-(--color-success)/10 text-(--color-success)',
-                        'intermediate' => 'bg-(--color-accent)/15 text-(--color-accent)',
-                        'advanced' => 'bg-(--color-danger)/10 text-(--color-danger)',
-                    ][$course->difficulty] ?? 'bg-(--color-text)/8 text-(--color-text-secondary)';
-                @endphp
-                <div class="course-card group flex flex-col" data-course-item data-course-title="{{ strtolower($course->title) }}">
-                    <div class="course-card-cover">
-                        @if($course->cover_image_path)
-                            <img src="{{ Storage::url($course->cover_image_path) }}" alt="{{ $course->title }}" loading="lazy">
-                        @else
-                            <div class="flex h-full w-full items-center justify-center">
-                                <x-icon name="graduation-cap" class="h-10 w-10 text-(--color-primary)/40" />
-                            </div>
-                        @endif
-                        <span class="course-card-badge">{{ $course->category->name }}</span>
-                        <span class="course-card-price">{{ $course->price_mad }} MAD</span>
-                    </div>
-
-                    <div class="flex flex-1 flex-col p-5">
-                        <div class="mb-2 flex items-center gap-2">
-                            <span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide {{ $difficultyStyle }}">{{ ucfirst($course->difficulty) }}</span>
-                            @if($avgRating !== null)
-                                <span class="flex items-center gap-1 text-xs font-semibold text-(--color-text)">
-                                    <x-icon name="star" class="h-3.5 w-3.5 fill-current text-amber-400" />
-                                    {{ number_format($avgRating, 1) }}
-                                    <span class="font-normal text-(--color-text-secondary)">({{ $reviewCount }})</span>
-                                </span>
-                            @endif
-                        </div>
-
-                        <h3 class="text-sm font-bold leading-snug text-(--color-text) dark:text-white">{{ $course->title }}</h3>
-                        <p class="mt-2 flex-1 text-xs leading-relaxed text-(--color-text-secondary)">
-                            {{ Str::limit($course->description, 90) }}
-                        </p>
-
-                        @if($course->instructor_name)
-                            <div class="mt-3 flex items-center gap-2">
-                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-(--color-primary)/10 text-[10px] font-bold text-(--color-primary)">
-                                    {{ strtoupper(substr($course->instructor_name, 0, 1)) }}
-                                </span>
-                                <span class="truncate text-xs font-medium text-(--color-text-secondary)">{{ $course->instructor_name }}</span>
-                            </div>
-                        @endif
-
-                        <div class="mt-4 flex items-center gap-4 text-xs text-(--color-text-secondary)">
-                            <span class="flex items-center gap-1.5">
-                                <x-icon name="book-open" class="h-3.5 w-3.5 text-(--color-primary)" />
-                                {{ $lessonsCount }} {{ Str::plural('lesson', $lessonsCount) }}
-                            </span>
-                            <span class="flex items-center gap-1.5">
-                                <x-icon name="user" class="h-3.5 w-3.5 text-(--color-primary)" />
-                                {{ $studentsCount }} {{ Str::plural('student', $studentsCount) }}
-                            </span>
-                        </div>
-
-                        @if($isEnrolled)
-                            <a href="{{ route('courses.learn', $course->slug) }}" class="btn-primary mt-5 w-full text-sm">
-                                <x-icon name="play" class="h-4 w-4" />
-                                Continue Learning
-                            </a>
-                        @else
-                            <a href="{{ route('courses.show', $course->slug) }}" class="btn-primary mt-5 w-full text-sm">
-                                View Course
-                                <x-icon name="arrow-right" class="h-4 w-4" />
-                            </a>
-                        @endif
-                    </div>
+        <div id="courseGrid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            @foreach($courses as $index => $course)
+                <div data-animate="fade-up" style="transition-delay: {{ min($index, 8) * 60 }}ms">
+                    @include('courses.partials.course-card', ['course' => $course])
                 </div>
             @endforeach
         </div>
@@ -171,6 +111,48 @@
         </div>
 
         <div class="mt-8">{{ $courses->appends(request()->query())->links() }}</div>
+
+    @else
+
+        <div class="flex flex-col gap-12">
+            @foreach($categories as $category)
+                @php
+                    $categoryCourses = $category->courses()->with('category')->latest()->take(10)->get();
+                    $categoryTotal = $category->courses()->count();
+                @endphp
+                @continue($categoryCourses->isEmpty())
+
+                <section data-animate="fade-up">
+                    <div class="mb-4 flex items-end justify-between gap-3">
+                        <div>
+                            <h2 class="text-lg font-bold text-(--color-text) dark:text-white sm:text-xl">{{ $category->name }}</h2>
+                            <p class="mt-0.5 text-xs text-(--color-text-secondary)">{{ $categoryTotal }} {{ Str::plural('course', $categoryTotal) }}</p>
+                        </div>
+                        <a href="{{ route('courses.index', ['category' => $category->slug]) }}"
+                           class="flex shrink-0 items-center gap-1 text-sm font-semibold text-(--color-primary) transition-colors hover:text-(--color-primary-dark)">
+                            View All
+                            <x-icon name="arrow-right" class="h-3.5 w-3.5" />
+                        </a>
+                    </div>
+
+                    <div class="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 pb-2 scrollbar-thin sm:mx-0 sm:px-0">
+                        @foreach($categoryCourses as $index => $course)
+                            <div class="w-64 shrink-0 snap-start sm:w-72" data-animate="fade-up" style="transition-delay: {{ min($index, 6) * 60 }}ms">
+                                @include('courses.partials.course-card', ['course' => $course])
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+            @endforeach
+        </div>
+
+        <div id="courseSearchEmpty" class="lesson-card mt-5 hidden items-center px-6 py-16 text-center">
+            <span class="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-(--color-primary)/10 text-(--color-primary)">
+                <x-icon name="search" class="h-7 w-7" />
+            </span>
+            <h3 class="text-base font-bold text-(--color-text) dark:text-white">No matches</h3>
+            <p class="mt-1 text-sm text-(--color-text-secondary)">Try a different search term, or clear the search to browse all categories.</p>
+        </div>
     @endif
 </div>
 
@@ -188,8 +170,12 @@
         var visibleCount = 0;
 
         items.forEach(function (item) {
+            // Hide the closest animated wrapper (the actual grid/row item),
+            // not just the card itself — otherwise a filtered-out card still
+            // reserves its slot in the grid/horizontal row.
+            var target = item.closest('[data-animate]') || item;
             var matches = !query || item.dataset.courseTitle.indexOf(query) !== -1;
-            item.classList.toggle('hidden', !matches);
+            target.classList.toggle('hidden', !matches);
             if (matches) visibleCount++;
         });
 

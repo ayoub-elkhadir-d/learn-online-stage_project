@@ -181,12 +181,12 @@
     ]
   },
   "resources/css/admin.css": {
-    "file": "assets/admin-Dzc4g1jN.css",
+    "file": "assets/admin-BUIdD_8S.css",
     "src": "resources/css/admin.css",
     "isEntry": true
   },
   "resources/css/app.css": {
-    "file": "assets/app-CPHCREF9.css",
+    "file": "assets/app-JCKp8LMI.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -201,12 +201,12 @@
     "isEntry": true
   },
   "resources/css/courses-index.css": {
-    "file": "assets/courses-index-BwlHldou.css",
+    "file": "assets/courses-index-nVBkNVU6.css",
     "src": "resources/css/courses-index.css",
     "isEntry": true
   },
   "resources/css/dashboard.css": {
-    "file": "assets/dashboard-fHCQ5I1H.css",
+    "file": "assets/dashboard-dXWxPyZQ.css",
     "src": "resources/css/dashboard.css",
     "isEntry": true
   },
@@ -216,7 +216,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-D_H6WCN_.js",
+    "file": "assets/app-C7pg85nK.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

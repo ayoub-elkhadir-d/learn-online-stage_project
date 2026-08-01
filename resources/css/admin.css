@@ -72,3 +72,17 @@ dialog[data-admin-modal][open] {
 .is-invalid-admin {
     border-color: var(--color-danger) !important;
 }
+
+/* ---- Loading skeleton (receipt preview modal) ----
+   Same shimmer technique already used on the Learning page, redefined here
+   since admin pages don't load learn.css. */
+@keyframes admin-skeleton-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--color-text) 8%, transparent) 25%, color-mix(in srgb, var(--color-text) 14%, transparent) 37%, color-mix(in srgb, var(--color-text) 8%, transparent) 63%);
+    background-size: 200% 100%;
+    animation: admin-skeleton-shimmer 1.4s ease-in-out infinite;
+}

@@ -85,10 +85,13 @@
                         </td>
                         <td class="px-4 py-3.5">
                             @if($payment->receipt_path)
-                                <a href="{{ Storage::url($payment->receipt_path) }}" target="_blank" class="inline-flex items-center gap-1 rounded-lg bg-(--color-primary)/10 px-2.5 py-1 text-xs font-semibold text-(--color-primary) hover:bg-(--color-primary)/20">
+                                <button type="button" data-receipt-trigger
+                                        data-receipt-url="{{ Storage::url($payment->receipt_path) }}"
+                                        data-receipt-type="{{ Str::endsWith(strtolower($payment->receipt_path), '.pdf') ? 'pdf' : 'image' }}"
+                                        class="inline-flex items-center gap-1 rounded-lg bg-(--color-primary)/10 px-2.5 py-1 text-xs font-semibold text-(--color-primary) transition-colors hover:bg-(--color-primary)/20">
                                     <x-icon name="image" class="h-3.5 w-3.5" />
                                     View
-                                </a>
+                                </button>
                             @else
                                 <span class="text-xs text-(--color-text-secondary)">—</span>
                             @endif

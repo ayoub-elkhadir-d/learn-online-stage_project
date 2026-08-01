@@ -143,3 +143,27 @@
 .animate-fade-in {
     animation: fade-in .25s ease-out;
 }
+
+/* ---- Scroll-reveal ----
+   Paired with resources/js/scroll-reveal.js (a plain IntersectionObserver,
+   no external library). Elements start hidden/offset and settle into place
+   once they enter the viewport; .is-visible is added once and never
+   removed, so nothing re-animates on scroll-back. */
+[data-animate] {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .4s ease-out, transform .4s ease-out;
+}
+
+[data-animate].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-animate] {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}

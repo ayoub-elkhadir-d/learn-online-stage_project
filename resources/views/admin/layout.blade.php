@@ -230,6 +230,8 @@
 })();
 </script>
 
+<x-receipt-modal />
+
 @stack('scripts')
 </body>
 </html>
