@@ -8,40 +8,47 @@
 
 @section('content')
 
-{{-- Hero --}}
+{{-- Hero — intentionally always-dark (independent of the site's light/dark
+     toggle), same technique as modern SaaS landing pages (Linear, Vercel,
+     Stripe): a dark hero band on an otherwise light page. Every color below
+     is therefore a fixed value, not a --color-* token that would flip with
+     the theme. --}}
 <div class="storefront-hero">
-    <div class="storefront-hero-grid"></div>
-    <div class="relative mx-auto max-w-4xl px-4 py-14 text-center sm:px-6 sm:py-20 lg:px-8">
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-(--color-primary)/10 px-3.5 py-1.5 text-xs font-semibold text-(--color-primary)">
+    <div class="hero-orb hero-orb-1" aria-hidden="true"></div>
+    <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+    <div class="storefront-hero-grid" aria-hidden="true"></div>
+
+    <div class="relative mx-auto max-w-4xl px-4 py-8 text-center sm:px-6 sm:py-10 lg:px-8">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-(--color-primary)/15 px-3.5 py-1.5 text-xs font-semibold text-(--color-accent)">
             <x-icon name="flame" class="h-3.5 w-3.5" />
             Professional Training Courses
         </span>
 
-        <h1 class="mt-5 text-3xl font-extrabold leading-tight tracking-tight text-(--color-text) dark:text-white sm:text-5xl">
+        <h1 class="mt-4 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
             Learn new skills,<br class="hidden sm:block">
-            <span class="text-(--color-primary)">grow your career</span>
+            <span class="text-(--color-accent)">grow your career</span>
         </h1>
 
-        <p class="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-(--color-text-secondary) sm:text-base">
+        <p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-[#CBD5E1] sm:text-base">
             Expert-led courses designed to help you master in-demand skills. One-time payment, lifetime access.
         </p>
 
         {{-- Search — filters the courses currently shown on this page --}}
-        <div class="mx-auto mt-8 max-w-xl">
+        <div class="mx-auto mt-5 max-w-xl">
             <div class="relative">
-                <x-icon name="search" class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-(--color-text-secondary)" />
+                <x-icon name="search" class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#94A3B8]" />
                 <input
                     type="search"
                     id="courseSearchInput"
                     placeholder="Search courses on this page..."
                     aria-label="Search courses"
-                    class="w-full rounded-full border border-(--color-border) bg-(--color-card) py-3.5 pl-12 pr-4 text-sm text-(--color-text) shadow-sm placeholder:text-(--color-text-secondary) focus:border-(--color-primary) focus:outline focus:outline-2 focus:outline-offset-1 focus:outline-(--color-primary)/30 dark:border-white/10 dark:bg-(--color-card-dark) dark:text-white"
+                    class="w-full rounded-full border border-white/10 bg-white/5 py-3 pl-12 pr-4 text-sm text-white placeholder:text-[#94A3B8] backdrop-blur-sm focus:border-(--color-primary) focus:outline focus:outline-2 focus:outline-offset-1 focus:outline-(--color-primary)/30"
                 >
             </div>
         </div>
 
         {{-- Category filters --}}
-        <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
             <a href="{{ route('courses.index') }}" class="filter-pill {{ !request('category') ? 'is-active' : '' }}">
                 <x-icon name="layout-grid" class="h-3.5 w-3.5" />
                 All
