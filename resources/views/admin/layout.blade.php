@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Dashboard') — Admin — ArtiWeb</title>
+    <title>@yield('title', __('admin.dashboard_title')) — {{ __('admin.admin_panel') }} — ArtiWeb</title>
     @include('partials.theme-init')
     <script>
         {{-- Synchronous pre-paint sidebar-collapse state, same reasoning as
@@ -15,20 +15,19 @@
             }
         })();
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/css/admin.css', 'resources/js/app.js'])
+    @include('partials.locale-fonts')
+    @vite(['resources/css/app.css', 'resources/css/rtl.css', 'resources/css/admin.css', 'resources/js/app.js'])
     @stack('head')
 </head>
 <body class="min-h-screen bg-(--color-bg-light) font-sans text-(--color-text) antialiased dark:bg-(--color-bg-dark) dark:text-[#ECECEC]">
 
 @php
     $navItems = [
-        ['route' => 'admin.dashboard', 'match' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'layout-dashboard'],
-        ['route' => 'admin.courses.index', 'match' => 'admin.courses.*', 'label' => 'Courses', 'icon' => 'book-open'],
-        ['route' => 'admin.categories.index', 'match' => 'admin.categories.*', 'label' => 'Categories', 'icon' => 'tag'],
-        ['route' => 'admin.payments.index', 'match' => 'admin.payments.*', 'label' => 'Payments', 'icon' => 'credit-card'],
-        ['route' => 'admin.users.index', 'match' => 'admin.users.*', 'label' => 'Users', 'icon' => 'users'],
+        ['route' => 'admin.dashboard', 'match' => 'admin.dashboard', 'label' => __('admin.sidebar_dashboard'), 'icon' => 'layout-dashboard'],
+        ['route' => 'admin.courses.index', 'match' => 'admin.courses.*', 'label' => __('admin.sidebar_courses'), 'icon' => 'book-open'],
+        ['route' => 'admin.categories.index', 'match' => 'admin.categories.*', 'label' => __('admin.sidebar_categories'), 'icon' => 'tag'],
+        ['route' => 'admin.payments.index', 'match' => 'admin.payments.*', 'label' => __('admin.sidebar_payments'), 'icon' => 'credit-card'],
+        ['route' => 'admin.users.index', 'match' => 'admin.users.*', 'label' => __('admin.sidebar_users'), 'icon' => 'users'],
     ];
 @endphp
 
@@ -40,7 +39,7 @@
             <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-(--color-primary) text-sm font-bold text-white">A</span>
             <span data-sidebar-brand-text class="min-w-0 truncate">
                 <span class="block text-sm font-bold text-(--color-text) dark:text-white">ArtiWeb</span>
-                <span class="block text-[11px] font-medium text-(--color-text-secondary)">Admin Panel</span>
+                <span class="block text-[11px] font-medium text-(--color-text-secondary)">{{ __('admin.admin_panel') }}</span>
             </span>
         </a>
 
@@ -55,13 +54,13 @@
                 </span>
                 <span data-sidebar-user-info class="min-w-0 flex-1">
                     <span class="block truncate text-xs font-semibold text-(--color-text) dark:text-white">{{ auth()->user()->name }}</span>
-                    <span class="block truncate text-[11px] text-(--color-text-secondary)">Administrator</span>
+                    <span class="block truncate text-[11px] text-(--color-text-secondary)">{{ __('admin.administrator') }}</span>
                 </span>
             </div>
-            <button type="button" data-sidebar-collapse-toggle title="Collapse sidebar"
+            <button type="button" data-sidebar-collapse-toggle title="{{ __('admin.collapse') }}"
                     class="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-(--color-text-secondary) transition-colors hover:bg-black/5 hover:text-(--color-text) dark:hover:bg-white/5 dark:hover:text-white">
                 <x-icon name="chevrons-left" data-sidebar-collapse-icon class="h-[18px] w-[18px] shrink-0 transition-transform duration-200" />
-                <span data-sidebar-label>Collapse</span>
+                <span data-sidebar-label>{{ __('admin.collapse') }}</span>
             </button>
         </div>
     </aside>
@@ -74,10 +73,10 @@
                 <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-(--color-primary) text-sm font-bold text-white">A</span>
                 <span>
                     <span class="block text-sm font-bold text-(--color-text) dark:text-white">ArtiWeb</span>
-                    <span class="block text-[11px] font-medium text-(--color-text-secondary)">Admin Panel</span>
+                    <span class="block text-[11px] font-medium text-(--color-text-secondary)">{{ __('admin.admin_panel') }}</span>
                 </span>
             </a>
-            <button type="button" data-admin-mobile-close aria-label="Close menu"
+            <button type="button" data-admin-mobile-close aria-label="{{ __('admin.close_menu') }}"
                     class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-(--color-text-secondary) hover:bg-black/5 dark:hover:bg-white/10">
                 <x-icon name="x" class="h-5 w-5" />
             </button>
@@ -90,7 +89,7 @@
                 @csrf
                 <button type="submit" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-(--color-danger) transition-colors hover:bg-(--color-danger)/10">
                     <x-icon name="log-out" class="h-[18px] w-[18px] shrink-0" />
-                    Sign Out
+                    {{ __('navbar.sign_out') }}
                 </button>
             </form>
         </div>
@@ -100,20 +99,22 @@
 
         {{-- Topbar --}}
         <header class="sticky top-0 z-30 flex items-center gap-3 border-b border-(--color-border) bg-(--color-card)/90 px-4 py-3 backdrop-blur dark:border-white/10 dark:bg-(--color-card-dark)/90 sm:px-6">
-            <button type="button" data-admin-mobile-toggle aria-label="Open menu"
+            <button type="button" data-admin-mobile-toggle aria-label="{{ __('admin.open_menu') }}"
                     class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-(--color-text-secondary) hover:bg-black/5 lg:hidden dark:hover:bg-white/10">
                 <x-icon name="menu" class="h-5 w-5" />
             </button>
 
-            <h1 class="min-w-0 truncate text-base font-bold text-(--color-text) dark:text-white sm:text-lg">@yield('title', 'Dashboard')</h1>
+            <h1 class="min-w-0 truncate text-base font-bold text-(--color-text) dark:text-white sm:text-lg">@yield('title', __('admin.dashboard_title'))</h1>
 
             <div class="ml-auto flex items-center gap-1.5 sm:gap-2">
                 <a href="{{ route('home') }}" target="_blank" class="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-(--color-text-secondary) transition-colors hover:bg-black/5 hover:text-(--color-text) sm:inline-flex dark:hover:bg-white/10 dark:hover:text-white">
                     <x-icon name="globe" class="h-4 w-4" />
-                    View Site
+                    {{ __('admin.view_site') }}
                 </a>
 
-                <button type="button" data-theme-toggle aria-label="Toggle dark mode"
+                <x-language-switcher />
+
+                <button type="button" data-theme-toggle aria-label="{{ __('navbar.toggle_theme') }}"
                         class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-(--color-text-secondary) transition-colors hover:bg-black/5 hover:text-(--color-text) dark:hover:bg-white/10 dark:hover:text-white">
                     <x-icon name="sun" class="hidden h-[18px] w-[18px] dark:block" />
                     <x-icon name="moon" class="block h-[18px] w-[18px] dark:hidden" />
@@ -167,7 +168,7 @@
                 <div class="mb-5 rounded-xl border border-(--color-danger)/20 bg-(--color-danger)/10 px-4 py-3 text-sm text-(--color-danger)">
                     <div class="flex items-center gap-2 font-semibold">
                         <x-icon name="alert-triangle" class="h-4 w-4 shrink-0" />
-                        Please fix the following
+                        {{ __('common.please_fix_following') }}
                     </div>
                     <ul class="mt-1.5 list-disc pl-6 text-xs">
                         @foreach($errors->all() as $error)

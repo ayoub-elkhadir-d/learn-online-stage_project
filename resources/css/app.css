@@ -4,6 +4,7 @@
 
 @theme {
     --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-arabic: "Cairo", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 
     --color-primary: #16A34A;
     --color-primary-dark: #15803D;
@@ -40,6 +41,14 @@
     html {
         font-family: var(--font-sans);
         -webkit-font-smoothing: antialiased;
+    }
+
+    /* Arabic gets its own typeface — Plus Jakarta Sans has no Arabic
+       glyphs, so the browser would silently fall back to a system font
+       otherwise. Keyed off <html lang="ar">, set once per request by every
+       layout from app()->getLocale(). */
+    html[lang="ar"] {
+        font-family: var(--font-arabic);
     }
 
     body {

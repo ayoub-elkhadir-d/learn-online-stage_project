@@ -35,6 +35,6 @@ class PaymentSettingController extends Controller
 
         return redirect()
             ->route('admin.payments.bank-settings.edit')
-            ->with('success', 'Bank information updated.');
+            ->with('success', __('admin.flash_bank_settings_updated'));
     }
 }

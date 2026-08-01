@@ -69,7 +69,7 @@ class CourseController extends Controller
         // If already paid, redirect to show
         if ($purchase && $purchase->status === 'paid') {
             return redirect()->route('courses.show', $course->slug)
-                ->with('status', 'You already have access to this course.');
+                ->with('status', __('checkout.already_have_access'));
         }
 
         // Always the single admin-managed row — nothing here is influenced

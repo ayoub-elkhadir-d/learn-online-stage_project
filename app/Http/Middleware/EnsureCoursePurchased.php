@@ -32,7 +32,7 @@ class EnsureCoursePurchased
 
         if (Gate::denies('learn', $course)) {
             return redirect()->route('courses.show', $course->slug)
-                ->with('status', 'You need to purchase this course to access the content.');
+                ->with('status', __('courses.purchase_required'));
         }
 
         return $next($request);

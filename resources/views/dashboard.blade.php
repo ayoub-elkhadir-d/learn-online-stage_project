@@ -1,6 +1,6 @@
 @extends('layouts.site')
 
-@section('title', 'My Courses — ArtiWeb')
+@section('title', __('dashboard.my_courses') . ' — ArtiWeb')
 
 @push('head')
     @vite(['resources/css/dashboard.css'])
@@ -18,26 +18,26 @@
 <div class="dashboard-hero">
     <div class="relative mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <h1 class="text-2xl font-extrabold tracking-tight text-(--color-text) dark:text-white sm:text-3xl">
-            Welcome back, {{ auth()->user()->name }}
+            {{ __('dashboard.welcome_back', ['name' => auth()->user()->name]) }}
         </h1>
-        <p class="mt-1.5 text-sm text-(--color-text-secondary) sm:text-base">Continue your learning journey.</p>
+        <p class="mt-1.5 text-sm text-(--color-text-secondary) sm:text-base">{{ __('dashboard.subtitle') }}</p>
 
         <div class="mt-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             <div class="stat-tile p-5">
                 <div class="text-2xl font-extrabold text-(--color-text) dark:text-white">{{ $totalPurchases }}</div>
-                <div class="mt-1 text-xs font-medium text-(--color-text-secondary)">Courses</div>
+                <div class="mt-1 text-xs font-medium text-(--color-text-secondary)">{{ __('dashboard.stat_courses') }}</div>
             </div>
             <div class="stat-tile p-5">
                 <div class="text-2xl font-extrabold text-(--color-primary)" data-stat-completed-lessons>0</div>
-                <div class="mt-1 text-xs font-medium text-(--color-text-secondary)">Completed Lessons</div>
+                <div class="mt-1 text-xs font-medium text-(--color-text-secondary)">{{ __('dashboard.stat_completed_lessons') }}</div>
             </div>
             <div class="stat-tile p-5">
                 <div class="text-2xl font-extrabold text-(--color-success)" data-stat-progress>0%</div>
-                <div class="mt-1 text-xs font-medium text-(--color-text-secondary)">Progress</div>
+                <div class="mt-1 text-xs font-medium text-(--color-text-secondary)">{{ __('dashboard.stat_progress') }}</div>
             </div>
             <div class="stat-tile p-5">
                 <div class="text-2xl font-extrabold text-(--color-accent)" data-stat-hours>0h</div>
-                <div class="mt-1 text-xs font-medium text-(--color-text-secondary)">Learning Hours</div>
+                <div class="mt-1 text-xs font-medium text-(--color-text-secondary)">{{ __('dashboard.stat_hours') }}</div>
             </div>
         </div>
     </div>
@@ -53,7 +53,7 @@
                 <x-icon name="play" class="h-5 w-5" />
             </span>
             <div class="min-w-0">
-                <div class="text-xs font-semibold uppercase tracking-wide text-(--color-primary)">Continue learning</div>
+                <div class="text-xs font-semibold uppercase tracking-wide text-(--color-primary)">{{ __('dashboard.continue_learning') }}</div>
                 <div class="truncate text-sm font-semibold" data-continue-learning-title>&nbsp;</div>
             </div>
         </div>
@@ -62,24 +62,24 @@
 
     {{-- Recently Viewed — populated client-side from localStorage, hidden until there's history --}}
     <div class="mb-8 hidden" data-recently-viewed-section>
-        <h2 class="mb-3 text-lg font-bold text-(--color-text) dark:text-white">Recently Viewed</h2>
+        <h2 class="mb-3 text-lg font-bold text-(--color-text) dark:text-white">{{ __('dashboard.recently_viewed') }}</h2>
         <div class="recent-scroll" data-recently-viewed-list></div>
     </div>
 
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 class="text-lg font-bold">My Courses</h2>
+        <h2 class="text-lg font-bold">{{ __('dashboard.my_courses') }}</h2>
         <a href="{{ route('courses.index') }}" class="btn-secondary text-sm">
             <x-icon name="layout-grid" class="h-4 w-4" />
-            Browse More
+            {{ __('dashboard.browse_more') }}
         </a>
     </div>
 
     @if(! $purchases->isEmpty())
         <div class="mb-5 flex flex-wrap items-center gap-2" data-status-filters>
-            <button type="button" class="status-pill is-active" data-status-filter="all">All</button>
-            <button type="button" class="status-pill" data-status-filter="in-progress">In Progress</button>
-            <button type="button" class="status-pill" data-status-filter="completed">Completed</button>
-            <button type="button" class="status-pill" data-status-filter="not-started">Not Started</button>
+            <button type="button" class="status-pill is-active" data-status-filter="all">{{ __('dashboard.filter_all') }}</button>
+            <button type="button" class="status-pill" data-status-filter="in-progress">{{ __('dashboard.filter_in_progress') }}</button>
+            <button type="button" class="status-pill" data-status-filter="completed">{{ __('dashboard.filter_completed') }}</button>
+            <button type="button" class="status-pill" data-status-filter="not-started">{{ __('dashboard.filter_not_started') }}</button>
         </div>
     @endif
 
@@ -88,13 +88,13 @@
             <span class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-(--color-primary)/10 text-(--color-primary)">
                 <x-icon name="graduation-cap" class="h-8 w-8" />
             </span>
-            <h3 class="text-lg font-bold text-(--color-text) dark:text-white">No courses yet</h3>
+            <h3 class="text-lg font-bold text-(--color-text) dark:text-white">{{ __('dashboard.no_courses_title') }}</h3>
             <p class="mt-1.5 max-w-sm text-sm text-(--color-text-secondary)">
-                You haven't purchased any courses yet. Browse the catalog and start learning today.
+                {{ __('dashboard.no_courses_text') }}
             </p>
             <a href="{{ route('courses.index') }}" class="btn-primary mt-6 text-sm">
                 <x-icon name="layout-grid" class="h-4 w-4" />
-                Browse Courses
+                {{ __('dashboard.browse_courses') }}
             </a>
         </div>
     @else
@@ -124,10 +124,10 @@
 
                         @if($purchase->status === 'paid')
                             <span class="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-(--color-success) px-2.5 py-1 text-[11px] font-semibold text-white shadow">
-                                <x-icon name="check" class="h-3 w-3" />Active
+                                <x-icon name="check" class="h-3 w-3" />{{ __('dashboard.active') }}
                             </span>
                             @if($lessonsCount > 0)
-                                <svg class="absolute bottom-3 right-3 drop-shadow" viewBox="0 0 36 36" width="40" height="40" data-progress-ring role="img" aria-label="Course progress">
+                                <svg class="absolute bottom-3 right-3 drop-shadow" viewBox="0 0 36 36" width="40" height="40" data-progress-ring role="img" aria-label="{{ __('dashboard.course_progress') }}">
                                     <circle class="progress-ring-track" cx="18" cy="18" r="15.5" fill="none" stroke-width="3"></circle>
                                     <circle class="progress-ring-fill" data-progress-ring-fill cx="18" cy="18" r="15.5" fill="none" stroke-width="3"
                                             stroke-linecap="round" stroke-dasharray="97.39" stroke-dashoffset="97.39" transform="rotate(-90 18 18)"></circle>
@@ -136,7 +136,7 @@
                             @endif
                         @else
                             <span class="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-(--color-accent) px-2.5 py-1 text-[11px] font-semibold text-white shadow">
-                                <x-icon name="clock" class="h-3 w-3" />Pending
+                                <x-icon name="clock" class="h-3 w-3" />{{ __('dashboard.pending') }}
                             </span>
                         @endif
                     </div>
@@ -144,7 +144,7 @@
                     <div class="flex flex-1 flex-col p-5">
                         <h3 class="text-sm font-bold leading-snug text-(--color-text) dark:text-white">{{ $purchase->course->title }}</h3>
                         <div class="mt-1.5 text-xs text-(--color-text-secondary)">
-                            Purchased {{ $purchase->purchased_at->format('d M Y') }}
+                            {{ __('dashboard.purchased_on', ['date' => $purchase->purchased_at->format('d M Y')]) }}
                         </div>
 
                         @if($purchase->status === 'paid')
@@ -152,9 +152,9 @@
                                 <div class="mb-1.5 flex items-center justify-between text-xs">
                                     <span class="font-semibold text-(--color-text) dark:text-white" data-progress-label>
                                         @if($lessonsCount > 0)
-                                            0 of {{ $lessonsCount }} {{ Str::plural('lesson', $lessonsCount) }}
+                                            0 {{ __('dashboard.js.of') }} {{ $lessonsCount }} {{ $lessonsCount === 1 ? __('dashboard.js.lesson') : __('dashboard.js.lessons') }}
                                         @else
-                                            No lessons yet
+                                            {{ __('dashboard.no_lessons_yet') }}
                                         @endif
                                     </span>
                                     <span class="font-bold text-(--color-primary)" data-progress-percent>0%</span>
@@ -164,13 +164,13 @@
                                 </div>
                                 <p class="mt-2 truncate text-xs text-(--color-text-secondary)" data-continue-label>
                                     @if($lessonsCount > 0)
-                                        Continue with: {{ $lessons->first()->title }}
+                                        {{ __('dashboard.continue_with', ['lesson' => $lessons->first()->title]) }}
                                     @endif
                                 </p>
                             </div>
                         @else
                             <div class="mt-4 text-xs text-(--color-text-secondary)">
-                                {{ $lessonsCount }} {{ Str::plural('lesson', $lessonsCount) }}
+                                {{ trans_choice('courses.lessons_count', $lessonsCount, ['count' => $lessonsCount]) }}
                             </div>
                         @endif
 
@@ -178,17 +178,17 @@
                             @if($purchase->status === 'paid')
                                 <a href="{{ route('courses.learn', $purchase->course->slug) }}" data-continue-link class="btn-primary w-full text-sm">
                                     <x-icon name="play" class="h-4 w-4" />
-                                    <span data-continue-cta>Start Learning</span>
+                                    <span data-continue-cta>{{ __('courses.start_learning') }}</span>
                                 </a>
-                                <button type="button" disabled title="Certificates are coming soon" data-certificate-badge
+                                <button type="button" disabled title="{{ __('dashboard.certificate_coming_soon') }}" data-certificate-badge
                                         class="hidden w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-(--color-border) px-4 py-2 text-xs font-semibold text-(--color-text-secondary) opacity-70 dark:border-white/10">
                                     <x-icon name="shield" class="h-3.5 w-3.5" />
-                                    Certificate — Coming Soon
+                                    {{ __('dashboard.certificate_coming_soon') }}
                                 </button>
                             @else
                                 <div class="flex items-center gap-2 rounded-lg bg-(--color-accent)/10 px-3 py-2 text-xs text-(--color-accent)">
                                     <x-icon name="alert-circle" class="h-3.5 w-3.5 shrink-0" />
-                                    Waiting for admin payment confirmation.
+                                    {{ __('dashboard.waiting_confirmation') }}
                                 </div>
                             @endif
                         </div>
@@ -202,7 +202,10 @@
 
 @push('scripts')
 <script>
+window.__dashboardI18n = @json(__('dashboard.js'));
 (function () {
+    var i18n = window.__dashboardI18n || {};
+
     function read(key, fallback) {
         try {
             var raw = localStorage.getItem(key);
@@ -261,7 +264,7 @@
 
         if (fill) fill.style.width = percent + '%';
         if (percentEl) percentEl.textContent = percent + '%';
-        if (labelEl) labelEl.textContent = completedCount + ' of ' + lessons.length + ' lesson' + (lessons.length === 1 ? '' : 's');
+        if (labelEl) labelEl.textContent = completedCount + ' ' + i18n.of + ' ' + lessons.length + ' ' + (lessons.length === 1 ? i18n.lesson : i18n.lessons);
         if (ringFill) ringFill.style.strokeDashoffset = String(97.39 * (1 - percent / 100));
         if (ringText) ringText.textContent = percent + '%';
 
@@ -270,12 +273,12 @@
         var nextLesson = lessons.find(function (l) { return completed.indexOf(l.id) === -1; });
 
         if (percent >= 100) {
-            if (continueEl) continueEl.textContent = 'Course completed';
-            if (ctaEl) ctaEl.textContent = 'Review Course';
+            if (continueEl) continueEl.textContent = i18n.course_completed;
+            if (ctaEl) ctaEl.textContent = i18n.review_course;
             if (certBadge) { certBadge.classList.remove('hidden'); certBadge.classList.add('flex'); }
         } else if (completedCount > 0) {
-            if (continueEl && nextLesson) continueEl.textContent = 'Continue with: ' + nextLesson.title;
-            if (ctaEl) ctaEl.textContent = 'Continue Learning';
+            if (continueEl && nextLesson) continueEl.textContent = i18n.continue_with.replace(':lesson', nextLesson.title);
+            if (ctaEl) ctaEl.textContent = i18n.continue_learning;
         }
 
         if (nextLesson && linkEl) {
@@ -319,7 +322,7 @@
                         '<span class="block truncate text-[11px] text-(--color-text-secondary)"></span>' +
                     '</span>';
                 var titles = chip.querySelectorAll('span.block');
-                titles[0].textContent = item.courseTitle || 'Untitled course';
+                titles[0].textContent = item.courseTitle || i18n.untitled_course;
                 titles[1].textContent = item.lessonTitle || '';
                 list.appendChild(chip);
             });

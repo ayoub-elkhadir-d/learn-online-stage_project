@@ -7,7 +7,7 @@
 
         <a href="{{ route('courses.index') }}" class="flex shrink-0 items-center gap-2">
             <img src="https://artiweb.ma/wp-content/uploads/2023/05/logo-1.png" alt="ArtiWeb" class="h-8 w-auto">
-            <span class="text-base font-extrabold tracking-tight text-(--color-text) dark:text-white">ArtiWeb</span>
+            <span class="text-base font-extrabold tracking-tight text-(--color-text) dark:text-white">{{ __('navbar.brand') }}</span>
         </a>
 
         <div class="hidden md:flex md:flex-1 md:items-center md:justify-center">
@@ -16,7 +16,7 @@
                 class="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-(--color-text-secondary) transition-colors hover:text-(--color-text) {{ request()->routeIs('courses.index') ? 'text-(--color-primary)!' : '' }} dark:hover:text-white"
             >
                 <x-icon name="layers" class="h-4 w-4" />
-                Courses
+                {{ __('navbar.courses') }}
             </a>
         </div>
 
@@ -25,8 +25,8 @@
                 <x-icon name="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
                 <input
                     type="search"
-                    placeholder="Search courses..."
-                    aria-label="Search courses"
+                    placeholder="{{ __('navbar.search_placeholder') }}"
+                    aria-label="{{ __('navbar.search_placeholder') }}"
                     class="w-full rounded-lg border border-(--color-border) bg-white/70 py-2 pl-9 pr-3 text-sm text-(--color-text) placeholder:text-(--color-text-secondary) focus:border-(--color-primary) focus:outline focus:outline-2 focus:outline-offset-1 focus:outline-(--color-primary)/30 dark:border-white/10 dark:bg-white/5 dark:text-white"
                 >
             </div>
@@ -34,7 +34,9 @@
 
         <div class="ml-auto flex items-center gap-1.5 sm:gap-2">
 
-            <button type="button" data-theme-toggle aria-label="Toggle dark mode"
+            <x-language-switcher />
+
+            <button type="button" data-theme-toggle aria-label="{{ __('navbar.toggle_theme') }}"
                     class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-(--color-text-secondary) transition-colors hover:bg-black/5 hover:text-(--color-text) dark:hover:bg-white/10 dark:hover:text-white">
                 <x-icon name="sun" class="hidden h-[18px] w-[18px] dark:block" />
                 <x-icon name="moon" class="block h-[18px] w-[18px] dark:hidden" />
@@ -42,16 +44,16 @@
 
             @auth
                 <div class="relative" data-dropdown>
-                    <button type="button" data-dropdown-toggle aria-haspopup="true" aria-expanded="false" aria-label="Notifications"
+                    <button type="button" data-dropdown-toggle aria-haspopup="true" aria-expanded="false" aria-label="{{ __('navbar.notifications') }}"
                             class="relative inline-flex h-9 w-9 items-center justify-center rounded-lg text-(--color-text-secondary) transition-colors hover:bg-black/5 hover:text-(--color-text) dark:hover:bg-white/10 dark:hover:text-white">
                         <x-icon name="bell" class="h-[18px] w-[18px]" />
                     </button>
                     <div data-dropdown-panel role="menu"
                          class="absolute right-0 z-50 mt-2 hidden w-72 overflow-hidden rounded-xl border border-(--color-border) bg-(--color-card) shadow-lift dark:border-white/10 dark:bg-(--color-card-dark)">
-                        <div class="border-b border-(--color-border) px-4 py-3 text-sm font-semibold dark:border-white/10">Notifications</div>
+                        <div class="border-b border-(--color-border) px-4 py-3 text-sm font-semibold dark:border-white/10">{{ __('navbar.notifications') }}</div>
                         <div class="flex flex-col items-center gap-2 px-4 py-8 text-center">
                             <x-icon name="bell" class="h-6 w-6 text-(--color-text-secondary)" />
-                            <p class="text-sm text-(--color-text-secondary)">You're all caught up.</p>
+                            <p class="text-sm text-(--color-text-secondary)">{{ __('navbar.no_notifications') }}</p>
                         </div>
                     </div>
                 </div>
@@ -59,7 +61,7 @@
                 <a href="{{ route('dashboard') }}"
                    class="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors sm:inline-flex {{ request()->routeIs('dashboard') ? 'bg-(--color-primary)/10 text-(--color-primary)' : 'text-(--color-text-secondary) hover:text-(--color-text) dark:hover:text-white' }}">
                     <x-icon name="graduation-cap" class="h-4 w-4" />
-                    My Courses
+                    {{ __('navbar.my_courses') }}
                 </a>
 
                 <div class="relative" data-dropdown>
@@ -82,13 +84,13 @@
 
                         <a href="{{ route('profile') }}" class="flex items-center gap-2.5 px-4 py-2 text-sm transition-colors hover:bg-black/5 dark:hover:bg-white/5">
                             <x-icon name="user" class="h-4 w-4 text-(--color-text-secondary)" />
-                            My Profile
+                            {{ __('navbar.my_profile') }}
                         </a>
 
                         @if(auth()->user()->role === 'admin')
                         <a href="{{ route('admin.courses.index') }}" class="flex items-center gap-2.5 px-4 py-2 text-sm transition-colors hover:bg-black/5 dark:hover:bg-white/5">
                             <x-icon name="shield" class="h-4 w-4 text-(--color-text-secondary)" />
-                            Admin Panel
+                            {{ __('navbar.admin_panel') }}
                         </a>
                         @endif
 
@@ -98,22 +100,22 @@
                             @csrf
                             <button type="submit" class="flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm text-(--color-danger) transition-colors hover:bg-(--color-danger)/10">
                                 <x-icon name="log-out" class="h-4 w-4" />
-                                Sign Out
+                                {{ __('navbar.sign_out') }}
                             </button>
                         </form>
                     </div>
                 </div>
             @else
                 <a href="{{ route('login') }}" class="hidden rounded-lg px-3 py-2 text-sm font-medium text-(--color-text-secondary) transition-colors hover:text-(--color-text) sm:inline-block dark:hover:text-white">
-                    Login
+                    {{ __('navbar.login') }}
                 </a>
                 <a href="{{ route('register') }}" class="btn-primary !px-4 !py-2 text-sm">
-                    Get Started
+                    {{ __('navbar.get_started') }}
                     <x-icon name="arrow-right" class="h-3.5 w-3.5" />
                 </a>
             @endauth
 
-            <button type="button" data-mobile-toggle aria-label="Toggle menu" aria-expanded="false"
+            <button type="button" data-mobile-toggle aria-label="{{ __('navbar.toggle_menu') }}" aria-expanded="false"
                     class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-(--color-text-secondary) hover:bg-black/5 md:hidden dark:hover:bg-white/10">
                 <x-icon name="menu" class="h-5 w-5" />
             </button>
@@ -124,15 +126,17 @@
     <div data-mobile-panel class="hidden border-t border-(--color-border) px-4 pb-4 pt-3 md:hidden dark:border-white/10">
         <div class="relative mb-3">
             <x-icon name="search" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
-            <input type="search" placeholder="Search courses..." aria-label="Search courses" class="input-field !py-2 pl-9">
+            <input type="search" placeholder="{{ __('navbar.search_placeholder') }}" aria-label="{{ __('navbar.search_placeholder') }}" class="input-field !py-2 pl-9">
         </div>
-        <a href="{{ route('courses.index') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-(--color-text-secondary) hover:bg-black/5 dark:hover:bg-white/5">Courses</a>
+        <a href="{{ route('courses.index') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-(--color-text-secondary) hover:bg-black/5 dark:hover:bg-white/5">{{ __('navbar.courses') }}</a>
         @auth
-            <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-(--color-text-secondary) hover:bg-black/5 dark:hover:bg-white/5">My Courses</a>
+            <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-(--color-text-secondary) hover:bg-black/5 dark:hover:bg-white/5">{{ __('navbar.my_courses') }}</a>
         @else
-            <a href="{{ route('login') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-(--color-text-secondary) hover:bg-black/5 dark:hover:bg-white/5">Login</a>
-            <a href="{{ route('register') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-(--color-primary)">Get Started</a>
+            <a href="{{ route('login') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-(--color-text-secondary) hover:bg-black/5 dark:hover:bg-white/5">{{ __('navbar.login') }}</a>
+            <a href="{{ route('register') }}" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-(--color-primary)">{{ __('navbar.get_started') }}</a>
         @endauth
+
+        <x-language-switcher variant="inline" />
     </div>
 </nav>
 

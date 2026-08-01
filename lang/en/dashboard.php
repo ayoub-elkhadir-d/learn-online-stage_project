@@ -1,0 +1,46 @@
+<?php
+
+return [
+    'welcome_back' => 'Welcome back, :name',
+    'subtitle' => 'Continue your learning journey.',
+    'stat_courses' => 'Courses',
+    'stat_completed_lessons' => 'Completed Lessons',
+    'stat_progress' => 'Progress',
+    'stat_hours' => 'Learning Hours',
+    'continue_learning' => 'Continue learning',
+    'recently_viewed' => 'Recently Viewed',
+    'my_courses' => 'My Courses',
+    'browse_more' => 'Browse More',
+    'filter_all' => 'All',
+    'filter_in_progress' => 'In Progress',
+    'filter_completed' => 'Completed',
+    'filter_not_started' => 'Not Started',
+    'no_courses_title' => 'No courses yet',
+    'no_courses_text' => "You haven't purchased any courses yet. Browse the catalog and start learning today.",
+    'browse_courses' => 'Browse Courses',
+    'purchased_on' => 'Purchased :date',
+    'active' => 'Active',
+    'pending' => 'Pending',
+    'waiting_confirmation' => 'Waiting for admin payment confirmation.',
+    'start_learning' => 'Start Learning',
+    'certificate_coming_soon' => 'Certificate — Coming Soon',
+    'no_lessons_yet' => 'No lessons yet',
+    'continue_with' => 'Continue with: :lesson',
+    'course_completed' => 'Course completed',
+    'review_course' => 'Review Course',
+    'course_progress' => 'Course progress',
+
+    // Small JS-facing fragments only (the live progress % is computed
+    // client-side from localStorage) — deliberately just these few words,
+    // not the whole file, per "don't load all translations into JS".
+    'js' => [
+        'of' => 'of',
+        'lesson' => 'lesson',
+        'lessons' => 'lessons',
+        'continue_with' => 'Continue with: :lesson',
+        'course_completed' => 'Course completed',
+        'review_course' => 'Review Course',
+        'continue_learning' => 'Continue Learning',
+        'untitled_course' => 'Untitled course',
+    ],
+];

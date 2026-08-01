@@ -30,7 +30,7 @@ class PurchaseController extends Controller
 
         if ($purchase && $purchase->status === 'paid') {
             return redirect()->route('courses.show', $course->slug)
-                ->with('status', 'You already have access to this course.');
+                ->with('status', __('checkout.already_have_access'));
         }
 
         // Store receipt file securely
@@ -59,6 +59,6 @@ class PurchaseController extends Controller
         }
 
         return redirect()->route('courses.show', $course->slug)
-            ->with('status', 'Purchase created (pending). Admin will confirm your payment.');
+            ->with('status', __('checkout.purchase_created_pending'));
     }
 }

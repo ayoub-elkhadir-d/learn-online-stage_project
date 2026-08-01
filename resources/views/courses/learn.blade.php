@@ -1,17 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $currentLesson ? $currentLesson->title . ' — ' : '' }}{{ $course->title }} — Learn</title>
     @include('partials.theme-init')
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    @include('partials.locale-fonts')
     @if($course->cover_image_path)
     <link rel="preload" as="image" href="{{ Storage::url($course->cover_image_path) }}">
     @endif
-    @vite(['resources/css/app.css', 'resources/css/learn.css', 'resources/js/app.js', 'resources/js/learn.js'])
+    @vite(['resources/css/app.css', 'resources/css/rtl.css', 'resources/css/learn.css', 'resources/js/app.js', 'resources/js/learn.js'])
     <script>
         window.__courseId = {{ $course->id }};
         window.__courseSlug = @json($course->slug);

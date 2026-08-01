@@ -36,6 +36,11 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            // Must come after StartSession (needs Auth::user()) and
+            // EncryptCookies (needs the decrypted 'locale' cookie value) —
+            // applies to every page in the app since routes/web.php is
+            // entirely within this group.
+            \App\Http\Middleware\SetLocale::class,
         ],
 
         'api' => [

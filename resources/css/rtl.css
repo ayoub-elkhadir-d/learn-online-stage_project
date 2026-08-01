@@ -1,0 +1,78 @@
+/* RTL corrections — only for Arabic (html[dir="rtl"]).
+   Most of the app already reverses correctly for free: flex-direction: row
+   is direction-relative per the CSS spec, so nav bars, button groups, and
+   card layouts (built almost entirely with `flex ... gap-*`, not
+   `space-x-*`) already mirror visually under dir="rtl" with zero markup
+   changes. What's left here are the physical (left/right) utilities that
+   Tailwind doesn't auto-flip: icon-in-input positioning, dropdown
+   alignment, and a couple of absolutely-positioned card badges. Loaded
+   after app.css, scoped entirely under html[dir="rtl"] so it never affects
+   English/French. */
+
+/* ---- Icon-in-input fields (search bars, form inputs across the whole
+   app) — icon moves from the left edge to the right edge, input padding
+   flips to match. */
+html[dir="rtl"] .pl-9 {
+    padding-left: 1rem;
+    padding-right: 2.25rem;
+}
+
+html[dir="rtl"] .pl-12 {
+    padding-left: 1rem;
+    padding-right: 3rem;
+}
+
+html[dir="rtl"] .left-3 {
+    left: auto;
+    right: 0.75rem;
+}
+
+html[dir="rtl"] .left-4 {
+    left: auto;
+    right: 1rem;
+}
+
+/* ---- Dropdown panels (navbar user menu, notifications, admin topbar) —
+   open toward the opposite edge in RTL. */
+html[dir="rtl"] [data-dropdown-panel] {
+    right: auto;
+    left: 0;
+}
+
+/* ---- Course card corner badges (category pill / price tag) ---- */
+html[dir="rtl"] .course-card-badge {
+    left: auto;
+    right: 0.75rem;
+}
+
+html[dir="rtl"] .course-card-price {
+    right: auto;
+    left: 0.75rem;
+}
+
+/* ---- Admin sidebar — the inner edge border flips with the layout ---- */
+html[dir="rtl"] [data-admin-sidebar] {
+    border-right: none;
+    border-left: 1px solid var(--color-border);
+}
+
+html[dir="rtl"].dark [data-admin-sidebar] {
+    border-left-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ---- Hero decorative shapes (courses index) — purely cosmetic, but a
+   left-anchored glow/ring reads oddly once everything else has mirrored. */
+html[dir="rtl"] .hero-orb-1 {
+    left: auto;
+    right: -50px;
+}
+
+html[dir="rtl"] .hero-orb-2 {
+    right: auto;
+    left: -40px;
+}
+
+html[dir="rtl"] .storefront-hero::after {
+    right: auto;
+    left: 4%;
+}

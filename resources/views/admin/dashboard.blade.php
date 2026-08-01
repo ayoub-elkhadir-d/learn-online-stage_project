@@ -1,5 +1,5 @@
 @extends('admin.layout')
-@section('title', 'Dashboard')
+@section('title', __('admin.dashboard_title'))
 
 @section('content')
 
@@ -12,7 +12,7 @@
             </span>
             <div class="min-w-0">
                 <div class="text-2xl font-extrabold text-(--color-text) dark:text-white">{{ $stats['courses'] }}</div>
-                <div class="truncate text-xs font-medium text-(--color-text-secondary)">Courses</div>
+                <div class="truncate text-xs font-medium text-(--color-text-secondary)">{{ __('admin.stat_courses') }}</div>
             </div>
         </div>
     </div>
@@ -23,7 +23,7 @@
             </span>
             <div class="min-w-0">
                 <div class="text-2xl font-extrabold text-(--color-text) dark:text-white">{{ $stats['users'] }}</div>
-                <div class="truncate text-xs font-medium text-(--color-text-secondary)">Users</div>
+                <div class="truncate text-xs font-medium text-(--color-text-secondary)">{{ __('admin.stat_users') }}</div>
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@
             </span>
             <div class="min-w-0">
                 <div class="text-2xl font-extrabold text-(--color-text) dark:text-white">{{ $stats['pending_payments'] }}</div>
-                <div class="truncate text-xs font-medium text-(--color-text-secondary)">Pending Payments</div>
+                <div class="truncate text-xs font-medium text-(--color-text-secondary)">{{ __('admin.stat_pending_payments') }}</div>
             </div>
         </div>
     </div>
@@ -45,7 +45,7 @@
             </span>
             <div class="min-w-0">
                 <div class="text-2xl font-extrabold text-(--color-text) dark:text-white">{{ number_format($stats['revenue'], 0, ',', ' ') }}</div>
-                <div class="truncate text-xs font-medium text-(--color-text-secondary)">Revenue (MAD)</div>
+                <div class="truncate text-xs font-medium text-(--color-text-secondary)">{{ __('admin.stat_revenue') }}</div>
             </div>
         </div>
     </div>
@@ -55,19 +55,19 @@
 <div class="mt-6 flex flex-wrap gap-2.5">
     <a href="{{ route('admin.courses.create') }}" class="btn-primary">
         <x-icon name="book-open" class="h-4 w-4" />
-        Add Course
+        {{ __('admin.quick_add_course') }}
     </a>
     <a href="{{ route('admin.categories.create') }}" class="btn-secondary">
         <x-icon name="tag" class="h-4 w-4" />
-        Add Category
+        {{ __('admin.quick_add_category') }}
     </a>
     <a href="{{ route('admin.payments.index') }}" class="btn-secondary">
         <x-icon name="credit-card" class="h-4 w-4" />
-        View Payments
+        {{ __('admin.quick_view_payments') }}
     </a>
     <a href="{{ route('admin.users.index') }}" class="btn-secondary">
         <x-icon name="users" class="h-4 w-4" />
-        View Users
+        {{ __('admin.quick_view_users') }}
     </a>
 </div>
 
@@ -76,8 +76,8 @@
     {{-- Recent payments --}}
     <div class="lesson-card p-5 sm:p-6">
         <div class="flex items-center justify-between gap-3">
-            <h2 class="text-sm font-bold text-(--color-text) dark:text-white">Recent Payments</h2>
-            <a href="{{ route('admin.payments.index') }}" class="text-xs font-semibold text-(--color-primary) hover:text-(--color-primary-dark)">View all</a>
+            <h2 class="text-sm font-bold text-(--color-text) dark:text-white">{{ __('admin.recent_payments') }}</h2>
+            <a href="{{ route('admin.payments.index') }}" class="text-xs font-semibold text-(--color-primary) hover:text-(--color-primary-dark)">{{ __('admin.view_all') }}</a>
         </div>
         <div class="mt-4 flex flex-col divide-y divide-(--color-border) dark:divide-white/10">
             @forelse($recentPayments as $payment)
@@ -92,7 +92,7 @@
                     <x-status-badge :status="$payment->status" class="shrink-0" />
                 </a>
             @empty
-                <p class="py-6 text-center text-sm text-(--color-text-secondary)">No payments yet.</p>
+                <p class="py-6 text-center text-sm text-(--color-text-secondary)">{{ __('admin.no_payments_yet') }}</p>
             @endforelse
         </div>
     </div>
@@ -100,8 +100,8 @@
     {{-- Recent enrollments --}}
     <div class="lesson-card p-5 sm:p-6">
         <div class="flex items-center justify-between gap-3">
-            <h2 class="text-sm font-bold text-(--color-text) dark:text-white">Recent Enrollments</h2>
-            <a href="{{ route('admin.payments.index') }}" class="text-xs font-semibold text-(--color-primary) hover:text-(--color-primary-dark)">View all</a>
+            <h2 class="text-sm font-bold text-(--color-text) dark:text-white">{{ __('admin.recent_enrollments') }}</h2>
+            <a href="{{ route('admin.payments.index') }}" class="text-xs font-semibold text-(--color-primary) hover:text-(--color-primary-dark)">{{ __('admin.view_all') }}</a>
         </div>
         <div class="mt-4 flex flex-col divide-y divide-(--color-border) dark:divide-white/10">
             @forelse($recentEnrollments as $enrollment)
@@ -116,7 +116,7 @@
                     <div class="shrink-0 text-xs text-(--color-text-secondary)">{{ $enrollment->purchased_at?->format('d M') }}</div>
                 </div>
             @empty
-                <p class="py-6 text-center text-sm text-(--color-text-secondary)">No enrollments yet.</p>
+                <p class="py-6 text-center text-sm text-(--color-text-secondary)">{{ __('admin.no_enrollments_yet') }}</p>
             @endforelse
         </div>
     </div>
@@ -124,8 +124,8 @@
     {{-- Latest courses --}}
     <div class="lesson-card p-5 sm:p-6">
         <div class="flex items-center justify-between gap-3">
-            <h2 class="text-sm font-bold text-(--color-text) dark:text-white">Latest Courses</h2>
-            <a href="{{ route('admin.courses.index') }}" class="text-xs font-semibold text-(--color-primary) hover:text-(--color-primary-dark)">View all</a>
+            <h2 class="text-sm font-bold text-(--color-text) dark:text-white">{{ __('admin.latest_courses') }}</h2>
+            <a href="{{ route('admin.courses.index') }}" class="text-xs font-semibold text-(--color-primary) hover:text-(--color-primary-dark)">{{ __('admin.view_all') }}</a>
         </div>
         <div class="mt-4 flex flex-col divide-y divide-(--color-border) dark:divide-white/10">
             @forelse($latestCourses as $course)
@@ -137,10 +137,10 @@
                         <div class="truncate text-sm font-semibold text-(--color-text) dark:text-white">{{ $course->title }}</div>
                         <div class="truncate text-xs text-(--color-text-secondary)">{{ $course->category->name }}</div>
                     </div>
-                    <div class="shrink-0 text-xs font-semibold text-(--color-primary)">{{ $course->price_mad }} MAD</div>
+                    <div class="shrink-0 text-xs font-semibold text-(--color-primary)">{{ $course->price_mad }} {{ __('common.mad') }}</div>
                 </a>
             @empty
-                <p class="py-6 text-center text-sm text-(--color-text-secondary)">No courses yet.</p>
+                <p class="py-6 text-center text-sm text-(--color-text-secondary)">{{ __('admin.no_courses_yet') }}</p>
             @endforelse
         </div>
     </div>
@@ -148,8 +148,8 @@
     {{-- Latest users --}}
     <div class="lesson-card p-5 sm:p-6">
         <div class="flex items-center justify-between gap-3">
-            <h2 class="text-sm font-bold text-(--color-text) dark:text-white">Latest Users</h2>
-            <a href="{{ route('admin.users.index') }}" class="text-xs font-semibold text-(--color-primary) hover:text-(--color-primary-dark)">View all</a>
+            <h2 class="text-sm font-bold text-(--color-text) dark:text-white">{{ __('admin.latest_users') }}</h2>
+            <a href="{{ route('admin.users.index') }}" class="text-xs font-semibold text-(--color-primary) hover:text-(--color-primary-dark)">{{ __('admin.view_all') }}</a>
         </div>
         <div class="mt-4 flex flex-col divide-y divide-(--color-border) dark:divide-white/10">
             @forelse($latestUsers as $user)
@@ -164,7 +164,7 @@
                     <div class="shrink-0 text-xs text-(--color-text-secondary)">{{ $user->created_at->format('d M') }}</div>
                 </div>
             @empty
-                <p class="py-6 text-center text-sm text-(--color-text-secondary)">No users yet.</p>
+                <p class="py-6 text-center text-sm text-(--color-text-secondary)">{{ __('admin.no_users_yet') }}</p>
             @endforelse
         </div>
     </div>

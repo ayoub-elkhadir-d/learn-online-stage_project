@@ -9,19 +9,19 @@
                     <x-icon name="alert-triangle" class="h-5 w-5" />
                 </span>
                 <div>
-                    <h3 class="text-sm font-bold text-(--color-text) dark:text-white">Reject this payment?</h3>
+                    <h3 class="text-sm font-bold text-(--color-text) dark:text-white">{{ __('admin.reject_confirm_title') }}</h3>
                     <p class="mt-1 text-xs text-(--color-text-secondary)">
-                        {{ $payment->user->name }}'s request for <strong>{{ $payment->course->title }}</strong> will be marked as rejected. They can resubmit later.
+                        {!! __('admin.reject_confirm_text', ['user' => e($payment->user->name), 'course' => '<strong>' . e($payment->course->title) . '</strong>']) !!}
                     </p>
                 </div>
             </div>
             <div class="mt-5 flex gap-2">
-                <button type="button" data-close-modal class="btn-secondary flex-1 !py-2 text-xs">Cancel</button>
+                <button type="button" data-close-modal class="btn-secondary flex-1 !py-2 text-xs">{{ __('common.cancel') }}</button>
                 <form method="POST" action="{{ route('admin.payments.reject', $payment) }}" class="flex-1">
                     @csrf @method('PUT')
                     <button class="flex w-full items-center justify-center gap-1.5 rounded-xl bg-(--color-danger) px-3 py-2 text-xs font-semibold text-white transition-colors hover:opacity-90">
                         <x-icon name="x" class="h-3.5 w-3.5" />
-                        Reject Payment
+                        {{ __('admin.reject_confirm_btn') }}
                     </button>
                 </form>
             </div>
@@ -33,19 +33,19 @@
                     <x-icon name="ban" class="h-5 w-5" />
                 </span>
                 <div>
-                    <h3 class="text-sm font-bold text-(--color-text) dark:text-white">Cancel this approval?</h3>
+                    <h3 class="text-sm font-bold text-(--color-text) dark:text-white">{{ __('admin.cancel_confirm_title') }}</h3>
                     <p class="mt-1 text-xs text-(--color-text-secondary)">
-                        {{ $payment->user->name }} will immediately lose access to <strong>{{ $payment->course->title }}</strong>. The payment record is kept, not deleted.
+                        {!! __('admin.cancel_confirm_text', ['user' => e($payment->user->name), 'course' => '<strong>' . e($payment->course->title) . '</strong>']) !!}
                     </p>
                 </div>
             </div>
             <div class="mt-5 flex gap-2">
-                <button type="button" data-close-modal class="btn-secondary flex-1 !py-2 text-xs">Keep Approved</button>
+                <button type="button" data-close-modal class="btn-secondary flex-1 !py-2 text-xs">{{ __('admin.keep_approved') }}</button>
                 <form method="POST" action="{{ route('admin.payments.cancel', $payment) }}" class="flex-1">
                     @csrf @method('PUT')
                     <button class="flex w-full items-center justify-center gap-1.5 rounded-xl bg-(--color-danger) px-3 py-2 text-xs font-semibold text-white transition-colors hover:opacity-90">
                         <x-icon name="ban" class="h-3.5 w-3.5" />
-                        Cancel Approval
+                        {{ __('admin.cancel_confirm_btn') }}
                     </button>
                 </form>
             </div>

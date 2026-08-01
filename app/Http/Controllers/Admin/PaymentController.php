@@ -37,7 +37,7 @@ class PaymentController extends Controller
     {
         if ($purchase->status === 'paid') {
             return redirect()->route('admin.payments.index')
-                ->with('success', 'This payment is already approved.');
+                ->with('success', __('admin.flash_already_approved'));
         }
 
         $purchase->update([
@@ -46,14 +46,17 @@ class PaymentController extends Controller
         ]);
 
         return redirect()->route('admin.payments.index')
-            ->with('success', "Payment approved. User '{$purchase->user->name}' now has access to '{$purchase->course->title}'.");
+            ->with('success', __('admin.flash_payment_approved', [
+                'user' => $purchase->user->name,
+                'course' => $purchase->course->title,
+            ]));
     }
 
     public function reject(CoursePurchase $purchase)
     {
         if ($purchase->status === 'paid') {
             return redirect()->route('admin.payments.index')
-                ->with('success', 'Cannot reject an already approved payment.');
+                ->with('success', __('admin.flash_cannot_reject_approved'));
         }
 
         // Soft status change — the record (and any receipt/reference the
@@ -61,14 +64,14 @@ class PaymentController extends Controller
         $purchase->update(['status' => 'rejected']);
 
         return redirect()->route('admin.payments.index')
-            ->with('success', 'Payment request rejected.');
+            ->with('success', __('admin.flash_payment_rejected'));
     }
 
     public function cancel(CoursePurchase $purchase)
     {
         if ($purchase->status !== 'paid') {
             return redirect()->route('admin.payments.index')
-                ->with('success', 'Only approved payments can be cancelled.');
+                ->with('success', __('admin.flash_only_approved_can_cancel'));
         }
 
         // Revokes access without deleting anything: Course::isPurchasedBy()
@@ -77,6 +80,9 @@ class PaymentController extends Controller
         $purchase->update(['status' => 'cancelled']);
 
         return redirect()->route('admin.payments.index')
-            ->with('success', "Access to '{$purchase->course->title}' has been revoked for {$purchase->user->name}.");
+            ->with('success', __('admin.flash_access_revoked', [
+                'user' => $purchase->user->name,
+                'course' => $purchase->course->title,
+            ]));
     }
 }

@@ -20,7 +20,7 @@
 <div class="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
     <a href="{{ route('courses.index') }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-(--color-text-secondary) transition-colors hover:text-(--color-text) dark:hover:text-white">
         <x-icon name="chevron-left" class="h-4 w-4" />
-        Back to courses
+        {{ __('courses.back_to_courses') }}
     </a>
 </div>
 
@@ -48,7 +48,7 @@
                     <span class="inline-flex items-center gap-1 rounded-full bg-(--color-text)/8 px-3 py-1 text-xs font-semibold text-(--color-text) dark:bg-white/10 dark:text-white">
                         <x-icon name="star" class="h-3.5 w-3.5 fill-current text-amber-400" />
                         {{ number_format($avgRating, 1) }}
-                        <span class="font-normal text-(--color-text-secondary)">({{ $reviewCount }} {{ Str::plural('review', $reviewCount) }})</span>
+                        <span class="font-normal text-(--color-text-secondary)">({{ trans_choice('courses.reviews_count', $reviewCount, ['count' => $reviewCount]) }})</span>
                     </span>
                 @endif
             </div>
@@ -64,11 +64,11 @@
             <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-(--color-text-secondary)">
                 <span class="flex items-center gap-1.5">
                     <x-icon name="book-open" class="h-4 w-4 text-(--color-primary)" />
-                    {{ $lessons->count() }} {{ Str::plural('lesson', $lessons->count()) }}
+                    {{ trans_choice('courses.lessons_count', $lessons->count(), ['count' => $lessons->count()]) }}
                 </span>
                 <span class="flex items-center gap-1.5">
                     <x-icon name="calendar" class="h-4 w-4 text-(--color-primary)" />
-                    Updated {{ $course->updated_at->diffForHumans() }}
+                    {{ __('courses.updated', ['time' => $course->updated_at->diffForHumans()]) }}
                 </span>
             </div>
 
@@ -78,7 +78,7 @@
                         {{ strtoupper(substr($course->instructor_name, 0, 1)) }}
                     </span>
                     <div class="min-w-0">
-                        <div class="text-[11px] font-semibold uppercase tracking-wide text-(--color-text-secondary)">Instructor</div>
+                        <div class="text-[11px] font-semibold uppercase tracking-wide text-(--color-text-secondary)">{{ __('courses.instructor') }}</div>
                         <div class="truncate text-sm font-bold text-(--color-text) dark:text-white">{{ $course->instructor_name }}</div>
                     </div>
                 </div>
@@ -89,9 +89,9 @@
         <div class="lesson-card p-6 lg:sticky lg:top-24">
             <div class="text-center">
                 <div class="text-3xl font-extrabold text-(--color-text) dark:text-white">
-                    {{ $course->price_mad }} <span class="text-base font-medium text-(--color-text-secondary)">MAD</span>
+                    {{ $course->price_mad }} <span class="text-base font-medium text-(--color-text-secondary)">{{ __('common.mad') }}</span>
                 </div>
-                <p class="mt-1 text-xs text-(--color-text-secondary)">One-time payment — lifetime access</p>
+                <p class="mt-1 text-xs text-(--color-text-secondary)">{{ __('courses.one_time_payment') }}</p>
             </div>
 
             <div class="mt-5">
@@ -101,37 +101,37 @@
                             <span class="flex h-12 w-12 items-center justify-center rounded-full bg-(--color-success)/10 text-(--color-success)">
                                 <x-icon name="check" class="h-5 w-5" />
                             </span>
-                            <h3 class="text-sm font-bold text-(--color-text) dark:text-white">You have access!</h3>
-                            <p class="text-xs text-(--color-text-secondary)">Purchased on {{ $purchase->purchased_at->format('d M Y') }}</p>
+                            <h3 class="text-sm font-bold text-(--color-text) dark:text-white">{{ __('courses.you_have_access') }}</h3>
+                            <p class="text-xs text-(--color-text-secondary)">{{ __('courses.purchased_on', ['date' => $purchase->purchased_at->format('d M Y')]) }}</p>
                         </div>
                         <a href="{{ route('courses.learn', $course->slug) }}" class="btn-primary w-full text-sm">
                             <x-icon name="play" class="h-4 w-4" />
-                            Start Learning
+                            {{ __('courses.start_learning') }}
                         </a>
                     @elseif($isPending)
                         <div class="mb-4 flex flex-col items-center gap-2 text-center">
                             <span class="flex h-12 w-12 items-center justify-center rounded-full bg-(--color-accent)/10 text-(--color-accent)">
                                 <x-icon name="clock" class="h-5 w-5" />
                             </span>
-                            <h3 class="text-sm font-bold text-(--color-text) dark:text-white">Payment Pending</h3>
-                            <p class="text-xs text-(--color-text-secondary)">Awaiting admin confirmation.</p>
+                            <h3 class="text-sm font-bold text-(--color-text) dark:text-white">{{ __('courses.payment_pending') }}</h3>
+                            <p class="text-xs text-(--color-text-secondary)">{{ __('courses.awaiting_confirmation') }}</p>
                         </div>
                         <div class="rounded-lg bg-(--color-accent)/10 px-3 py-2.5 text-center text-xs text-(--color-accent)">
-                            Reference: <strong>{{ $purchase->reference ?? 'N/A' }}</strong>
+                            {{ __('courses.reference') }}: <strong>{{ $purchase->reference ?? __('courses.not_available') }}</strong>
                         </div>
                     @else
                         <a href="{{ route('courses.checkout', $course->slug) }}" class="btn-primary w-full text-sm">
                             <x-icon name="credit-card" class="h-4 w-4" />
-                            Proceed to Checkout
+                            {{ __('courses.proceed_to_checkout') }}
                         </a>
                         <p class="mt-3 flex items-center justify-center gap-1 text-center text-[11px] text-(--color-text-secondary)">
                             <x-icon name="shield" class="h-3.5 w-3.5 text-(--color-primary)" />
-                            Secure payment — Admin confirmation required
+                            {{ __('courses.secure_payment_note') }}
                         </p>
                     @endif
                 @else
                     <a href="{{ route('login') }}" class="btn-primary w-full text-sm">
-                        Login to Purchase
+                        {{ __('courses.login_to_purchase') }}
                     </a>
                 @endauth
             </div>
@@ -139,19 +139,19 @@
             <ul class="mt-6 flex flex-col text-sm">
                 <li class="feature-row flex items-center gap-2.5 py-2.5 text-(--color-text-secondary)">
                     <x-icon name="check-circle" class="h-4 w-4 shrink-0 text-(--color-primary)" />
-                    Full course access
+                    {{ __('courses.feature_full_access') }}
                 </li>
                 <li class="feature-row flex items-center gap-2.5 py-2.5 text-(--color-text-secondary)">
                     <x-icon name="check-circle" class="h-4 w-4 shrink-0 text-(--color-primary)" />
-                    Certificate upon completion
+                    {{ __('courses.feature_certificate') }}
                 </li>
                 <li class="feature-row flex items-center gap-2.5 py-2.5 text-(--color-text-secondary)">
                     <x-icon name="check-circle" class="h-4 w-4 shrink-0 text-(--color-primary)" />
-                    Payment confirmed by admin
+                    {{ __('courses.feature_admin_confirmed') }}
                 </li>
                 <li class="feature-row flex items-center gap-2.5 py-2.5 text-(--color-text-secondary)">
                     <x-icon name="check-circle" class="h-4 w-4 shrink-0 text-(--color-primary)" />
-                    Lifetime access
+                    {{ __('courses.feature_lifetime_access') }}
                 </li>
             </ul>
         </div>
@@ -163,23 +163,23 @@
 <div class="mx-auto max-w-4xl px-4 pb-16 sm:px-6 lg:px-8">
     <div class="flex flex-col gap-6">
         <div class="lesson-card p-5 sm:p-6">
-            <h2 class="text-lg font-bold text-(--color-text) dark:text-white">About this course</h2>
-            <p class="mt-3 whitespace-pre-line text-sm leading-relaxed text-(--color-text-secondary)">{{ $course->description ?: 'No description available.' }}</p>
+            <h2 class="text-lg font-bold text-(--color-text) dark:text-white">{{ __('courses.about_course') }}</h2>
+            <p class="mt-3 whitespace-pre-line text-sm leading-relaxed text-(--color-text-secondary)">{{ $course->description ?: __('courses.no_description') }}</p>
         </div>
 
         <div class="lesson-card overflow-hidden">
             <div class="flex items-center justify-between gap-3 p-5 pb-4 sm:p-6 sm:pb-4">
                 <h2 class="flex items-center gap-2 text-lg font-bold text-(--color-text) dark:text-white">
                     <x-icon name="video" class="h-5 w-5 text-(--color-primary)" />
-                    Course Content
+                    {{ __('courses.course_content') }}
                 </h2>
                 <span class="shrink-0 rounded-full bg-(--color-text)/8 px-2.5 py-1 text-xs font-semibold text-(--color-text-secondary) dark:bg-white/10">
-                    {{ $lessons->count() }} {{ Str::plural('lesson', $lessons->count()) }}
+                    {{ trans_choice('courses.lessons_count', $lessons->count(), ['count' => $lessons->count()]) }}
                 </span>
             </div>
 
             @if($lessons->isEmpty())
-                <p class="px-5 pb-6 text-sm text-(--color-text-secondary) sm:px-6">No lessons have been added to this course yet.</p>
+                <p class="px-5 pb-6 text-sm text-(--color-text-secondary) sm:px-6">{{ __('courses.no_lessons_yet') }}</p>
             @else
                 <div>
                     @foreach($lessons as $index => $lesson)
@@ -200,18 +200,18 @@
                                         <x-icon name="check-circle" class="h-4 w-4" />
                                     </span>
                                 @else
-                                    <span class="shrink-0 text-(--color-text-secondary)" title="Purchase this course to unlock">
+                                    <span class="shrink-0 text-(--color-text-secondary)" title="{{ __('courses.purchase_to_unlock') }}">
                                         <x-icon name="lock" class="h-4 w-4" />
                                     </span>
                                 @endif
                                 <x-icon name="chevron-down" data-chevron class="h-4 w-4 shrink-0 text-(--color-text-secondary)" />
                             </summary>
                             <div class="px-5 pb-5 pl-[3.75rem] text-sm leading-relaxed text-(--color-text-secondary) sm:px-6 sm:pl-[4.25rem]">
-                                {{ $lesson->description ?: 'No description provided for this lesson.' }}
+                                {{ $lesson->description ?: __('courses.no_lesson_description') }}
                                 @if($isPaid)
                                     <a href="{{ route('courses.learn', [$course->slug, 'lesson' => $lesson->id]) }}" class="mt-3 flex w-fit items-center gap-1.5 text-sm font-semibold text-(--color-primary) transition-colors hover:text-(--color-primary-dark)">
                                         <x-icon name="play" class="h-3.5 w-3.5" />
-                                        Watch lesson
+                                        {{ __('courses.watch_lesson') }}
                                     </a>
                                 @endif
                             </div>
@@ -225,7 +225,7 @@
             <div class="flex items-center justify-between gap-3">
                 <h2 class="flex items-center gap-2 text-lg font-bold text-(--color-text) dark:text-white">
                     <x-icon name="star" class="h-5 w-5 text-(--color-primary)" />
-                    Ratings &amp; Reviews
+                    {{ __('courses.ratings_reviews') }}
                 </h2>
                 @if($avgRating !== null)
                     <span class="flex shrink-0 items-center gap-1 text-sm font-semibold text-(--color-text) dark:text-white">
@@ -237,7 +237,7 @@
             </div>
 
             @if($recentReviews->isEmpty())
-                <p class="mt-3 text-sm text-(--color-text-secondary)">No reviews yet — be the first to review this course after enrolling.</p>
+                <p class="mt-3 text-sm text-(--color-text-secondary)">{{ __('courses.no_reviews_yet') }}</p>
             @else
                 <div class="mt-4 flex flex-col gap-3">
                     @foreach($recentReviews as $review)
@@ -245,7 +245,7 @@
                     @endforeach
                 </div>
                 @if($reviewCount > $recentReviews->count())
-                    <p class="mt-3 text-xs text-(--color-text-secondary)">See all {{ $reviewCount }} reviews from the Learning page after enrolling.</p>
+                    <p class="mt-3 text-xs text-(--color-text-secondary)">{{ __('courses.see_all_reviews', ['count' => $reviewCount]) }}</p>
                 @endif
             @endif
         </div>

@@ -2,10 +2,10 @@
 
 @php
 $map = [
-    'pending'   => ['label' => 'Pending',   'icon' => 'clock',        'class' => 'bg-(--color-warning)/10 text-(--color-warning)'],
-    'paid'      => ['label' => 'Approved',  'icon' => 'check-circle', 'class' => 'bg-(--color-success)/10 text-(--color-success)'],
-    'rejected'  => ['label' => 'Rejected',  'icon' => 'x',            'class' => 'bg-(--color-danger)/10 text-(--color-danger)'],
-    'cancelled' => ['label' => 'Cancelled', 'icon' => 'ban',          'class' => 'bg-(--color-text)/8 text-(--color-text-secondary) dark:bg-white/10'],
+    'pending'   => ['label' => __('admin.status_pending'),  'icon' => 'clock',        'class' => 'bg-(--color-warning)/10 text-(--color-warning)'],
+    'paid'      => ['label' => __('admin.status_approved'), 'icon' => 'check-circle', 'class' => 'bg-(--color-success)/10 text-(--color-success)'],
+    'rejected'  => ['label' => __('admin.status_rejected'), 'icon' => 'x',            'class' => 'bg-(--color-danger)/10 text-(--color-danger)'],
+    'cancelled' => ['label' => __('admin.status_cancelled'),'icon' => 'ban',          'class' => 'bg-(--color-text)/8 text-(--color-text-secondary) dark:bg-white/10'],
 ];
 $s = $map[$status] ?? ['label' => ucfirst($status), 'icon' => 'circle', 'class' => 'bg-(--color-text)/8 text-(--color-text-secondary) dark:bg-white/10'];
 @endphp

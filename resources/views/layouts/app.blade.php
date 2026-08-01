@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'ArtiWeb')</title>
     @include('partials.theme-init')
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/css/auth.css', 'resources/js/app.js'])
+    @include('partials.locale-fonts')
+    @vite(['resources/css/app.css', 'resources/css/rtl.css', 'resources/css/auth.css', 'resources/js/app.js'])
     @stack('head')
 </head>
 <body class="min-h-screen bg-(--color-bg-light) font-sans text-(--color-text) antialiased dark:bg-(--color-bg-dark) dark:text-[#ECECEC]">
@@ -19,7 +18,7 @@
         <div class="relative w-full max-w-md">
             <div class="auth-card rounded-2xl border border-(--color-border) p-8 shadow-lift dark:border-white/10">
                 <div class="text-center">
-                    <h1 class="text-xl font-extrabold tracking-tight text-(--color-text) dark:text-white">@yield('heading', 'Welcome')</h1>
+                    <h1 class="text-xl font-extrabold tracking-tight text-(--color-text) dark:text-white">@yield('heading', __('common.welcome'))</h1>
                     <p class="mt-1.5 text-sm text-(--color-text-secondary)">@yield('subtitle', '')</p>
                 </div>
 
@@ -41,7 +40,7 @@
                     <div class="mt-5 rounded-xl border border-(--color-danger)/20 bg-(--color-danger)/10 px-4 py-3 text-sm text-(--color-danger)">
                         <div class="flex items-center gap-2 font-semibold">
                             <x-icon name="alert-triangle" class="h-4 w-4 shrink-0" />
-                            Please fix the following
+                            {{ __('common.please_fix_following') }}
                         </div>
                         <ul class="mt-1.5 list-disc pl-6 text-xs">
                             @foreach($errors->all() as $error)

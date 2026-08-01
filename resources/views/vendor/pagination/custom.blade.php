@@ -9,23 +9,23 @@
             @if ($paginator->onFirstPage())
                 <span class="btn-secondary pointer-events-none opacity-40">
                     <x-icon name="chevron-left" class="h-4 w-4" />
-                    Previous
+                    {{ __('Previous') }}
                 </span>
             @else
                 <a href="{{ $paginator->previousPageUrl() }}" class="btn-secondary">
                     <x-icon name="chevron-left" class="h-4 w-4" />
-                    Previous
+                    {{ __('Previous') }}
                 </a>
             @endif
 
             @if ($paginator->hasMorePages())
                 <a href="{{ $paginator->nextPageUrl() }}" class="btn-secondary">
-                    Next
+                    {{ __('Next') }}
                     <x-icon name="chevron-right" class="h-4 w-4" />
                 </a>
             @else
                 <span class="btn-secondary pointer-events-none opacity-40">
-                    Next
+                    {{ __('Next') }}
                     <x-icon name="chevron-right" class="h-4 w-4" />
                 </span>
             @endif

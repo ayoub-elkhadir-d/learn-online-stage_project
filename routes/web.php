@@ -6,6 +6,7 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseAssetController;
 use App\Http\Controllers\CourseReviewController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\StorageController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\Admin\AdminCourseController;
@@ -22,6 +23,12 @@ use App\Http\Controllers\Admin\UserController;
 Route::get('/storage/{path}', [StorageController::class, 'show'])
     ->where('path', '.*')
     ->name('storage.show');
+
+// Language switcher — available to guests and authenticated users alike,
+// on every page (see resources/views/components/language-switcher.blade.php).
+// POST-only so it's a real state change, not a link a crawler/prefetch
+// could trigger.
+Route::post('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 
 // Auth routes (guests only)
 Route::middleware('guest')->group(function () {

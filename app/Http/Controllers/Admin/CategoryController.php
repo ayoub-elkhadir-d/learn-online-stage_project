@@ -37,7 +37,7 @@ class CategoryController extends Controller
 
         Category::create($data);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category created successfully.');
+        return redirect()->route('admin.categories.index')->with('success', __('admin.flash_category_created'));
     }
 
     public function edit(Category $category)
@@ -57,18 +57,18 @@ class CategoryController extends Controller
 
         $category->update($data);
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category updated successfully.');
+        return redirect()->route('admin.categories.index')->with('success', __('admin.flash_category_updated'));
     }
 
     public function destroy(Category $category)
     {
         if ($category->courses()->exists()) {
             return redirect()->route('admin.categories.index')
-                ->with('error', "Cannot delete '{$category->name}' — it still has courses assigned to it. Move or delete those courses first.");
+                ->with('error', __('admin.flash_category_has_courses', ['name' => $category->name]));
         }
 
         $category->delete();
 
-        return redirect()->route('admin.categories.index')->with('success', 'Category deleted.');
+        return redirect()->route('admin.categories.index')->with('success', __('admin.flash_category_deleted'));
     }
 }

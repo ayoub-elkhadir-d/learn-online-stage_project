@@ -36,7 +36,7 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->intended(route('courses.index'))->with('success', 'Registration successful!');
+        return redirect()->intended(route('courses.index'))->with('success', __('auth.registration_successful'));
     }
 
     public function showLogin()
@@ -60,7 +60,7 @@ class AuthController extends Controller
             return redirect()->intended(route('courses.index'));
         }
 
-        return back()->withErrors(['email' => 'Invalid credentials.']);
+        return back()->withErrors(['email' => __('auth.invalid_credentials')]);
     }
 
     public function logout(Request $request)
@@ -139,6 +139,6 @@ class AuthController extends Controller
         
         $user->save();
 
-        return back()->with('success', 'Profile updated successfully!');
+        return back()->with('success', __('auth.profile_updated'));
     }
 }

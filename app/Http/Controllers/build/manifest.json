@@ -186,7 +186,7 @@
     "isEntry": true
   },
   "resources/css/app.css": {
-    "file": "assets/app-7pesUgM7.css",
+    "file": "assets/app-BHMcwzL6.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -213,6 +213,11 @@
   "resources/css/learn.css": {
     "file": "assets/learn-Bqy8EDjx.css",
     "src": "resources/css/learn.css",
+    "isEntry": true
+  },
+  "resources/css/rtl.css": {
+    "file": "assets/rtl-Cq2ewXHc.css",
+    "src": "resources/css/rtl.css",
     "isEntry": true
   },
   "resources/js/app.js": {

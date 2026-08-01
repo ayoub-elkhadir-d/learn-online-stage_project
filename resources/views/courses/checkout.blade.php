@@ -1,6 +1,6 @@
 @extends('layouts.site')
 
-@section('title', 'Checkout — ' . $course->title . ' — ArtiWeb')
+@section('title', __('checkout.title') . ' — ' . $course->title . ' — ArtiWeb')
 
 @php
     // $bankInfo is the single admin-managed PaymentSetting row, passed in by
@@ -8,11 +8,11 @@
     // request. Fields with a copy button per the spec; Bank Name / Account
     // Holder are display-only.
     $bankFields = [
-        ['label' => 'Bank Name', 'value' => $bankInfo->bank_name, 'icon' => 'landmark', 'copy' => false],
-        ['label' => 'Account Holder', 'value' => $bankInfo->account_holder, 'icon' => 'user', 'copy' => false],
-        ['label' => 'Account Number', 'value' => $bankInfo->account_number, 'icon' => 'credit-card', 'copy' => true],
-        ['label' => 'IBAN', 'value' => $bankInfo->iban, 'icon' => 'file-text', 'copy' => true],
-        ['label' => 'SWIFT / BIC', 'value' => $bankInfo->swift_bic, 'icon' => 'link', 'copy' => true],
+        ['label' => __('checkout.bank_name'), 'value' => $bankInfo->bank_name, 'icon' => 'landmark', 'copy' => false],
+        ['label' => __('checkout.account_holder'), 'value' => $bankInfo->account_holder, 'icon' => 'user', 'copy' => false],
+        ['label' => __('checkout.account_number'), 'value' => $bankInfo->account_number, 'icon' => 'credit-card', 'copy' => true],
+        ['label' => __('checkout.iban'), 'value' => $bankInfo->iban, 'icon' => 'file-text', 'copy' => true],
+        ['label' => __('checkout.swift'), 'value' => $bankInfo->swift_bic, 'icon' => 'link', 'copy' => true],
     ];
 @endphp
 
@@ -21,13 +21,13 @@
 <div class="mx-auto max-w-3xl px-4 pt-6 sm:px-6 lg:px-8">
     <a href="{{ route('courses.show', $course->slug) }}" class="inline-flex items-center gap-1.5 text-sm font-medium text-(--color-text-secondary) transition-colors hover:text-(--color-text) dark:hover:text-white">
         <x-icon name="chevron-left" class="h-4 w-4" />
-        Back to course
+        {{ __('checkout.back_to_course') }}
     </a>
 </div>
 
 <div class="mx-auto max-w-3xl px-4 py-6 pb-16 sm:px-6 lg:px-8">
-    <h1 class="text-2xl font-extrabold tracking-tight text-(--color-text) dark:text-white sm:text-3xl">Secure Checkout</h1>
-    <p class="mt-1.5 text-sm text-(--color-text-secondary)">Complete your payment to get instant access to <strong class="text-(--color-text) dark:text-white">{{ $course->title }}</strong></p>
+    <h1 class="text-2xl font-extrabold tracking-tight text-(--color-text) dark:text-white sm:text-3xl">{{ __('checkout.title') }}</h1>
+    <p class="mt-1.5 text-sm text-(--color-text-secondary)">{!! __('checkout.subtitle', ['course' => '<strong class="text-(--color-text) dark:text-white">' . e($course->title) . '</strong>']) !!}</p>
 
     @if($purchase && $purchase->status === 'pending')
 
@@ -36,37 +36,37 @@
             <span class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-(--color-accent)/10 text-(--color-accent)">
                 <x-icon name="clock" class="h-6 w-6" />
             </span>
-            <h2 class="text-lg font-bold text-(--color-text) dark:text-white">Payment Already Submitted</h2>
+            <h2 class="text-lg font-bold text-(--color-text) dark:text-white">{{ __('checkout.already_submitted_title') }}</h2>
             <p class="mt-1.5 max-w-sm text-sm text-(--color-text-secondary)">
-                You've already submitted a payment request for this course. It's awaiting admin confirmation.
+                {{ __('checkout.already_submitted_text') }}
             </p>
 
             <div class="mt-5 w-full rounded-xl border border-(--color-border) p-4 text-left text-sm dark:border-white/10">
                 <div class="flex items-center justify-between py-1.5">
-                    <span class="text-(--color-text-secondary)">Sender Account Name</span>
+                    <span class="text-(--color-text-secondary)">{{ __('checkout.sender_name') }}</span>
                     <span class="font-semibold text-(--color-text) dark:text-white">{{ $purchase->full_name }}</span>
                 </div>
                 <div class="flex items-center justify-between py-1.5">
-                    <span class="text-(--color-text-secondary)">Sender Account Number</span>
+                    <span class="text-(--color-text-secondary)">{{ __('checkout.sender_account') }}</span>
                     <span class="font-semibold text-(--color-text) dark:text-white">{{ $purchase->rib }}</span>
                 </div>
                 @if($purchase->reference)
                     <div class="flex items-center justify-between py-1.5">
-                        <span class="text-(--color-text-secondary)">Details</span>
+                        <span class="text-(--color-text-secondary)">{{ __('checkout.details') }}</span>
                         <span class="max-w-[60%] text-right font-semibold text-(--color-text) dark:text-white">{{ $purchase->reference }}</span>
                     </div>
                 @endif
                 @if($purchase->receipt_path)
                     <div class="flex items-center justify-between py-1.5">
-                        <span class="text-(--color-text-secondary)">Receipt</span>
-                        <a href="{{ Storage::url($purchase->receipt_path) }}" target="_blank" class="font-semibold text-(--color-primary) hover:text-(--color-primary-dark)">View</a>
+                        <span class="text-(--color-text-secondary)">{{ __('checkout.receipt') }}</span>
+                        <a href="{{ Storage::url($purchase->receipt_path) }}" target="_blank" class="font-semibold text-(--color-primary) hover:text-(--color-primary-dark)">{{ __('common.view') }}</a>
                     </div>
                 @endif
             </div>
 
             <a href="{{ route('courses.show', $course->slug) }}" class="btn-secondary mt-6 w-full sm:w-auto">
                 <x-icon name="chevron-left" class="h-4 w-4" />
-                Back to Course
+                {{ __('checkout.back_to_course_btn') }}
             </a>
         </div>
 
@@ -83,7 +83,7 @@
             <div class="mt-6 rounded-xl border border-(--color-danger)/20 bg-(--color-danger)/10 px-4 py-3 text-sm text-(--color-danger)">
                 <div class="flex items-center gap-2 font-semibold">
                     <x-icon name="alert-triangle" class="h-4 w-4 shrink-0" />
-                    Please fix the following
+                    {{ __('common.please_fix_following') }}
                 </div>
                 <ul class="mt-1.5 list-disc pl-6 text-xs">
                     @foreach($errors->all() as $error)
@@ -98,15 +98,15 @@
             <div class="flex items-center gap-3">
                 <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-(--color-primary) text-sm font-bold text-white">1</span>
                 <div>
-                    <h2 class="text-base font-bold text-(--color-text) dark:text-white sm:text-lg">Step 1 — Make the Bank Transfer</h2>
-                    <p class="text-xs text-(--color-text-secondary) sm:text-sm">Send the exact course price to the account below.</p>
+                    <h2 class="text-base font-bold text-(--color-text) dark:text-white sm:text-lg">{{ __('checkout.step1_title') }}</h2>
+                    <p class="text-xs text-(--color-text-secondary) sm:text-sm">{{ __('checkout.step1_subtitle') }}</p>
                 </div>
             </div>
 
             @if(blank($bankInfo->bank_name))
                 <div class="mt-5 flex items-center gap-2 rounded-xl border border-(--color-accent)/20 bg-(--color-accent)/10 px-4 py-3 text-sm text-(--color-primary-dark) dark:text-(--color-accent)">
                     <x-icon name="alert-circle" class="h-4 w-4 shrink-0" />
-                    Bank details haven't been configured yet. Please check back shortly.
+                    {{ __('checkout.not_configured') }}
                 </div>
             @else
                 <div class="mt-6 flex flex-col">
@@ -123,7 +123,7 @@
                                 <button type="button" data-copy-btn data-copy-text="{{ $field['value'] }}"
                                         class="flex shrink-0 items-center gap-1.5 rounded-lg border border-(--color-border) px-3 py-1.5 text-xs font-semibold text-(--color-text-secondary) transition-colors hover:border-(--color-primary)/40 hover:bg-(--color-primary)/5 hover:text-(--color-primary) dark:border-white/10">
                                     <x-icon name="copy" class="h-3.5 w-3.5" data-copy-icon />
-                                    <span data-copy-label>Copy</span>
+                                    <span data-copy-label>{{ __('checkout.copy') }}</span>
                                 </button>
                             @endif
                         </div>
@@ -138,12 +138,12 @@
 
                 @if($bankInfo->whatsapp || $bankInfo->support_email)
                     <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-(--color-border) pt-4 dark:border-white/10">
-                        <span class="text-xs font-semibold text-(--color-text-secondary)">Need help?</span>
+                        <span class="text-xs font-semibold text-(--color-text-secondary)">{{ __('checkout.need_help') }}</span>
                         @if($bankInfo->whatsapp)
                             <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $bankInfo->whatsapp) }}" target="_blank" rel="noopener"
                                class="inline-flex items-center gap-1.5 rounded-lg bg-(--color-primary)/10 px-2.5 py-1.5 text-xs font-semibold text-(--color-primary) hover:bg-(--color-primary)/20">
                                 <x-icon name="mail" class="h-3.5 w-3.5" />
-                                WhatsApp
+                                {{ __('checkout.whatsapp') }}
                             </a>
                         @endif
                         @if($bankInfo->support_email)
@@ -164,8 +164,7 @@
                 <x-icon name="alert-circle" class="h-4 w-4" />
             </span>
             <p class="text-sm leading-relaxed text-(--color-primary-dark) dark:text-(--color-accent)">
-                After completing the transfer, please upload your payment receipt and enter the account information used for the transfer.
-                We will verify your payment and activate your course as soon as possible.
+                {{ __('checkout.payment_notice') }}
             </p>
         </div>
 
@@ -180,35 +179,35 @@
                 <div class="flex items-center gap-3">
                     <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-(--color-primary) text-sm font-bold text-white">2</span>
                     <div>
-                        <h2 class="text-base font-bold text-(--color-text) dark:text-white sm:text-lg">Step 2 — Your Transfer Details</h2>
-                        <p class="text-xs text-(--color-text-secondary) sm:text-sm">Tell us who sent the money, then attach your receipt.</p>
+                        <h2 class="text-base font-bold text-(--color-text) dark:text-white sm:text-lg">{{ __('checkout.step2_title') }}</h2>
+                        <p class="text-xs text-(--color-text-secondary) sm:text-sm">{{ __('checkout.step2_subtitle') }}</p>
                     </div>
                 </div>
 
                 <div class="mt-6 flex flex-col gap-4">
                     <div>
-                        <label for="full_name" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Sender Account Name</label>
+                        <label for="full_name" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">{{ __('checkout.sender_name') }}</label>
                         <div class="relative">
                             <x-icon name="user" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
                             <input type="text" id="full_name" name="full_name" value="{{ old('full_name', auth()->user()->name) }}"
-                                   placeholder="Name on the sending bank account" required
+                                   placeholder="{{ __('checkout.sender_name_placeholder') }}" required
                                    class="input-field pl-9 @error('full_name') border-(--color-danger)! @enderror">
                         </div>
-                        <p class="mt-1.5 text-xs text-(--color-text-secondary)">The full name registered on the account you transferred from.</p>
+                        <p class="mt-1.5 text-xs text-(--color-text-secondary)">{{ __('checkout.sender_name_hint') }}</p>
                         @error('full_name')
                             <p class="mt-1.5 text-xs text-(--color-danger)">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
-                        <label for="rib" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Sender Account Number</label>
+                        <label for="rib" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">{{ __('checkout.sender_account') }}</label>
                         <div class="relative">
                             <x-icon name="landmark" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-(--color-text-secondary)" />
                             <input type="text" id="rib" name="rib" value="{{ old('rib') }}"
-                                   placeholder="e.g. 123 456 789 0123456789 01" required
+                                   placeholder="{{ __('checkout.sender_account_placeholder') }}" required
                                    class="input-field pl-9 @error('rib') border-(--color-danger)! @enderror">
                         </div>
-                        <p class="mt-1.5 text-xs text-(--color-text-secondary)">The RIB/account number you transferred from.</p>
+                        <p class="mt-1.5 text-xs text-(--color-text-secondary)">{{ __('checkout.sender_account_hint') }}</p>
                         @error('rib')
                             <p class="mt-1.5 text-xs text-(--color-danger)">{{ $message }}</p>
                         @enderror
@@ -216,31 +215,31 @@
 
                     <div>
                         <label for="reference" class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">
-                            Additional Transfer Details <span class="font-normal text-(--color-text-secondary)">(optional)</span>
+                            {{ __('checkout.additional_details') }} <span class="font-normal text-(--color-text-secondary)">({{ __('common.optional') }})</span>
                         </label>
                         <textarea id="reference" name="reference" rows="3"
-                                  placeholder="e.g. Sent 1,200 MAD from CIH Bank on 15 Jan 2026"
+                                  placeholder="{{ __('checkout.additional_details_placeholder') }}"
                                   class="input-field resize-none @error('reference') border-(--color-danger)! @enderror">{{ old('reference') }}</textarea>
-                        <p class="mt-1.5 text-xs text-(--color-text-secondary)">Sender bank, transfer date, amount, or any other note that helps us match your payment.</p>
+                        <p class="mt-1.5 text-xs text-(--color-text-secondary)">{{ __('checkout.additional_details_hint') }}</p>
                         @error('reference')
                             <p class="mt-1.5 text-xs text-(--color-danger)">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
-                        <label class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">Payment Receipt</label>
+                        <label class="mb-1.5 block text-sm font-medium text-(--color-text) dark:text-white/90">{{ __('checkout.payment_receipt') }}</label>
 
                         <div id="receiptArea" data-receipt-area
                              class="relative flex min-h-40 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-(--color-border) px-6 py-8 text-center transition-colors hover:border-(--color-primary)/50 hover:bg-(--color-primary)/5 dark:border-white/15">
 
                             <div data-receipt-placeholder class="flex flex-col items-center gap-1.5">
                                 <x-icon name="upload-cloud" class="h-8 w-8 text-(--color-text-secondary)" />
-                                <div class="text-sm font-medium text-(--color-text) dark:text-white">Click or drag & drop to upload</div>
-                                <div class="text-xs text-(--color-text-secondary)">JPG, PNG or PDF — Max 5MB</div>
+                                <div class="text-sm font-medium text-(--color-text) dark:text-white">{{ __('checkout.receipt_upload_hint') }}</div>
+                                <div class="text-xs text-(--color-text-secondary)">{{ __('checkout.receipt_formats') }}</div>
                             </div>
 
                             <div data-receipt-preview class="hidden w-full flex-col items-center gap-3">
-                                <img data-receipt-thumb class="hidden h-28 w-28 rounded-lg object-cover shadow-soft" alt="Receipt preview">
+                                <img data-receipt-thumb class="hidden h-28 w-28 rounded-lg object-cover shadow-soft" alt="{{ __('checkout.payment_receipt') }}">
                                 <div data-receipt-file-icon class="hidden h-16 w-16 items-center justify-center rounded-lg bg-(--color-primary)/10 text-(--color-primary)">
                                     <x-icon name="file-text" class="h-7 w-7" />
                                 </div>
@@ -251,11 +250,11 @@
                                 <div class="flex items-center gap-2">
                                     <button type="button" data-receipt-replace class="btn-secondary !px-3 !py-1.5 text-xs">
                                         <x-icon name="upload-cloud" class="h-3.5 w-3.5" />
-                                        Replace
+                                        {{ __('common.replace') }}
                                     </button>
                                     <button type="button" data-receipt-remove class="inline-flex items-center gap-1.5 rounded-xl border border-(--color-danger)/30 px-3 py-1.5 text-xs font-semibold text-(--color-danger) transition-colors hover:bg-(--color-danger)/10">
                                         <x-icon name="x" class="h-3.5 w-3.5" />
-                                        Remove
+                                        {{ __('common.remove') }}
                                     </button>
                                 </div>
                             </div>
@@ -276,44 +275,44 @@
                 <div class="flex items-center gap-3">
                     <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-(--color-primary) text-sm font-bold text-white">3</span>
                     <div>
-                        <h2 class="text-base font-bold text-(--color-text) dark:text-white sm:text-lg">Step 3 — Confirmation</h2>
-                        <p class="text-xs text-(--color-text-secondary) sm:text-sm">Review everything, then submit your payment proof.</p>
+                        <h2 class="text-base font-bold text-(--color-text) dark:text-white sm:text-lg">{{ __('checkout.step3_title') }}</h2>
+                        <p class="text-xs text-(--color-text-secondary) sm:text-sm">{{ __('checkout.step3_subtitle') }}</p>
                     </div>
                 </div>
 
                 <div class="mt-6 flex flex-col text-sm">
                     <div class="flex items-center justify-between gap-3 py-2.5">
-                        <span class="text-(--color-text-secondary)">Course</span>
+                        <span class="text-(--color-text-secondary)">{{ __('checkout.course') }}</span>
                         <span class="max-w-[60%] truncate text-right font-semibold text-(--color-text) dark:text-white">{{ $course->title }}</span>
                     </div>
                     <div class="flex items-center justify-between gap-3 border-t border-(--color-border) py-2.5 dark:border-white/10">
-                        <span class="text-(--color-text-secondary)">Price</span>
-                        <span class="font-semibold text-(--color-text) dark:text-white">{{ number_format($course->price_mad, 0, ',', ' ') }} MAD</span>
+                        <span class="text-(--color-text-secondary)">{{ __('checkout.price') }}</span>
+                        <span class="font-semibold text-(--color-text) dark:text-white">{{ number_format($course->price_mad, 0, ',', ' ') }} {{ __('common.mad') }}</span>
                     </div>
                     <div class="flex items-center justify-between gap-3 border-t border-(--color-border) py-2.5 dark:border-white/10">
-                        <span class="text-(--color-text-secondary)">Uploaded Receipt</span>
-                        <span data-confirm-receipt class="max-w-[60%] truncate text-right font-semibold text-(--color-text-secondary)">Not uploaded yet</span>
+                        <span class="text-(--color-text-secondary)">{{ __('checkout.uploaded_receipt') }}</span>
+                        <span data-confirm-receipt class="max-w-[60%] truncate text-right font-semibold text-(--color-text-secondary)">{{ __('checkout.not_uploaded_yet') }}</span>
                     </div>
                     <div class="flex items-center justify-between gap-3 border-t border-(--color-border) py-2.5 dark:border-white/10">
-                        <span class="text-(--color-text-secondary)">Transfer Amount</span>
-                        <span class="text-lg font-extrabold text-(--color-primary)">{{ number_format($course->price_mad, 0, ',', ' ') }} MAD</span>
+                        <span class="text-(--color-text-secondary)">{{ __('checkout.transfer_amount') }}</span>
+                        <span class="text-lg font-extrabold text-(--color-primary)">{{ number_format($course->price_mad, 0, ',', ' ') }} {{ __('common.mad') }}</span>
                     </div>
                 </div>
 
                 <label class="mt-6 flex items-start gap-3 rounded-xl border border-(--color-border) p-4 dark:border-white/10">
                     <input type="checkbox" id="confirmCheckbox" required
                            class="mt-0.5 h-4 w-4 shrink-0 rounded border-(--color-border) accent-[var(--color-primary)]">
-                    <span class="text-sm text-(--color-text-secondary)">I confirm that the information above is correct.</span>
+                    <span class="text-sm text-(--color-text-secondary)">{{ __('checkout.confirm_checkbox') }}</span>
                 </label>
 
                 <button type="submit" id="submitBtn" disabled class="btn-primary mt-5 w-full text-base opacity-50">
                     <x-icon name="lock" class="h-4 w-4" />
-                    <span data-submit-label>Submit Payment</span>
+                    <span data-submit-label>{{ __('checkout.submit_payment') }}</span>
                 </button>
 
                 <p class="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-(--color-text-secondary)">
                     <x-icon name="shield" class="h-3.5 w-3.5 text-(--color-primary)" />
-                    Your information is securely submitted. Admin will confirm your payment.
+                    {{ __('checkout.secure_note') }}
                 </p>
             </div>
         </form>
@@ -324,13 +323,16 @@
 <div id="copyToast" class="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex translate-y-2 justify-center opacity-0 transition-all duration-200">
     <span class="flex items-center gap-2 rounded-full bg-(--color-text) px-4 py-2.5 text-sm font-medium text-white shadow-lift dark:bg-white dark:text-(--color-text)">
         <x-icon name="check-circle" class="h-4 w-4 text-(--color-accent)" />
-        Copied
+        {{ __('checkout.copied') }}
     </span>
 </div>
 
 @push('scripts')
 <script>
+window.__checkoutI18n = @json(__('checkout.js'));
 (function () {
+    var i18n = window.__checkoutI18n || {};
+
     // ---- Copy to clipboard ----
     var toast = document.getElementById('copyToast');
     var toastTimer;
@@ -350,11 +352,11 @@
             var text = btn.dataset.copyText || '';
             var reset = function () {
                 var label = btn.querySelector('[data-copy-label]');
-                if (label) label.textContent = 'Copy';
+                if (label) label.textContent = i18n.copy;
             };
             var onCopied = function () {
                 var label = btn.querySelector('[data-copy-label]');
-                if (label) label.textContent = 'Copied';
+                if (label) label.textContent = i18n.copied;
                 showToast();
                 setTimeout(reset, 1600);
             };
@@ -430,7 +432,7 @@
             fileIcon.classList.add('hidden');
             fileIcon.classList.remove('flex');
             if (confirmReceipt) {
-                confirmReceipt.textContent = 'Not uploaded yet';
+                confirmReceipt.textContent = i18n.not_uploaded_yet;
                 confirmReceipt.classList.add('text-(--color-text-secondary)');
                 confirmReceipt.classList.remove('text-(--color-primary)');
             }
@@ -494,7 +496,7 @@
             var label = submitBtn.querySelector('[data-submit-label]');
             submitBtn.disabled = true;
             submitBtn.classList.add('opacity-70', 'pointer-events-none');
-            if (label) label.textContent = 'Submitting...';
+            if (label) label.textContent = i18n.submitting;
         });
     }
 })();
