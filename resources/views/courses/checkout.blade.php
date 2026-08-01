@@ -3,17 +3,16 @@
 @section('title', 'Checkout — ' . $course->title . ' — ArtiWeb')
 
 @php
-    // Admin bank details — purely presentational (no backend/config source
-    // exists for this yet). Update these values here if the receiving
-    // account ever changes.
-    $bankInfo = [
-        ['label' => 'Bank Name', 'value' => 'Attijariwafa Bank', 'icon' => 'landmark'],
-        ['label' => 'Account Holder', 'value' => 'ArtiWeb SARL', 'icon' => 'user'],
-        ['label' => 'Account Number', 'value' => '007 780 0001234567890 12', 'icon' => 'credit-card'],
-        ['label' => 'IBAN', 'value' => 'MA64 0077 8000 0123 4567 8901 2', 'icon' => 'file-text'],
-        ['label' => 'SWIFT / BIC', 'value' => 'BCMAMAMC', 'icon' => 'link'],
-        ['label' => 'Country', 'value' => 'Morocco', 'icon' => 'globe'],
-        ['label' => 'Currency', 'value' => 'MAD', 'icon' => 'credit-card'],
+    // $bankInfo is the single admin-managed PaymentSetting row, passed in by
+    // CourseController@checkout — never influenced by anything in this
+    // request. Fields with a copy button per the spec; Bank Name / Account
+    // Holder are display-only.
+    $bankFields = [
+        ['label' => 'Bank Name', 'value' => $bankInfo->bank_name, 'icon' => 'landmark', 'copy' => false],
+        ['label' => 'Account Holder', 'value' => $bankInfo->account_holder, 'icon' => 'user', 'copy' => false],
+        ['label' => 'Account Number', 'value' => $bankInfo->account_number, 'icon' => 'credit-card', 'copy' => true],
+        ['label' => 'IBAN', 'value' => $bankInfo->iban, 'icon' => 'file-text', 'copy' => true],
+        ['label' => 'SWIFT / BIC', 'value' => $bankInfo->swift_bic, 'icon' => 'link', 'copy' => true],
     ];
 @endphp
 
@@ -104,24 +103,59 @@
                 </div>
             </div>
 
-            <div class="mt-6 flex flex-col">
-                @foreach($bankInfo as $field)
-                    <div class="flex items-center gap-3 py-3.5 {{ !$loop->first ? 'border-t border-(--color-border) dark:border-white/10' : '' }}">
-                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--color-primary)/10 text-(--color-primary)">
-                            <x-icon name="{{ $field['icon'] }}" class="h-4 w-4" />
-                        </span>
-                        <div class="min-w-0 flex-1">
-                            <div class="text-[11px] font-semibold uppercase tracking-wide text-(--color-text-secondary)">{{ $field['label'] }}</div>
-                            <div class="truncate text-sm font-bold text-(--color-text) dark:text-white">{{ $field['value'] }}</div>
+            @if(blank($bankInfo->bank_name))
+                <div class="mt-5 flex items-center gap-2 rounded-xl border border-(--color-accent)/20 bg-(--color-accent)/10 px-4 py-3 text-sm text-(--color-primary-dark) dark:text-(--color-accent)">
+                    <x-icon name="alert-circle" class="h-4 w-4 shrink-0" />
+                    Bank details haven't been configured yet. Please check back shortly.
+                </div>
+            @else
+                <div class="mt-6 flex flex-col">
+                    @foreach($bankFields as $field)
+                        <div class="flex items-center gap-3 py-3.5 {{ !$loop->first ? 'border-t border-(--color-border) dark:border-white/10' : '' }}">
+                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-(--color-primary)/10 text-(--color-primary)">
+                                <x-icon name="{{ $field['icon'] }}" class="h-4 w-4" />
+                            </span>
+                            <div class="min-w-0 flex-1">
+                                <div class="text-[11px] font-semibold uppercase tracking-wide text-(--color-text-secondary)">{{ $field['label'] }}</div>
+                                <div class="truncate text-sm font-bold text-(--color-text) dark:text-white">{{ $field['value'] }}</div>
+                            </div>
+                            @if($field['copy'])
+                                <button type="button" data-copy-btn data-copy-text="{{ $field['value'] }}"
+                                        class="flex shrink-0 items-center gap-1.5 rounded-lg border border-(--color-border) px-3 py-1.5 text-xs font-semibold text-(--color-text-secondary) transition-colors hover:border-(--color-primary)/40 hover:bg-(--color-primary)/5 hover:text-(--color-primary) dark:border-white/10">
+                                    <x-icon name="copy" class="h-3.5 w-3.5" data-copy-icon />
+                                    <span data-copy-label>Copy</span>
+                                </button>
+                            @endif
                         </div>
-                        <button type="button" data-copy-btn data-copy-text="{{ $field['value'] }}"
-                                class="flex shrink-0 items-center gap-1.5 rounded-lg border border-(--color-border) px-3 py-1.5 text-xs font-semibold text-(--color-text-secondary) transition-colors hover:border-(--color-primary)/40 hover:bg-(--color-primary)/5 hover:text-(--color-primary) dark:border-white/10">
-                            <x-icon name="copy" class="h-3.5 w-3.5" data-copy-icon />
-                            <span data-copy-label>Copy</span>
-                        </button>
+                    @endforeach
+                </div>
+
+                @if($bankInfo->payment_instructions)
+                    <p class="mt-4 rounded-xl bg-(--color-text)/5 p-3.5 text-xs leading-relaxed text-(--color-text-secondary) dark:bg-white/5">
+                        {{ $bankInfo->payment_instructions }}
+                    </p>
+                @endif
+
+                @if($bankInfo->whatsapp || $bankInfo->support_email)
+                    <div class="mt-4 flex flex-wrap items-center gap-2 border-t border-(--color-border) pt-4 dark:border-white/10">
+                        <span class="text-xs font-semibold text-(--color-text-secondary)">Need help?</span>
+                        @if($bankInfo->whatsapp)
+                            <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $bankInfo->whatsapp) }}" target="_blank" rel="noopener"
+                               class="inline-flex items-center gap-1.5 rounded-lg bg-(--color-primary)/10 px-2.5 py-1.5 text-xs font-semibold text-(--color-primary) hover:bg-(--color-primary)/20">
+                                <x-icon name="mail" class="h-3.5 w-3.5" />
+                                WhatsApp
+                            </a>
+                        @endif
+                        @if($bankInfo->support_email)
+                            <a href="mailto:{{ $bankInfo->support_email }}"
+                               class="inline-flex items-center gap-1.5 rounded-lg bg-(--color-primary)/10 px-2.5 py-1.5 text-xs font-semibold text-(--color-primary) hover:bg-(--color-primary)/20">
+                                <x-icon name="mail" class="h-3.5 w-3.5" />
+                                {{ $bankInfo->support_email }}
+                            </a>
+                        @endif
                     </div>
-                @endforeach
-            </div>
+                @endif
+            @endif
         </div>
 
         {{-- Payment notice --}}

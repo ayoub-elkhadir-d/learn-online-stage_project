@@ -18,6 +18,10 @@
         <h2 class="text-lg font-bold text-(--color-text) dark:text-white">Payment Requests</h2>
         <p class="text-sm text-(--color-text-secondary)">{{ $payments->total() }} {{ Str::plural('request', $payments->total()) }} total</p>
     </div>
+    <a href="{{ route('admin.payments.bank-settings.edit') }}" class="btn-secondary">
+        <x-icon name="landmark" class="h-4 w-4" />
+        Bank Information
+    </a>
 </div>
 
 <form method="GET" action="{{ route('admin.payments.index') }}" class="mb-5 flex flex-col gap-3">

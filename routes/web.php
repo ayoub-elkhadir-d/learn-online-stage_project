@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\LessonController;
 use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\PaymentSettingController;
 use App\Http\Controllers\Admin\UserController;
 
 // Fallback for the "public" disk's Storage::url() links — see
@@ -44,7 +45,16 @@ Route::middleware('user.only')->group(function () {
 
 // Authenticated users only (not admins)
 Route::middleware(['auth', 'user.only'])->group(function () {
-    Route::get('/courses/{slug}/learn', [CourseController::class, 'learn'])->name('courses.learn');
+    // {course:slug} (implicit binding by the slug column) is required here —
+    // 'course.purchased' reads $request->route('course') expecting an
+    // already-resolved Course model, and denies access unless the viewer
+    // has a CoursePurchase with status === 'paid' for it (see
+    // App\Http\Middleware\EnsureCoursePurchased / App\Policies\CoursePolicy).
+    // Rejected/cancelled purchases fail this the same as never having
+    // purchased at all.
+    Route::get('/courses/{course:slug}/learn', [CourseController::class, 'learn'])
+        ->middleware('course.purchased')
+        ->name('courses.learn');
     Route::get('/lessons/{lesson}/video', [VideoController::class, 'stream'])
         // A single <video> element issues many Range requests per lesson
         // (buffer refills, seeking), especially on mobile where buffering
@@ -68,8 +78,12 @@ Route::middleware(['auth', 'user.only'])->group(function () {
     Route::get('/courses/{course:slug}/assets/more', [CourseAssetController::class, 'loadMore'])->name('courses.assets.more');
 
     Route::get('/dashboard', function () {
+        // Rejected/cancelled purchases are kept for admin history/auditing
+        // but must never show up as "My Courses" — only an active (paid) or
+        // still-being-reviewed (pending) purchase belongs here.
         $purchases = \App\Models\CoursePurchase::with(['course.category'])
             ->where('user_id', auth()->id())
+            ->whereIn('status', ['pending', 'paid'])
             ->latest()
             ->paginate(9);
         return view('dashboard', compact('purchases'));
@@ -91,6 +105,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('categories', CategoryController::class)->except(['show']);
 
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+
+    // Must be registered before /payments/{purchase} — otherwise "bank-settings"
+    // would be matched as a {purchase} route parameter.
+    Route::get('/payments/bank-settings', [PaymentSettingController::class, 'edit'])->name('payments.bank-settings.edit');
+    Route::put('/payments/bank-settings', [PaymentSettingController::class, 'update'])->name('payments.bank-settings.update');
+
     Route::get('/payments/{purchase}', [PaymentController::class, 'show'])->name('payments.show');
     Route::put('/payments/{purchase}/approve', [PaymentController::class, 'approve'])->name('payments.approve');
     Route::put('/payments/{purchase}/reject', [PaymentController::class, 'reject'])->name('payments.reject');

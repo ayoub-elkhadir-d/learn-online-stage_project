@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Course;
 use App\Models\CoursePurchase;
+use App\Models\PaymentSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,21 +37,22 @@ class CourseController extends Controller
         return view('courses.show', compact('course', 'purchase'));
     }
 
-    public function learn(string $slug)
+    /**
+     * Access is already enforced before this method runs — the
+     * 'course.purchased' route middleware (App\Http\Middleware\
+     * EnsureCoursePurchased) denies the request via CoursePolicy::learn()
+     * for anyone without a 'paid' CoursePurchase, so this method only ever
+     * runs for a viewer who is already authorized.
+     */
+    public function learn(Course $course)
     {
-        $course = Course::with(['lessons' => fn($q) => $q->orderBy('sort_order')])->where('slug', $slug)->firstOrFail();
-
-        if (! $course->isPurchasedBy(Auth::user())) {
-            return redirect()->route('courses.show', $slug)
-                ->with('status', 'You need to complete your purchase to access this course.');
-        }
+        $lessons = $course->lessons()->orderBy('sort_order')->get();
 
         $purchase = CoursePurchase::where('user_id', Auth::id())
             ->where('course_id', $course->id)
             ->where('status', 'paid')
             ->first();
 
-        $lessons = $course->lessons;
         $currentLesson = $lessons->firstWhere('id', request('lesson')) ?? $lessons->first();
 
         return view('courses.learn', compact('course', 'lessons', 'currentLesson', 'purchase'));
@@ -70,6 +72,11 @@ class CourseController extends Controller
                 ->with('status', 'You already have access to this course.');
         }
 
-        return view('courses.checkout', compact('course', 'purchase'));
+        // Always the single admin-managed row — nothing here is influenced
+        // by the request (no id/query param selects it), so there is no way
+        // for a client to change which bank account is displayed.
+        $bankInfo = PaymentSetting::current();
+
+        return view('courses.checkout', compact('course', 'purchase', 'bankInfo'));
     }
 }
